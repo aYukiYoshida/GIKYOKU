@@ -1,7 +1,7 @@
 {
-  "name": "@testla/screenplay-playwright",
-  "version": "1.2.0",
-  "description": "Implementation of the Playwright abilities, actions and questions.",
+  "name": "GIKYOKU",
+  "version": "1.0.0",
+  "description": "implement the screenplay pattern for Playwright.",
   "main": "index.js",
   "types": "index.d.ts",
   "commitHooks": false,
@@ -19,24 +19,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/testla-project/testla-screenplay-playwright-js.git"
+    "url": "git+https://github.com/aYukiYoshida/GIKYOKU.git"
   },
   "keywords": [
     "playwright",
     "screenplay",
-    "testla",
-    "testing",
-    "test",
-    "tdd",
-    "bdd",
-    "e2e"
+    "test"
   ],
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/testla-project/testla-screenplay-playwright-js/issues"
+    "url": "https://github.com/aYukiYoshida/GIKYOKU/issues"
   },
-  "homepage": "https://github.com/testla-project/testla-screenplay-playwright-js#readme",
+  "homepage": "https://github.com/aYukiYoshida/GIKYOKU#readme",
   "devDependencies": {
     "@types/node": "^17.0.23",
     "@typescript-eslint/eslint-plugin": "^5.18.0",
