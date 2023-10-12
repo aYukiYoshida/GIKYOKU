@@ -2,27 +2,25 @@
   "parser": "@typescript-eslint/parser",
   "ignorePatterns": [
     "node_modules/",
-    "lib/"
+    "dist/",
+    "scripts/"
   ],
   "extends": [
-    "airbnb",
     "plugin:@typescript-eslint/recommended",
-    "plugin:import/typescript"
+    "plugin:import/typescript",
+    "prettier"
   ],
   "plugins": [
-    "react",
-    "import",
-    "jsx-a11y"
+    "@typescript-eslint",
+    "import"
   ],
   "parserOptions": {
-    "project": "./tsconfig.json",
+    "project": "tsconfig.json",
     "ecmaVersion": 2018,
-    "sourceType": "module",
-    "editor.codeActionsOnSave": {
-      "source.fixAll": true
-    }
+    "sourceType": "module"
   },
   "rules": {
+    "semi": [2, "always"],
     "import/extensions": [
       "error",
       {
@@ -34,14 +32,14 @@
     ],
     "indent": [
       "error",
-      4,
+      2,
       {
         "SwitchCase": 1
       }
     ],
     "@typescript-eslint/indent": [
       "error",
-      4,
+      2,
       {
         "SwitchCase": 1
       }
@@ -61,6 +59,19 @@
     "@typescript-eslint/no-use-before-define": [
       "error"
     ],
-    "@typescript-eslint/no-floating-promises": ["error"]
+    "@typescript-eslint/no-floating-promises": ["error"],
+    "import/order": [
+      "error",
+      {
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index", "object", "type"],
+        "newlines-between": "always",
+        "pathGroupsExcludedImportTypes": ["builtin"],
+        "alphabetize": { "order": "asc", "caseInsensitive": true },
+        "pathGroups": [
+          { "pattern": "src/web/**", "group": "internal", "position": "before" },
+          { "pattern": "src/api/**", "group": "internal", "position": "before" }
+        ]
+      }
+    ]
   } 
 }

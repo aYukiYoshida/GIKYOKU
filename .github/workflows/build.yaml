@@ -1,0 +1,29 @@
+name: Test
+on:
+  - pull_request
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    steps:
+      - name: Checkout main branch in repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - name: Install dependencies
+        run: |
+          npm install
+      - name: Build
+        run: npm run build
+      - name: Archive testing report as artifact
+        uses: actions/upload-artifact@v3
+        if: always()
+        with: 
+          name: report
+          path: report/
+          retention-days: 2
