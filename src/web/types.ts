@@ -24,3 +24,7 @@ export type SelectorOptions = {
   timeout?: number;
   state?: SelectorOptionsState;
 };
+
+export type ScreenOptions = {
+  timeout?: number;
+};

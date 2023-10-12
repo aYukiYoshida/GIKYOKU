@@ -713,6 +713,28 @@ Element.toBe.editable('mySelector');
 Element.notToBe.editable('mySelector', { hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]});
 ```
 
+### Screen.*.title(url: string|RegExp, options?: ScreenOptions)
+
+Validates wether an page has title. A mode operator must be prepended.
+
+```js
+// simple call with just selector
+Screen.toHave.title('Title');
+// or with options
+Screen.notToHave.title('Title', { timeout: 1000 });
+```
+
+### Screen.*.title(title: string|RegExp, options?: ScreenOptions)
+
+Validates wether an page has URL. A mode operator must be prepended.
+
+```js
+// simple call with just selector
+Screen.toHave.url('https://google.com');
+// or with options
+Screen.notToHave.url('https://google.com', { timeout: 1000 });
+```
+
 ## Available Api Questions
 
 ### Response.has

@@ -15,6 +15,7 @@ import { Set } from "./actions/Set";
 import { Type } from "./actions/Type";
 import { Wait } from "./actions/Wait";
 import { Element } from "./questions/Element";
+import { Screen } from "./questions/Screen";
 
 export {
   BrowseTheWeb,
@@ -34,4 +35,5 @@ export {
   Clear,
   Remove,
   Set,
+  Screen,
 };
