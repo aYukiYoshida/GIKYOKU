@@ -24,9 +24,7 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : 2,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [
-    ["html", { open: "never", outputFolder: "report" }]
-  ],
+  reporter: [["html", { open: "never", outputFolder: "report" }]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -45,18 +43,8 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: "chrome",
-      use: { ...devices["Desktop Chrome"], channel: "chrome" },
-    },
-
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-    },
-
-    {
-      name: "safari",
-      use: { ...devices["Desktop Safari"] },
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
     },
   ],
 
