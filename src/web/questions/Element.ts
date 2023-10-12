@@ -4,10 +4,11 @@ import { BrowseTheWeb } from '../abilities/BrowseTheWeb';
 import { Selector, SelectorOptions } from '../types';
 
 /**
- * Question Class. Get a specified state for a selector like visible or enabled.
+ * Question Class. Get a specified state for selector as following.
+ * { visible, enabled, editable }.
  */
 export class Element extends Question<boolean> {
-  private mode: 'visible' | 'enabled' | 'text' | 'value' = 'visible';
+  private mode: 'visible' | 'enabled' | 'editable' | 'text' | 'value' = 'visible';
 
   // the selector of the element to check.
   private selector: Selector = '';
@@ -55,7 +56,6 @@ export class Element extends Question<boolean> {
           await BrowseTheWeb.as(actor).checkSelectorValue(this.selector, this.payload, this.checkMode === 'toBe' ? 'has' : 'hasNot', this.options),
         ); // if the ability method is not the expected result there will be an exception
       }
-
       throw new Error('Element.value: incompatible payload! Arrays can not be checked.');
     }
     throw new Error('Unknown mode: Element.answeredBy');
@@ -150,6 +150,21 @@ export class Element extends Question<boolean> {
     this.mode = 'value';
     this.selector = selector;
     this.payload = value;
+    this.options = options;
+
+    return this;
+  }
+
+  /**
+  * Verifies if an element is editable.
+  *
+  * @param {Selector} selector the selector
+  * @param {SelectorOptions} options (optional) advanced selector lookup options.
+  * @return {Element} this Element instance
+  */
+  public editable(selector: Selector, options?: SelectorOptions): Element {
+    this.mode = 'editable';
+    this.selector = selector;
     this.options = options;
 
     return this;
