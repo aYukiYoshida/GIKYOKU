@@ -166,6 +166,17 @@ BrowseTheWeb.as(actor).checkVisibilityState('mySelector', 'visible');
 BrowseTheWeb.as(actor).checkVisibilityState('mySelector', 'hidden', { hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]});
 ```
 
+### checkEditableState(selector: Selector, mode: 'editable' | 'notEditable', options?: SelectorOptions)
+
+Verify if a locator on the page is editable.
+
+```js
+// simple call with just selector
+BrowseTheWeb.as(actor).checkEditableState('mySelector', 'editable');
+// or with options
+BrowseTheWeb.as(actor).checkEditableState('mySelector', 'notEditable', { hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]});
+```
+
 ### press(keys: string)
 
 Press the specified key(s) on the keyboard.
@@ -689,6 +700,17 @@ Validates wether an element is enabled. A mode operator must be prepended.
 Element.toBe.enabled('mySelector');
 // or with options
 Element.notToBe.enabled('mySelector', { hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]});
+```
+
+### Element.*.editable(selector: Selector, options?: SelectorOptions)
+
+Validates wether an element is editable. A mode operator must be prepended.
+
+```js
+// simple call with just selector
+Element.toBe.editable('mySelector');
+// or with options
+Element.notToBe.editable('mySelector', { hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]});
 ```
 
 ## Available Api Questions
