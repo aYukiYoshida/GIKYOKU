@@ -1,0 +1,22 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "tsconfig": "tsconfig.json",
+    "entryPoints": [
+        "./src",
+        "./src/shared/actions",
+        "./src/web/*/index.ts",
+        "./src/web/types.ts",
+        "./src/web/utils.ts",
+        "./src/api/*/index.ts",
+        "./src/api/constants.ts",
+        "./src/api/types.ts",
+    ],
+    "entryPointStrategy": "resolve",
+    "out": "docs",
+    "name": "API of the screenplay testing framework",
+    "readme": "./README.md",
+    "excludePrivate": true,
+    "githubPages": true,
+    "theme": "default",
+    "categorizeByGroup": true
+}

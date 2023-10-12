@@ -3,7 +3,8 @@
   "ignorePatterns": [
     "node_modules/",
     "dist/",
-    "scripts/"
+    "scripts/",
+    "docs/"
   ],
   "extends": [
     "plugin:@typescript-eslint/recommended",
