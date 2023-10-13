@@ -119,6 +119,28 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
+   * Press the specified keys sequentially for each string character.
+   * To press a special key, like Control or ArrowDown, use {@link press}.
+   * @param {Selector} selector the selector of the source element.
+   * @param {string} input string of characters to sequentially press into a focused element
+   * @return {void} Returns when the `keys` can specify the intended values or characters to generate the text for.
+   * @example
+   * // Press a single button
+   * BrowseTheWeb.as(actor).pressSequentially('ABC');
+   * // or multiple buttons
+   * BrowseTheWeb.as(actor).press('Control+A');
+   */
+  public async pressSequentially(
+    selector: Selector,
+    input: string,
+    options?: SelectorOptions,
+  ): Promise<void> {
+    return (
+      await recursiveLocatorLookup({ page: this.page, selector, options })
+    ).pressSequentially(input);
+  }
+
+  /**
    * Check the specified checkbox.
    *
    * @param {Selector} selector the selector of the checkbox.
