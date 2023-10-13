@@ -52,6 +52,6 @@ jobs:
             fi
           done
           body=$(echo -e "Update API specification from ${hash}")
-          git commit -m ${body} --no-verify
+          git commit -m "${body}" --no-verify
           git push origin ${branch_name}
           gh pr create --base main --head ${branch_name} --title "Update document" --body "${body}"
