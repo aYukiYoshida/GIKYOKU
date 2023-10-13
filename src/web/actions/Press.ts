@@ -1,6 +1,7 @@
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
+import { Selector, SelectorOptions } from "../types";
 
 /**
  * @group Actions
@@ -8,7 +9,12 @@ import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
  * Press the specified key on the keyboard.
  */
 export class Press extends Action {
-  private constructor(private input: string) {
+  private constructor(
+    private input: string,
+    private selector: Selector = "",
+    private options?: SelectorOptions,
+    private sequential: boolean = false,
+  ) {
     super();
   }
 
@@ -19,7 +25,15 @@ export class Press extends Action {
    * @return {void} Returns when the `key` can specify the intended value or a single character to generate the text for.
    */
   public async performAs(actor: Actor): Promise<void> {
-    return BrowseTheWeb.as(actor).press(this.input);
+    if (this.sequential) {
+      return BrowseTheWeb.as(actor).pressSequentially(
+        this.selector,
+        this.input,
+        this.options,
+      );
+    } else {
+      return BrowseTheWeb.as(actor).press(this.input);
+    }
   }
 
   /**
@@ -35,5 +49,24 @@ export class Press extends Action {
    */
   public static key(keys: string): Press {
     return new Press(keys);
+  }
+
+  /**
+   * Press the specified keys sequentially for each string character
+   * To press a special key, like Control or ArrowDown, use {@link key}.
+   * @param {Selector} selector the selector.
+   * @param {string} input the keys of characters to press.
+   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @return {Press} new Press instance
+   * @example
+   * // keys of characters
+   * Press.characters('abcdefghijklmnopqrstuvwxyz');
+   */
+  public static characters(
+    selector: Selector,
+    input: string,
+    options?: SelectorOptions,
+  ): Press {
+    return new Press(input, selector, options, true);
   }
 }
