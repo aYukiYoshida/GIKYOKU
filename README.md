@@ -1,7 +1,7 @@
 # GIKYOKU
 
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](https://opensource.org/licenses/MIT)
-[![BUILD](https://github.com/aYukiYoshida/GIKYOKU/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/aYukiYoshida/GIKYOKU/actions/workflows/build.yaml)
+[![BUILD](https://github.com/aYukiYoshida/GIKYOKU/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/aYukiYoshida/GIKYOKU/actions/workflows/build.yaml)[![npm version](https://badge.fury.io/js/gikyoku.svg)](https://badge.fury.io/js/gikyoku)
 
 ## Introduction
 
@@ -92,4 +92,4 @@ Since tasks, actions and questions return promises, we advise to make use of the
 
 ### API Specification
 
-See. [API Specification](https://ayukiyoshida.github.io/GIKYOKU/)
+See [API Specification](https://ayukiyoshida.github.io/GIKYOKU/index.html).
