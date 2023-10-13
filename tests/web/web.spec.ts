@@ -375,17 +375,17 @@ test.describe("Testing g5u web module", () => {
     );
 
     expect(
-      await actor.asks(Element.toBe.visible("h3", { hasText: "Data Tables" })),
+      await actor.asks(Element.of("h3", { hasText: "Data Tables" }).visible()),
     ).toBe(true);
 
     let visibleRes = false;
     try {
       expect(
         await actor.asks(
-          Element.toBe.visible("h3", {
+          Element.of("h3", {
             hasText: "this does not exist",
             timeout: 1000,
-          }),
+          }).visible(),
         ),
       ).toBe(true);
     } catch (error) {
@@ -395,7 +395,7 @@ test.describe("Testing g5u web module", () => {
 
     expect(
       await actor.asks(
-        Element.notToBe.visible("h3", { hasText: "this does not exist" }),
+        Element.of("h3", { hasText: "this does not exist" }).not.visible(),
       ),
     ).toBe(true);
 
@@ -403,10 +403,10 @@ test.describe("Testing g5u web module", () => {
     try {
       expect(
         await actor.asks(
-          Element.notToBe.visible("h3", {
+          Element.of("h3", {
             hasText: "Data Tables",
             timeout: 1000,
-          }),
+          }).not.visible(),
         ),
       ).toBe(true);
     } catch (error) {
@@ -422,7 +422,7 @@ test.describe("Testing g5u web module", () => {
       Click.on('[aria-label="Bold"]'),
     );
 
-    expect(await actor.asks(Element.toBe.enabled('[aria-label="Undo"]'))).toBe(
+    expect(await actor.asks(Element.of('[aria-label="Undo"]').enabled())).toBe(
       true,
     );
 
@@ -430,7 +430,7 @@ test.describe("Testing g5u web module", () => {
     try {
       expect(
         await actor.asks(
-          Element.toBe.enabled('[aria-label="Redo"]', { timeout: 1000 }),
+          Element.of('[aria-label="Redo"]', { timeout: 1000 }).enabled(),
         ),
       ).toBe(true);
     } catch (error) {
@@ -439,14 +439,14 @@ test.describe("Testing g5u web module", () => {
     expect(enabledRes).toBeTruthy();
 
     expect(
-      await actor.asks(Element.notToBe.enabled('[aria-label="Redo"]')),
+      await actor.asks(Element.of('[aria-label="Redo"]').not.enabled()),
     ).toBe(true);
 
     let notEnabledRes = false;
     try {
       expect(
         await actor.asks(
-          Element.notToBe.enabled('[aria-label="Undo"]', { timeout: 1000 }),
+          Element.of('[aria-label="Undo"]', { timeout: 1000 }).not.enabled(),
         ),
       ).toBe(true);
     } catch (error) {
@@ -461,7 +461,7 @@ test.describe("Testing g5u web module", () => {
       Wait.forLoadState("networkidle"),
     );
 
-    expect(await actor.asks(Element.toHave.text("h3", "Data Tables"))).toBe(
+    expect(await actor.asks(Element.of("h3").haveText("Data Tables"))).toBe(
       true,
     );
 
@@ -469,9 +469,9 @@ test.describe("Testing g5u web module", () => {
     try {
       expect(
         await actor.asks(
-          Element.toHave.text("h3", "this text does not exist", {
+          Element.of("h3", {
             timeout: 1000,
-          }),
+          }).haveText("this text does not exist"),
         ),
       ).toBe(true);
     } catch (error) {
@@ -481,7 +481,7 @@ test.describe("Testing g5u web module", () => {
 
     expect(
       await actor.asks(
-        Element.notToHave.text("h3", /[0-9]/), // RegExp that does not exist
+        Element.of("h3").not.haveText(/[0-9]/), // RegExp that does not exist
       ),
     ).toBe(true);
 
@@ -489,7 +489,7 @@ test.describe("Testing g5u web module", () => {
     try {
       expect(
         await actor.asks(
-          Element.notToHave.text("h3", ["Data Tables"], { timeout: 1000 }),
+          Element.of("h3", { timeout: 1000 }).not.haveText(["Data Tables"]),
         ),
       ).toBe(true);
     } catch (error) {
@@ -508,7 +508,7 @@ test.describe("Testing g5u web module", () => {
     await actor.attemptsTo(Fill.in('[id="username"]', "test"));
     // toBe.value test: expect the value of the username field to be the string 'test'
     expect(
-      await actor.asks(Element.toHave.value('[id="username"]', "test")),
+      await actor.asks(Element.of('[id="username"]').haveValue("test")),
     ).toBe(true);
 
     // toBe.value test: expect the question to fail if the expected string is not correct
@@ -516,9 +516,9 @@ test.describe("Testing g5u web module", () => {
     try {
       expect(
         await actor.asks(
-          Element.toHave.value('[id="username"]', "this value is wrong", {
+          Element.of('[id="username"]', {
             timeout: 1000,
-          }),
+          }).haveValue("this value is wrong"),
         ),
       ).toBe(true);
     } catch (error) {
@@ -528,7 +528,7 @@ test.describe("Testing g5u web module", () => {
 
     expect(
       await actor.asks(
-        Element.notToHave.value('[id="username"]', "this value is wrong"),
+        Element.of('[id="username"]').not.haveValue("this value is wrong"),
       ),
     ).toBe(true);
 
@@ -536,7 +536,9 @@ test.describe("Testing g5u web module", () => {
     try {
       expect(
         await actor.asks(
-          Element.notToHave.value('[id="username"]', /test/, { timeout: 1000 }), // RegExp for the string 'test'
+          Element.of('[id="username"]', { timeout: 1000 }).not.haveValue(
+            /test/,
+          ), // RegExp for the string 'test'
         ),
       ).toBe(true);
     } catch (error) {
@@ -548,16 +550,16 @@ test.describe("Testing g5u web module", () => {
   test("Screen.url", async ({ actor }) => {
     await actor.attemptsTo(Navigate.to("https://google.com"));
 
-    expect(await actor.asks(Screen.toHave.url("https://www.google.com/"))).toBe(
-      true,
-    );
+    expect(
+      await actor.asks(Screen.does.haveUrl("https://www.google.com/")),
+    ).toBe(true);
 
     // toHave.url test: expect the question to fail if the expected url is not correct
     let urlRes = false;
     try {
       expect(
         await actor.asks(
-          Screen.toHave.url("https://www.google.co.jp/", { timeout: 1000 }),
+          Screen.does.haveUrl("https://www.google.co.jp/", { timeout: 1000 }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -566,14 +568,14 @@ test.describe("Testing g5u web module", () => {
     expect(urlRes).toBeTruthy();
 
     expect(
-      await actor.asks(Screen.notToHave.url("https://www.google.co.jp/")),
+      await actor.asks(Screen.does.not.haveUrl("https://www.google.co.jp/")),
     ).toBe(true);
 
     let notTextRes = false;
     try {
       expect(
         await actor.asks(
-          Screen.notToHave.url("https://www.google.com/", { timeout: 1000 }),
+          Screen.does.not.haveUrl("https://www.google.com/", { timeout: 1000 }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -585,25 +587,39 @@ test.describe("Testing g5u web module", () => {
   test("Screen.title", async ({ actor }) => {
     await actor.attemptsTo(Navigate.to("https://google.com"));
 
-    expect(await actor.asks(Screen.toHave.title("Google"))).toBe(true);
+    expect(
+      await actor.asks(Screen.of(actor.states("page")).haveTitle("Google")),
+    ).toBe(true);
 
     // toHave.title test: expect the question to fail if the expected title is not correct
     let titleRes = false;
     try {
       expect(
-        await actor.asks(Screen.toHave.title("GIKYOKU", { timeout: 1000 })),
+        await actor.asks(
+          Screen.of(actor.states("page")).haveTitle("GIKYOKU", {
+            timeout: 1000,
+          }),
+        ),
       ).toBe(true);
     } catch (error) {
       titleRes = true;
     }
     expect(titleRes).toBeTruthy();
 
-    expect(await actor.asks(Screen.notToHave.title("GIKYOKU"))).toBe(true);
+    expect(
+      await actor.asks(
+        Screen.of(actor.states("page")).not.haveTitle("GIKYOKU"),
+      ),
+    ).toBe(true);
 
     let notTitleRes = false;
     try {
       expect(
-        await actor.asks(Screen.notToHave.title("Google", { timeout: 1000 })),
+        await actor.asks(
+          Screen.of(actor.states("page")).not.haveTitle("Google", {
+            timeout: 1000,
+          }),
+        ),
       ).toBe(true);
     } catch (error) {
       notTitleRes = true;
