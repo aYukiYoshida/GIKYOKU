@@ -37,13 +37,13 @@ const subLocatorLookup = async ({
     resolvedLocator =
       typeof subSelector[0] === "string"
         ? resolvedLocator.locator(subSelector[0], {
-            hasText: subSelector[1]?.hasText,
-          })
+          hasText: subSelector[1]?.hasText,
+        })
         : await getSubLocator(
-            resolvedLocator,
-            subSelector[0],
-            subSelector[1]?.hasText,
-          );
+          resolvedLocator,
+          subSelector[0],
+          subSelector[1]?.hasText,
+        );
 
     // wait for sub selector to become visible based on timeout options
     await resolvedLocator.waitFor({ timeout });

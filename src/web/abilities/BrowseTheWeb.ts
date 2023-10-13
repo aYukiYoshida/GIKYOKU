@@ -5,7 +5,10 @@ import { Selector, SelectorOptions, ScreenOptions } from "../types";
 import { recursiveLocatorLookup } from "../utils";
 
 /**
+ * @group Abilities
+ *
  * This class represents the actor's ability to use a Browser.
+ * This ability enables the actor to interact with the browser and browse web user interfaces.
  */
 export class BrowseTheWeb extends Ability {
   /**
@@ -20,6 +23,7 @@ export class BrowseTheWeb extends Ability {
 
   /**
    * Use this Ability as an Actor.
+   * Required by Actions to get access to the ability functions.
    *
    * @param {Actor} actor Actor is using this ability
    * @return {BrowseTheWeb} Returns the ability to use a browser
@@ -51,6 +55,8 @@ export class BrowseTheWeb extends Ability {
    *
    * @param {string} url the url to access.
    * @return {Response} Returns the main resource response
+   * @example
+   * BrowseTheWeb.as(actor).goto('myURL');
    */
   public async goto(url: string): Promise<Response | null> {
     return this.page.goto(url);
@@ -61,6 +67,8 @@ export class BrowseTheWeb extends Ability {
    *
    * @param {string} status the status to wait for. Allowed: "load" | "domcontentloaded" | "networkidle".
    * @return {void} Returns when the required load state has been reached.
+   * @example
+   * BrowseTheWeb.as(actor).waitForLoadState('networkidle');
    */
   public async waitForLoadState(
     status: "load" | "domcontentloaded" | "networkidle",
@@ -74,6 +82,15 @@ export class BrowseTheWeb extends Ability {
    * @param {Selector} selector the selector of the element to hover over.
    * @param {SelectorOptions} options (optional) advanced selector lookup options + Modifier keys to press. Ensures that only these modifiers are pressed during the operation.
    * @return {void} Returns when hovered over the element
+   * @example
+   * // simple call with just selector
+   * BrowseTheWeb.as(actor).hover('mySelector');
+   * // or with options
+   * BrowseTheWeb.as(actor).hover('mySelector', {
+   *     hasText: 'myText',
+   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
+   *     modifiers: ['Alt', 'Shift']
+   * });
    */
   public async hover(
     selector: Selector,
@@ -91,6 +108,11 @@ export class BrowseTheWeb extends Ability {
    *
    * @param {string} input the key(s). multiple keys can be pressed by concatenating with "+"
    * @return {void} Returns when the `key` can specify the intended value or a single character to generate the text for.
+   * @example
+   * // Press a single button
+   * BrowseTheWeb.as(actor).press('A');
+   * // or multiple buttons
+   * BrowseTheWeb.as(actor).press('Control+A');
    */
   public async press(input: string): Promise<void> {
     return this.page.keyboard.press(input);
@@ -102,6 +124,16 @@ export class BrowseTheWeb extends Ability {
    * @param {Selector} selector the selector of the checkbox.
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @return {void} Returns after checking the element
+   * @example
+   * // simple call with just selector
+   * BrowseTheWeb.as(actor).checkBox('mySelector');
+   * // or with options
+   * BrowseTheWeb.as(actor)
+   *   .checkBox('mySelector', {
+   *     hasText: 'myText',
+   *     subSelector: ['mySubSelector', {
+   *       hasText: 'anotherText' }
+   * ]});
    */
   public async checkBox(
     selector: Selector,
@@ -118,6 +150,16 @@ export class BrowseTheWeb extends Ability {
    * @param {Selector} selector the selector of the element.
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @return {Locator} Promise<Locator> returns the locator
+   * @example
+   * // simple call with just selector
+   * BrowseTheWeb.as(actor).waitForSelector('mySelector');
+   * // or with options
+   * BrowseTheWeb.as(actor).waitForSelector(
+   *   'mySelector', {
+   *     hasText: 'myText',
+   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
+   *   }
+   * );
    */
   public async waitForSelector(
     selector: Selector,
@@ -133,6 +175,15 @@ export class BrowseTheWeb extends Ability {
    * @param {Selector} targetSelector the selector of the target element.
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @return {void} Returns after dragging the locator to another target locator or target position
+   * @example
+   * // simple call with just source and target selector
+   * BrowseTheWeb.as(actor).dragAndDrop('sourceSelector', 'targetSelector');
+   * // or with options
+   * BrowseTheWeb.as(actor).dragAndDrop('sourceSelector', 'targetSelector', {
+   *     source: { hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]},
+   *     target: { hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]}
+});
+
    */
   public async dragAndDrop(
     sourceSelector: Selector,
@@ -163,6 +214,11 @@ export class BrowseTheWeb extends Ability {
    * @param {string} input the input to fill the element with.
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @return {void} Returns after checks, focuses the element, fills it and triggers an `input` event after filling.
+   * @example
+   * // simple call with just selector and input value
+   * BrowseTheWeb.as(actor).fill('mySelector', 'myInput');
+   * // or with options
+   * BrowseTheWeb.as(actor).fill('mySelector', 'myInput', { hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]});
    */
   public async fill(
     selector: Selector,
@@ -176,11 +232,22 @@ export class BrowseTheWeb extends Ability {
 
   /**
    * Type the given input into the element specified by the selector.
-   *
+   * @deprecated Use {@link fill} instead.
    * @param {Selector} selector the selector of the source element.
    * @param {string} input the input to type into the element.
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @return {void} Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
+   * @example
+   * // simple call with just selector and input value
+   * BrowseTheWeb.as(actor).type('mySelector', 'myInput');
+   * // or with options
+   * BrowseTheWeb.as(actor).type(
+   *   'mySelector',
+   *   'myInput', {
+   *     hasText: 'myText',
+   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
+   *   }
+   * );
    */
   public async type(
     selector: Selector,
@@ -198,6 +265,12 @@ export class BrowseTheWeb extends Ability {
    * @param {Selector} selector the selector of the element to click.
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @return {void} Returns after clicking the element
+   * @example
+   * // simple call with just selector
+   * BrowseTheWeb.as(actor).click('mySelector');
+   * // or with options
+   * BrowseTheWeb.as(actor).click('mySelector', {
+   *   hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]});
    */
   public async click(
     selector: Selector,
@@ -214,6 +287,12 @@ export class BrowseTheWeb extends Ability {
    * @param {Selector} selector the selector of the element to double click.
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @return {void} Returns after double clicking the element
+   * @example
+   * // simple call with just selector
+   * BrowseTheWeb.as(actor).dblclick('mySelector');
+   * // or with options
+   * BrowseTheWeb.as(actor).dblclick('mySelector', {
+   *   hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]});
    */
   public async dblclick(
     selector: Selector,
@@ -229,7 +308,7 @@ export class BrowseTheWeb extends Ability {
    *
    * @param {string} mode the expected property of the page that needs to be checked. either 'toHaveUrl' or 'notToHaveUrl'.
    * @param {string|RegExp} expectedUrl the expected url of the page.
-   * @param {number} options (optional) timeout in milliseconds to wait for the element to be visible/hidden. Defaults to {@link defaultWaitTimeout}
+   * @param {number} options (optional) timeout in milliseconds to wait for the element to be visible/hidden.
    * @returns {boolean} Promise<boolean> true if the page has URL as expected, false if the timeout was reached.
    */
   public async checkPageUrl(
@@ -267,12 +346,23 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
-   * Validate if a locator on the page is visible or hidden.
+   * Verify if a locator on the page is visible or hidden.
    *
    * @param {Selector} selector the locator to search for.
    * @param {string} mode the expected property of the selector that needs to be checked. either 'visible' or 'hidden'.
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @returns {boolean} Promise<boolean> true if the element is visible/hidden as expected, false if the timeout was reached.
+   * @example
+   * // simple call with just selector
+   * BrowseTheWeb.as(actor).checkVisibilityState('mySelector', 'visible');
+   * // or with options
+   * BrowseTheWeb.as(actor).checkVisibilityState(
+   *   'mySelector',
+   *   'hidden', {
+   *     hasText: 'myText',
+   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
+   *   }
+   * );
    */
   public async checkVisibilityState(
     selector: Selector,
@@ -300,12 +390,23 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
-   * Validate if a locator on the page is enabled or disabled.
+   * Verify if a locator on the page is enabled or disabled.
    *
    * @param {Selector} selector the locator to search for.
    * @param {string} mode the expected property of the selector that needs to be checked. either 'enabled' or 'disabled'.
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @returns {boolean} true if the element is enabled/disabled as expected, false if the timeout was reached.
+   * @example
+   * // simple call with just selector
+   * BrowseTheWeb.as(actor).checkEnabledState('mySelector', 'enabled');
+   * // or with options
+   * BrowseTheWeb.as(actor).checkEnabledState(
+   *   'mySelector',
+   *   'disabled', {
+   *     hasText: 'myText',
+   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
+   *   }
+   * );
    */
   public async checkEnabledState(
     selector: Selector,
@@ -339,6 +440,17 @@ export class BrowseTheWeb extends Ability {
    * @param {string} mode the expected property of the selector that needs to be checked. either 'editable' or 'notEditable'.
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @returns {boolean} true if the element is editable/not as expected, false if the timeout was reached.
+   * @example
+   * // simple call with just selector
+   * BrowseTheWeb.as(actor).checkEditableState('mySelector', 'editable');
+   * // or with options
+   * BrowseTheWeb.as(actor).checkEditableState(
+   *   'mySelector',
+   *   'notEditable', {
+   *     hasText: 'myText',
+   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
+   *   }
+   * );
    */
   public async checkEditableState(
     selector: Selector,
@@ -435,6 +547,13 @@ export class BrowseTheWeb extends Ability {
    * Get the cookies of the current browser context. If no URLs are specified, this method returns all cookies. If URLs are specified, only cookies that affect those URLs are returned.
    * @param {string|string[]} urls affected urls
    * @return {Cookie[]} Returns the cookies of the current browser context.
+   * @example
+   * // get all cookies
+   * BrowseTheWeb.as(actor).getCookies();
+   * // get cookies for one single domain
+   * BrowseTheWeb.as(actor).getCookies('https:www.myapp.com');
+   * // get cookies for two domains
+   * BrowseTheWeb.as(actor).getCookies(['https:www.myapp.com', 'https:www.another-app.com']);
    */
   public async getCookies(
     urls?: string | string[] | undefined,
@@ -446,6 +565,12 @@ export class BrowseTheWeb extends Ability {
    * Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be obtained via BrowseTheWeb.getCookies([urls]).
    * @param {Cookie[]} cookies Cookies to add at browser context
    * @return {void} Returns after adding cookies into this browser context.
+   * @example
+   * BrowseTheWeb.as(actor).addCookies([{
+   *   name: 'my cookie',
+   *   value: 'my value',
+   *   url: 'http://www.myapp.com',
+   * }]);
    */
   public async addCookies(cookies: Cookie[]): Promise<void> {
     return this.page.context().addCookies(cookies);
@@ -454,16 +579,20 @@ export class BrowseTheWeb extends Ability {
   /**
    * Clear the browser context cookies.
    * @return {void} Clears context cookies.
+   * @example
+   * BrowseTheWeb.as(actor).clearCookies();
    */
   public async clearCookies(): Promise<void> {
     return this.page.context().clearCookies();
   }
 
   /**
-   * Get a local storage item.
+   * Get a local storage item specified by the given key.
    *
    * @param {string} key the key that specifies the item.
    * @return {any} Returns the local storage item
+   * @example
+   * BrowseTheWeb.as(actor).getLocalStorageItem('some key');
    */
   public async getLocalStorageItem(key: string): Promise<any> {
     return this.page.evaluate((k) => {
@@ -481,6 +610,8 @@ export class BrowseTheWeb extends Ability {
    * @param {string} key the key that specifies the item.
    * @param {any} value the value to set.
    * @return {void} Returns after adding the local storage item
+   * @example
+   * BrowseTheWeb.as(actor).setLocalStorageItem('some key', 'some value');
    */
   public async setLocalStorageItem(key: string, value: any): Promise<void> {
     return this.page.evaluate(
@@ -497,6 +628,8 @@ export class BrowseTheWeb extends Ability {
    *
    * @param {string} key the key that specifies the item.
    * @return {void} Returns after deleting a local storage item
+   * @example
+   * BrowseTheWeb.as(actor).removeLocalStorageItem('some key');
    */
   public async removeLocalStorageItem(key: string): Promise<void> {
     return this.page.evaluate((k) => {
@@ -506,10 +639,12 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
-   * Get a session storage item.
+   * Get a session storage item specified by given key.
    *
    * @param {string} key the key that specifies the item.
    * @return {any} Retrieves a session storage item
+   * @example
+   * BrowseTheWeb.as(actor).getSessionStorageItem('some key');
    */
   public async getSessionStorageItem(key: string): Promise<any> {
     return this.page.evaluate((k) => {
@@ -527,6 +662,8 @@ export class BrowseTheWeb extends Ability {
    * @param {string} key the key that specifies the item.
    * @param {any} value the value to set.
    * @return {void} Set the session storage item
+   * @example
+   * BrowseTheWeb.as(actor).setSessionStorageItem('some key', 'some value');
    */
   public async setSessionStorageItem(key: string, value: any): Promise<void> {
     return this.page.evaluate(
@@ -543,6 +680,8 @@ export class BrowseTheWeb extends Ability {
    *
    * @param {string} key the key that specifies the item.
    * @return {void} Returns after removing a session storage item.
+   * @example
+   * BrowseTheWeb.as(actor).removeSessionStorageItem('some key');
    */
   public async removeSessionStorageItem(key: string): Promise<void> {
     return this.page.evaluate((k) => {
@@ -558,6 +697,17 @@ export class BrowseTheWeb extends Ability {
    * @param {string} option the label of the option.
    * @param {SelectorOptions} selectorOptions (optional): advanced selector lookup options.
    * @return {any} Returns the array of option values that have been successfully selected.
+   * @example
+   * // simple call with just selector and input value
+   * BrowseTheWeb.as(actor).selectOption('mySelector', 'myOptionLabel');
+   * // or with options
+   * BrowseTheWeb.as(actor).selectOption(
+   *   'mySelector',
+   *   'myOptionLabel', {
+   *     hasText: 'myText',
+   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
+   *   }
+   * );
    */
   public async selectOption(
     selector: Selector,

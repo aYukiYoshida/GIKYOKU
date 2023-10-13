@@ -1,61 +1,77 @@
-import { Action, Actor } from '@testla/screenplay';
+import { Action, Actor } from "@testla/screenplay";
 
-import { BrowseTheWeb } from '../abilities/BrowseTheWeb';
+import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 
 /**
- * Action Class. Get either Cookies, Session Storage Items or Local Storage Items from the Browser.
+ * @group Actions
+ *
+ * Get either Cookies, Session Storage Items or Local Storage Items from the Browser.
  */
 export class Get extends Action {
-  private constructor(private mode: 'cookies' | 'sessionStorage' | 'localStorage', private payload: any) {
+  private constructor(
+    private mode: "cookies" | "sessionStorage" | "localStorage",
+    private payload: any,
+  ) {
     super();
   }
 
   /**
-     * wait for either a specified loading state or for a selector to become visible/active.
-     *
-     * @param {Actor} actor Actor performing this action
-     * @return {any} Returns cookies, session storage items or local storage items
-     */
+   * wait for either a specified loading state or for a selector to become visible/active.
+   *
+   * @param {Actor} actor Actor performing this action
+   * @return {any} Returns cookies, session storage items or local storage items
+   */
   public performAs(actor: Actor): Promise<any> {
-    if (this.mode === 'cookies') {
+    if (this.mode === "cookies") {
       return BrowseTheWeb.as(actor).getCookies(this.payload);
     }
-    if (this.mode === 'sessionStorage') {
+    if (this.mode === "sessionStorage") {
       return BrowseTheWeb.as(actor).getSessionStorageItem(this.payload);
     }
-    if (this.mode === 'localStorage') {
+    if (this.mode === "localStorage") {
       return BrowseTheWeb.as(actor).getLocalStorageItem(this.payload);
     }
-    throw new Error('Error: no match for Get.performAs()!');
+    throw new Error("Error: no match for Get.performAs()!");
   }
 
   /**
-     * Get the specified cookies.
-     *
-     * @param {string} urls (optional): If URLs are specified, only cookies that affect those URLs are returned. If no URLs are specified, this all cookies are returned.
-     * @return {Get} new Get instance for cookies
-     */
+   * Get the specified cookies.
+   *
+   * @param {string} urls (optional): If URLs are specified, only cookies that affect those URLs are returned. If no URLs are specified, this all cookies are returned.
+   * @return {Get} new Get instance for cookies
+   * @example
+   * // get all cookies
+   * Get.cookies();
+   * // get cookies for a single domain
+   * Get.cookies('https://www.myapp.com');
+   * // get cookies for two domains
+   * Get.cookies(['https://www.myapp.com', 'https://www.another-app.com']);
+   */
   public static cookies(urls?: string | string[] | undefined): Get {
-    return new Get('cookies', urls);
+    return new Get("cookies", urls);
   }
 
   /**
-     * Get a session storage item.
-     *
-     * @param {string} key the key that specifies the item.
-     * @return {Get} new Get instance for session storage
-     */
+   * Get a session storage item.
+   *
+   * @param {string} key the key that specifies the item.
+   * @return {Get} new Get instance for session storage
+   * @example
+   * Get.sessionStorageItem('some key');
+   */
   public static sessionStorageItem(key: string): Get {
-    return new Get('sessionStorage', key);
+    return new Get("sessionStorage", key);
   }
 
   /**
-     * Get a local storage item.
-     *
-     * @param {string} key the key that specifies the item.
-     * @return {Get} new Get instance for local storage
-     */
+   * Get a local storage item.
+   *
+   * @param {string} key the key that specifies the item.
+   * @return {Get} new Get instance for local storage
+   * @example
+   * Get.localStorageItem('some key');
+   */
   public static localStorageItem(key: string): Get {
-    return new Get('localStorage', key);
+    return new Get("localStorage", key);
   }
 }

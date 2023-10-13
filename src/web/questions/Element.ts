@@ -4,8 +4,10 @@ import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 import { Selector, SelectorOptions } from "../types";
 
 /**
- * Question Class. Get a specified state for selector as following.
- * { visible, enabled, editable }.
+ * @group Questions
+ *
+ * Get a specified state for selector.
+ * A mode operator must be prepended.
  */
 export class Element extends Question<boolean> {
   private mode: "visible" | "enabled" | "editable" | "text" | "value" =
@@ -28,7 +30,8 @@ export class Element extends Question<boolean> {
    * Verifies if an element.
    *
    * @param {Actor} actor the actor
-   * @return {boolean} if .is was called -> positive check, if .not was called -> negative check
+   * @return {Promise<boolean>} true if the element has the specified state, false otherwise.
+   * @example
    */
   public async answeredBy(actor: Actor): Promise<boolean> {
     if (this.mode === "visible") {
@@ -94,6 +97,7 @@ export class Element extends Question<boolean> {
 
   /**
    * make the Question check for the positive.
+   * i.e. checks if a condition is true.
    * @return {Element} new Element instance
    */
   static get toBe() {
@@ -102,6 +106,7 @@ export class Element extends Question<boolean> {
 
   /**
    * make the Question check for the negative.
+   * i.e. checks if a condition is false.
    * @return {Element} new Element instance
    */
   static get notToBe() {
@@ -110,6 +115,7 @@ export class Element extends Question<boolean> {
 
   /**
    * make the Question check for the positive.
+   * i.e. checks if a condition is true.
    * @return {Element} new Element instance
    */
   static get toHave() {
@@ -118,6 +124,7 @@ export class Element extends Question<boolean> {
 
   /**
    * make the Question check for the negative.
+   * i.e. checks if a condition is false.
    * @return {Element} new Element instance
    */
   static get notToHave() {
@@ -125,11 +132,24 @@ export class Element extends Question<boolean> {
   }
 
   /**
+   * @category mode operators
+   *
    * Verifies if an element is visible.
    *
    * @param {Selector} selector the selector
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @return {Element} this Element instance
+   *
+   * @example
+   * // simple call with just selector
+   * Element.toBe.visible('mySelector');
+   * // or with options
+   * Element.notToBe.visible(
+   *   'mySelector', {
+   *     hasText: 'myText',
+   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
+   *   }
+   * );
    */
   public visible(selector: Selector, options?: SelectorOptions): Element {
     this.mode = "visible";
@@ -140,11 +160,23 @@ export class Element extends Question<boolean> {
   }
 
   /**
+   * @category mode operators
+   *
    * Verifies if an element is enabled.
    *
    * @param {Selector} selector the selector
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @return {Element} this Element instance
+   * @example
+   * // simple call with just selector
+   * Element.toBe.enabled('mySelector');
+   * // or with options
+   * Element.notToBe.enabled(
+   *   'mySelector', {
+   *     hasText: 'myText',
+   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
+   *   }
+   * );
    */
   public enabled(selector: Selector, options?: SelectorOptions): Element {
     this.mode = "enabled";
@@ -155,6 +187,8 @@ export class Element extends Question<boolean> {
   }
 
   /**
+   * @category mode operators
+   *
    * Verifies if an element has the given text.
    *
    * @param selector the selector.
@@ -195,11 +229,23 @@ export class Element extends Question<boolean> {
   }
 
   /**
+   * @category mode operators
+   *
    * Verifies if an element is editable.
    *
    * @param {Selector} selector the selector
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @return {Element} this Element instance
+   * @example
+   * // simple call with just selector
+   * Element.toBe.editable('mySelector');
+   * // or with options
+   * Element.notToBe.editable(
+   *   'mySelector', {
+   *     hasText: 'myText',
+   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
+   *   }
+   * );
    */
   public editable(selector: Selector, options?: SelectorOptions): Element {
     this.mode = "editable";

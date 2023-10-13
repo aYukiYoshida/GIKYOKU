@@ -4,7 +4,10 @@ import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 import { ScreenOptions } from "../types";
 
 /**
- * Question Class. Get a specified state for page.
+ * @category Questions
+ *
+ * Get a specified state for page.
+ * A mode operator must be prepended.
  */
 export class Screen extends Question<boolean> {
   private mode: "toHaveUrl" | "toHaveTitle" = "toHaveUrl";
@@ -23,7 +26,7 @@ export class Screen extends Question<boolean> {
    * Verifies if an element.
    *
    * @param {Actor} actor the actor
-   * @return {boolean} if .is was called -> positive check, if .not was called -> negative check
+   * @return {Promise<boolean>} true if the element has the specified state, false otherwise.
    */
   public async answeredBy(actor: Actor): Promise<boolean> {
     if (this.mode === "toHaveUrl") {
@@ -82,11 +85,18 @@ export class Screen extends Question<boolean> {
   }
 
   /**
+   * @category mode operators
+   *
    * Verifies if the page has URL.
    *
    * @param {string|RegExp} url the expected URL.
    * @param {ScreenOptions} options the timeout in milliseconds.
    * @return {Screen} this Screen instance
+   * @example
+   * // simple call with just selector
+   * Screen.toHave.title('Title');
+   * // or with options
+   * Screen.notToHave.title('Title', { timeout: 1000 });
    */
   public title(title: string | RegExp, options?: ScreenOptions): Screen {
     this.mode = "toHaveTitle";
@@ -102,6 +112,11 @@ export class Screen extends Question<boolean> {
    * @param {string|RegExp} url the expected URL.
    * @param {number} options the timeout in milliseconds.
    * @return {Screen} this Screen instance
+   * @example
+   * // simple call with just selector
+   * Screen.toHave.url('https://www.example.com');
+   * // or with options
+   * Screen.notToHave.url('https://www.example.com', { timeout: 1000 });
    */
   public url(url: string | RegExp, options?: ScreenOptions): Screen {
     this.mode = "toHaveUrl";
