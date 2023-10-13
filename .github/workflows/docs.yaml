@@ -1,0 +1,57 @@
+name: Build documentation
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'typedoc.json'
+      - 'README.md'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  NODE_VERSION: 18.x
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email actions@github.com
+
+      - name: Checkout main branch in repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Build
+        run: npm run build:docs
+
+      - name: Commit changes of documentation
+        run: |
+          hash=$(git rev-parse --short HEAD)
+          branch_name="docs-${hash}"
+          git switch -c ${branch_name}
+          files=$(git status --short --untracked-files|awk '{print $2}')
+          for file in ${files[@]}; do
+            if [[ ${file} =~ ^docs/.*$ ]]; then
+              git add ${file}
+            fi
+          done
+          body=$(echo -e "Update API specification from ${hash}")
+          git commit -m ${body} --no-verify
+          git push origin ${branch_name}
+          gh pr create --base main --head ${branch_name} --title "Update document" --body "${body}"
