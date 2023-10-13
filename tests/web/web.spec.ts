@@ -39,7 +39,6 @@ const test = base.extend<MyActors>({
   },
 });
 
-// TODO: test different details between Fill and Type
 test.describe("Testing g5u web module", () => {
   test("Navigate", async ({ actor }) => {
     // To get access of the page object
@@ -134,12 +133,40 @@ test.describe("Testing g5u web module", () => {
     await expect(actor.states("page").locator("//input[2]")).toBeChecked();
   });
 
-  test("Fill+Type", async ({ actor }) => {
+  test("Fill", async ({ actor }) => {
     await actor.attemptsTo(
       Navigate.to("https://the-internet.herokuapp.com/login"),
       Wait.forLoadState("networkidle"),
       Fill.in('[id="username"]', "tomsmith"),
-      Type.in('[id="password"]', "SuperSecretPassword!"),
+      Fill.in('[id="password"]', "SuperSecretPassword!"),
+      Click.on('[class="radius"]'),
+      Wait.forLoadState("networkidle"),
+    );
+    // assert that the login worked
+    await expect(actor.states("page")).toHaveURL(
+      "https://the-internet.herokuapp.com/secure",
+    );
+  });
+
+  test("Type", async ({ actor }) => {
+    await actor.attemptsTo(
+      Navigate.to("https://the-internet.herokuapp.com/login"),
+      Wait.forLoadState("networkidle"),
+    );
+    // assert that checkbox is checked before we click it at twice.
+    await expect(actor.states("page").locator('[id="username"]')).toHaveText(
+      "",
+    );
+    await expect(actor.states("page").locator('[id="password"]')).toHaveText(
+      "",
+    );
+
+    await actor.attemptsTo(
+      Type.in('[id="username"]', "tomsmith"),
+      Type.in('[id="password"]', "Super"),
+      Type.in('[id="password"]', "Secret"),
+      Type.in('[id="password"]', "Password"),
+      Type.in('[id="password"]', "!"),
       Click.on('[class="radius"]'),
       Wait.forLoadState("networkidle"),
     );
