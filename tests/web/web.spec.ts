@@ -195,19 +195,51 @@ test.describe("Testing g5u web module", () => {
     ).toBeVisible();
   });
 
-  test("Press", async ({ actor }) => {
-    await actor.attemptsTo(
-      Navigate.to("https://the-internet.herokuapp.com/key_presses"),
-      Wait.forLoadState("networkidle"),
-    );
-    // assert that there is nothing in the result box
-    await expect(actor.states("page").locator('[id="result"]')).toHaveText("");
+  test.describe("Press", () => {
+    test("single key", async ({ actor }) => {
+      await actor.attemptsTo(
+        Navigate.to("https://the-internet.herokuapp.com/key_presses"),
+        Wait.forLoadState("networkidle"),
+      );
+      // assert that there is nothing in the result box
+      await expect(actor.states("page").locator('[id="result"]')).toHaveText(
+        "",
+      );
 
-    await actor.attemptsTo(Click.on('[id="target"]'), Press.key("a"));
-    // assert that the pressed button was recognized
-    await expect(actor.states("page").locator('[id="result"]')).toHaveText(
-      "You entered: A",
-    );
+      await actor.attemptsTo(Click.on('[id="target"]'), Press.key("a"));
+      // assert that the pressed button was recognized
+      await expect(actor.states("page").locator('[id="result"]')).toHaveText(
+        "You entered: A",
+      );
+    });
+
+    test("multiple keys", async ({ actor }) => {
+      await actor.attemptsTo(
+        Navigate.to("https://the-internet.herokuapp.com/login"),
+        Wait.forLoadState("networkidle"),
+      );
+      // assert that checkbox is checked before we click it at twice.
+      await expect(actor.states("page").locator('[id="username"]')).toHaveText(
+        "",
+      );
+      await expect(actor.states("page").locator('[id="password"]')).toHaveText(
+        "",
+      );
+
+      await actor.attemptsTo(
+        Press.characters('[id="username"]', "tomsmith"),
+        Press.characters('[id="password"]', "Super"),
+        Press.characters('[id="password"]', "Secret"),
+        Press.characters('[id="password"]', "Password"),
+        Press.characters('[id="password"]', "!"),
+        Click.on('[class="radius"]'),
+        Wait.forLoadState("networkidle"),
+      );
+      // assert that the login worked
+      await expect(actor.states("page")).toHaveURL(
+        "https://the-internet.herokuapp.com/secure",
+      );
+    });
   });
 
   test("Select", async ({ actor }) => {
