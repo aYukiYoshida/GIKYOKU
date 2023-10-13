@@ -6,6 +6,7 @@ import {
   Check,
   Clear,
   Click,
+  DoubleClick,
   DragAndDrop,
   Fill,
   Get,
@@ -38,7 +39,6 @@ const test = base.extend<MyActors>({
   },
 });
 
-// TODO: implement test for DoubleClick
 // TODO: test different details between Fill and Type
 test.describe("Testing g5u web module", () => {
   test("Navigate", async ({ actor }) => {
@@ -117,6 +117,21 @@ test.describe("Testing g5u web module", () => {
     await expect(
       actor.states("page").locator('[class="added-manually"]'),
     ).toHaveCount(1);
+  });
+
+  test("DoubleClick", async ({ actor }) => {
+    await actor.attemptsTo(
+      Navigate.to("https://the-internet.herokuapp.com/checkboxes"),
+      Wait.forLoadState("networkidle"),
+    );
+    // assert that checkbox is checked before we click it at twice.
+    await expect(actor.states("page").locator("//input[2]")).toBeChecked();
+
+    await actor.attemptsTo(
+      DoubleClick.on(actor.states("page").locator("//input[2]")),
+    );
+    // assert that the checkbox is checked after we click it at twice
+    await expect(actor.states("page").locator("//input[2]")).toBeChecked();
   });
 
   test("Fill+Type", async ({ actor }) => {
