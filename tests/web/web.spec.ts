@@ -1,22 +1,25 @@
 /* eslint-disable no-restricted-syntax */
 
-import { BrowseTheWeb } from "@g5u/web/abilities/BrowseTheWeb";
-import { Add } from "@g5u/web/actions/Add";
-import { Check } from "@g5u/web/actions/Check";
-import { Clear } from "@g5u/web/actions/Clear";
-import { Click } from "@g5u/web/actions/Click";
-import { DragAndDrop } from "@g5u/web/actions/DragAndDrop";
-import { Fill } from "@g5u/web/actions/Fill";
-import { Get } from "@g5u/web/actions/Get";
-import { Hover } from "@g5u/web/actions/Hover";
-import { Navigate } from "@g5u/web/actions/Navigate";
-import { Press } from "@g5u/web/actions/Press";
-import { Remove } from "@g5u/web/actions/Remove";
-import { Set } from "@g5u/web/actions/Set";
-import { Type } from "@g5u/web/actions/Type";
-import { Wait } from "@g5u/web/actions/Wait";
-import { Element } from "@g5u/web/questions/Element";
-import { Screen } from "@g5u/web/questions/Screen";
+import {
+  BrowseTheWeb,
+  Add,
+  Check,
+  Clear,
+  Click,
+  DragAndDrop,
+  Fill,
+  Get,
+  Hover,
+  Navigate,
+  Press,
+  Remove,
+  Select,
+  Set,
+  Type,
+  Wait,
+  Element,
+  Screen,
+} from "@g5u/web";
 import { BrowserContext, Cookie, expect, test as base } from "@playwright/test";
 import { Actor } from "@testla/screenplay";
 
@@ -162,6 +165,23 @@ test.describe("Testing g5u web module", () => {
     // assert that the pressed button was recognized
     await expect(actor.states("page").locator('[id="result"]')).toHaveText(
       "You entered: A",
+    );
+  });
+
+  test("Select", async ({ actor }) => {
+    await actor.attemptsTo(
+      Navigate.to("https://the-internet.herokuapp.com/dropdown"),
+      Wait.forLoadState("networkidle"),
+    );
+    // assert that there is nothing in the dropdown
+    await expect(actor.states("page").locator('[id="dropdown"]')).toHaveValue(
+      "",
+    );
+
+    await actor.attemptsTo(Select.option('[id="dropdown"]', "Option 1"));
+    // assert that the pressed button was recognized
+    await expect(actor.states("page").locator('[id="dropdown"]')).toHaveValue(
+      "1",
     );
   });
 

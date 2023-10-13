@@ -1,31 +1,33 @@
-import { UseAPI } from '@g5u/api/abilities/UseAPI';
-import { Delete } from '@g5u/api/actions/Delete';
-import { Get } from '@g5u/api/actions/Get';
-import { Head } from '@g5u/api/actions/Head';
-import { Patch } from '@g5u/api/actions/Patch';
-import { Post } from '@g5u/api/actions/Post';
-import { Put } from '@g5u/api/actions/Put';
-import { Response } from '@g5u/api/questions/Response';
-import { ResponseBodyType, Response as ResponseType } from '@g5u/api/types';
-import { expect, test as base } from '@playwright/test';
-import { Actor } from '@testla/screenplay';
+import {
+  UseAPI,
+  Delete,
+  Get,
+  Head,
+  Patch,
+  Post,
+  Put,
+  Response,
+} from "@g5u/api";
+import { ResponseBodyType, Response as ResponseType } from "@g5u/api/types";
+import { expect, test as base } from "@playwright/test";
+import { Actor } from "@testla/screenplay";
 
 type MyActors = {
   actor: Actor;
 };
 
 // helper method for the response body verification. to avoid duplicated code.
-async function verifyBodies(actor: Actor, response: ResponseType, expectedBody: ResponseBodyType): Promise<void> {
-  await actor.asks(
-    Response.has.body(response, expectedBody),
-  );
+async function verifyBodies(
+  actor: Actor,
+  response: ResponseType,
+  expectedBody: ResponseBodyType,
+): Promise<void> {
+  await actor.asks(Response.has.body(response, expectedBody));
 
   let bodyRes = false;
 
   try {
-    await actor.asks(
-      Response.has.body(response, {}),
-    );
+    await actor.asks(Response.has.body(response, {}));
   } catch (error) {
     bodyRes = true;
   }
@@ -35,159 +37,160 @@ async function verifyBodies(actor: Actor, response: ResponseType, expectedBody: 
   let notBodyRes = false;
 
   try {
-    await actor.asks(
-      Response.hasNot.body(response, expectedBody),
-    );
+    await actor.asks(Response.hasNot.body(response, expectedBody));
   } catch (error) {
     notBodyRes = true;
   }
 
   expect(notBodyRes).toBeTruthy();
 
-  await actor.asks(
-    Response.hasNot.body(response, {}),
-  );
+  await actor.asks(Response.hasNot.body(response, {}));
 }
 
 const test = base.extend<MyActors>({
   actor: async ({ request }, use) => {
-    const actor = Actor.named('TestActor').can(UseAPI.using(request));
+    const actor = Actor.named("TestActor").can(UseAPI.using(request));
     await use(actor);
   },
 });
 
 // TODO: implement test with headers
-test.describe('Testing g5u web module', () => {
-  test('GET', async ({ actor }) => {
+test.describe("Testing g5u web module", () => {
+  test("GET", async ({ actor }) => {
     const response = await actor.attemptsTo(
-      Get.from('http://zippopotam.us/us/90210').withResponseBodyFormat('text'),
+      Get.from("http://zippopotam.us/us/90210").withResponseBodyFormat("text"),
     );
     expect(response.status).toBe(200);
     expect(response.body).not.toBeNull();
   });
 
   // skip POST test until website is back or this test is replaced.
-  test('POST', async ({ actor }) => {
+  test("POST", async ({ actor }) => {
     const data = {
-      title: 'foo',
-      body: 'bar',
+      title: "foo",
+      body: "bar",
       userId: 1,
     };
 
     const expected = {
-      title: 'foo', body: 'bar', userId: 1, id: 101,
+      title: "foo",
+      body: "bar",
+      userId: 1,
+      id: 101,
     };
 
     const response = await actor.attemptsTo(
-      Post.to('https://jsonplaceholder.typicode.com/posts').withData(data),
+      Post.to("https://jsonplaceholder.typicode.com/posts").withData(data),
     );
 
     expect(response.status).toBe(201);
     expect(response.body).toStrictEqual(expected);
   });
 
-  test('PUT', async ({ actor }) => {
+  test("PUT", async ({ actor }) => {
     const data = {
       id: 1,
-      title: 'foo',
-      body: 'bar',
+      title: "foo",
+      body: "bar",
       userId: 1,
     };
 
     const response = await actor.attemptsTo(
-      Put.to('https://jsonplaceholder.typicode.com/posts/1').withData(data),
+      Put.to("https://jsonplaceholder.typicode.com/posts/1").withData(data),
     );
     expect(response.status).toBe(200);
     expect(response.body).toStrictEqual(data);
 
     const responseWithHeaders = await actor.attemptsTo(
-      Patch.to('https://jsonplaceholder.typicode.com/posts/1').withData(data)
+      Patch.to("https://jsonplaceholder.typicode.com/posts/1")
+        .withData(data)
         .withHeaders({
-          'Content-type': 'text/plain; charset=UTF-8',
+          "Content-type": "text/plain; charset=UTF-8",
         }),
     );
     expect(responseWithHeaders.status).toBe(200);
     expect(responseWithHeaders.body).toStrictEqual({
       userId: 1,
       id: 1,
-      title: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
-      body: 'quia et suscipit\n'
-              + 'suscipit recusandae consequuntur expedita et cum\n'
-              + 'reprehenderit molestiae ut ut quas totam\n'
-              + 'nostrum rerum est autem sunt rem eveniet architecto',
+      title:
+        "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+      body:
+        "quia et suscipit\n" +
+        "suscipit recusandae consequuntur expedita et cum\n" +
+        "reprehenderit molestiae ut ut quas totam\n" +
+        "nostrum rerum est autem sunt rem eveniet architecto",
     });
   });
 
-  test('PATCH', async ({ actor }) => {
+  test("PATCH", async ({ actor }) => {
     const data = {
       userId: 1,
       id: 1,
-      title: 'I patched this title!',
-      body: 'I patched this body!',
+      title: "I patched this title!",
+      body: "I patched this body!",
     };
 
     const response = await actor.attemptsTo(
-      Patch.to('https://jsonplaceholder.typicode.com/posts/1').withData(data),
+      Patch.to("https://jsonplaceholder.typicode.com/posts/1").withData(data),
     );
     expect(response.status).toBe(200);
     expect(response.body).toStrictEqual(data);
 
     const responseWithHeaders = await actor.attemptsTo(
-      Patch.to('https://jsonplaceholder.typicode.com/posts/1').withData(data)
+      Patch.to("https://jsonplaceholder.typicode.com/posts/1")
+        .withData(data)
         .withHeaders({
-          'Content-type': 'text/plain; charset=UTF-8',
+          "Content-type": "text/plain; charset=UTF-8",
         }),
     );
     expect(responseWithHeaders.status).toBe(200);
     expect(responseWithHeaders.body).toStrictEqual({
       userId: 1,
       id: 1,
-      title: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
-      body: 'quia et suscipit\n'
-              + 'suscipit recusandae consequuntur expedita et cum\n'
-              + 'reprehenderit molestiae ut ut quas totam\n'
-              + 'nostrum rerum est autem sunt rem eveniet architecto',
+      title:
+        "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
+      body:
+        "quia et suscipit\n" +
+        "suscipit recusandae consequuntur expedita et cum\n" +
+        "reprehenderit molestiae ut ut quas totam\n" +
+        "nostrum rerum est autem sunt rem eveniet architecto",
     });
   });
 
-  test('DELETE', async ({ actor }) => {
+  test("DELETE", async ({ actor }) => {
     const response = await actor.attemptsTo(
-      Delete.from('https://jsonplaceholder.typicode.com/posts/1'),
+      Delete.from("https://jsonplaceholder.typicode.com/posts/1"),
     );
     expect(response.status).toBe(200);
     expect(response.body).toStrictEqual({});
 
     const responseWithHeaders = await actor.attemptsTo(
-      Delete.from('https://jsonplaceholder.typicode.com/posts/1').withHeaders({
-        'Content-type': 'text/plain; charset=UTF-8',
+      Delete.from("https://jsonplaceholder.typicode.com/posts/1").withHeaders({
+        "Content-type": "text/plain; charset=UTF-8",
       }),
     );
     expect(responseWithHeaders.status).toBe(200);
     expect(responseWithHeaders.body).toStrictEqual({});
   });
 
-  test('HEAD', async ({ actor }) => {
+  test("HEAD", async ({ actor }) => {
     const response = await actor.attemptsTo(
-      Head.from('https://jsonplaceholder.typicode.com/posts/1'),
+      Head.from("https://jsonplaceholder.typicode.com/posts/1"),
     );
     expect(response.status).toBe(200);
     expect(response.body).toBeNull();
   });
 
-  test('Response.statusCode (Question)', async ({ actor }) => {
+  test("Response.statusCode (Question)", async ({ actor }) => {
     const response = await actor.attemptsTo(
-      Get.from('http://zippopotam.us/us/90210'),
+      Get.from("http://zippopotam.us/us/90210"),
     );
 
-    await actor.asks(
-      Response.has.statusCode(response, 200),
-    );
+    await actor.asks(Response.has.statusCode(response, 200));
 
     let statusRes = false;
     try {
-      await actor.asks(
-        Response.has.statusCode(response, 404),
-      );
+      await actor.asks(Response.has.statusCode(response, 404));
     } catch (error) {
       statusRes = true;
     }
@@ -195,69 +198,70 @@ test.describe('Testing g5u web module', () => {
 
     let notStatusRes = false;
     try {
-      await actor.asks(
-        Response.hasNot.statusCode(response, 200),
-      );
+      await actor.asks(Response.hasNot.statusCode(response, 200));
     } catch (error) {
       notStatusRes = true;
     }
     expect(notStatusRes).toBeTruthy();
 
-    await actor.asks(
-      Response.hasNot.statusCode(response, 404),
-    );
+    await actor.asks(Response.hasNot.statusCode(response, 404));
   });
 
-  test('Response.body (Question)', async ({ actor }) => {
+  test("Response.body (Question)", async ({ actor }) => {
     const responseJSON = await actor.attemptsTo(
-      Get.from('http://zippopotam.us/us/90210'),
+      Get.from("http://zippopotam.us/us/90210"),
     );
 
     const expectedBodyJSON = {
-      'post code': '90210',
-      country: 'United States',
-      'country abbreviation': 'US',
-      places: [{
-        'place name': 'Beverly Hills', longitude: '-118.4065', state: 'California', 'state abbreviation': 'CA', latitude: '34.0901',
-      }],
+      "post code": "90210",
+      country: "United States",
+      "country abbreviation": "US",
+      places: [
+        {
+          "place name": "Beverly Hills",
+          longitude: "-118.4065",
+          state: "California",
+          "state abbreviation": "CA",
+          latitude: "34.0901",
+        },
+      ],
     };
 
     await verifyBodies(actor, responseJSON, expectedBodyJSON);
 
     const responseText = await actor.attemptsTo(
-      Get.from('https://jsonplaceholder.typicode.com/posts/1').withResponseBodyFormat('text'),
+      Get.from(
+        "https://jsonplaceholder.typicode.com/posts/1",
+      ).withResponseBodyFormat("text"),
     );
 
     // exact spaces and line breaks are necessary! pls don't change this string or else the test fails
-    const expectedBodyText = '{\n'
-            + '  "userId": 1,\n'
-            + '  "id": 1,\n'
-            + '  "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",\n'
-            + '  "body": "quia et suscipit\\nsuscipit recusandae consequuntur expedita et cum\\nreprehenderit molestiae ut ut quas totam\\nnostrum rerum est autem sunt rem eveniet architecto"\n'
-            + '}';
+    const expectedBodyText =
+      "{\n" +
+      '  "userId": 1,\n' +
+      '  "id": 1,\n' +
+      '  "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",\n' +
+      '  "body": "quia et suscipit\\nsuscipit recusandae consequuntur expedita et cum\\nreprehenderit molestiae ut ut quas totam\\nnostrum rerum est autem sunt rem eveniet architecto"\n' +
+      "}";
 
     await verifyBodies(actor, responseText, expectedBodyText);
   });
 
-  test('Response.headers (Question)', async ({ actor }) => {
+  test("Response.headers (Question)", async ({ actor }) => {
     const response = await actor.attemptsTo(
-      Get.from('http://zippopotam.us/us/90210'),
+      Get.from("http://zippopotam.us/us/90210"),
     );
 
     const expectedHeaders = {
-      'content-type': 'application/json',
-      server: 'cloudflare',
+      "content-type": "application/json",
+      server: "cloudflare",
     };
 
-    await actor.asks(
-      Response.has.headers(response, expectedHeaders),
-    );
+    await actor.asks(Response.has.headers(response, expectedHeaders));
 
     let headersRes = false;
     try {
-      await actor.asks(
-        Response.has.headers(response, { '???': '???' }),
-      );
+      await actor.asks(Response.has.headers(response, { "???": "???" }));
     } catch (error) {
       headersRes = true;
     }
@@ -265,24 +269,20 @@ test.describe('Testing g5u web module', () => {
 
     let notHeadersRes = false;
     try {
-      await actor.asks(
-        Response.hasNot.headers(response, expectedHeaders),
-      );
+      await actor.asks(Response.hasNot.headers(response, expectedHeaders));
     } catch (error) {
       notHeadersRes = true;
     }
     expect(notHeadersRes).toBeTruthy();
 
-    await actor.asks(
-      Response.hasNot.headers(response, { '???': '???' }),
-    );
+    await actor.asks(Response.hasNot.headers(response, { "???": "???" }));
   });
 
-  test('Response.beenReceivedWithin (Question)', async ({ actor }) => {
+  test("Response.beenReceivedWithin (Question)", async ({ actor }) => {
     const start = Date.now();
 
     const response = await actor.attemptsTo(
-      Get.from('http://zippopotam.us/us/90210'),
+      Get.from("http://zippopotam.us/us/90210"),
     );
 
     // expectedReceived is guaranteed to be higher than the response duration
@@ -294,9 +294,7 @@ test.describe('Testing g5u web module', () => {
 
     let receivedRes = false;
     try {
-      await actor.asks(
-        Response.has.beenReceivedWithin(response, 1),
-      );
+      await actor.asks(Response.has.beenReceivedWithin(response, 1));
     } catch (error) {
       receivedRes = true;
     }
@@ -312,8 +310,6 @@ test.describe('Testing g5u web module', () => {
     }
     expect(notReceivedRes).toBeTruthy();
 
-    await actor.asks(
-      Response.hasNot.beenReceivedWithin(response, 1),
-    );
+    await actor.asks(Response.hasNot.beenReceivedWithin(response, 1));
   });
 });
