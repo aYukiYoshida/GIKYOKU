@@ -281,7 +281,7 @@ test.describe("Testing g5u web module", () => {
 
     expect(
       await actor.asks(
-        Element.toBe.visible(page.locator("h3"), { hasText: "Data Tables" }),
+        Element.of(page.locator("h3"), { hasText: "Data Tables" }).visible(),
       ),
     ).toBe(true);
 
@@ -289,10 +289,10 @@ test.describe("Testing g5u web module", () => {
     try {
       expect(
         await actor.asks(
-          Element.toBe.visible(page.locator("h3"), {
+          Element.of(page.locator("h3"), {
             hasText: "this does not exist",
             timeout: 1000,
-          }),
+          }).visible(),
         ),
       ).toBe(true);
     } catch (error) {
@@ -302,9 +302,9 @@ test.describe("Testing g5u web module", () => {
 
     expect(
       await actor.asks(
-        Element.notToBe.visible(page.locator("h3"), {
+        Element.of(page.locator("h3"), {
           hasText: "this does not exist",
-        }),
+        }).not.visible(),
       ),
     ).toBe(true);
 
@@ -312,10 +312,10 @@ test.describe("Testing g5u web module", () => {
     try {
       expect(
         await actor.asks(
-          Element.notToBe.visible(page.locator("h3"), {
+          Element.of(page.locator("h3"), {
             hasText: "Data Tables",
             timeout: 1000,
-          }),
+          }).not.visible(),
         ),
       ).toBe(true);
     } catch (error) {
@@ -335,7 +335,7 @@ test.describe("Testing g5u web module", () => {
 
     expect(
       await actor.asks(
-        Element.toBe.enabled(page.locator('[aria-label="Undo"]')),
+        Element.of(page.locator('[aria-label="Undo"]')).enabled(),
       ),
     ).toBe(true);
 
@@ -343,9 +343,9 @@ test.describe("Testing g5u web module", () => {
     try {
       expect(
         await actor.asks(
-          Element.toBe.enabled(page.locator('[aria-label="Redo"]'), {
+          Element.of(page.locator('[aria-label="Redo"]'), {
             timeout: 1000,
-          }),
+          }).enabled(),
         ),
       ).toBe(true);
     } catch (error) {
@@ -355,7 +355,7 @@ test.describe("Testing g5u web module", () => {
 
     expect(
       await actor.asks(
-        Element.notToBe.enabled(page.locator('[aria-label="Redo"]')),
+        Element.of(page.locator('[aria-label="Redo"]')).not.enabled(),
       ),
     ).toBe(true);
 
@@ -363,9 +363,9 @@ test.describe("Testing g5u web module", () => {
     try {
       expect(
         await actor.asks(
-          Element.notToBe.enabled(page.locator('[aria-label="Undo"]'), {
+          Element.of(page.locator('[aria-label="Undo"]'), {
             timeout: 1000,
-          }),
+          }).not.enabled(),
         ),
       ).toBe(true);
     } catch (error) {
@@ -386,11 +386,11 @@ test.describe("Testing g5u web module", () => {
 
     expect(
       await actor.asks(
-        Element.toBe.editable(
+        Element.of(
           page
             .frameLocator("#output-iframe")
             .locator('input[name="firstName"]'),
-        ),
+        ).editable(),
       ),
     ).toBe(true);
 
@@ -398,10 +398,10 @@ test.describe("Testing g5u web module", () => {
     try {
       expect(
         await actor.asks(
-          Element.toBe.editable(
+          Element.of(
             page.frameLocator("#output-iframe").getByRole("spinbutton"),
             { timeout: 1000 },
-          ),
+          ).editable(),
         ),
       ).toBe(true);
     } catch (error) {
@@ -411,9 +411,9 @@ test.describe("Testing g5u web module", () => {
 
     expect(
       await actor.asks(
-        Element.notToBe.editable(
+        Element.of(
           page.frameLocator("#output-iframe").getByRole("spinbutton"),
-        ),
+        ).not.editable(),
       ),
     ).toBe(true);
 
@@ -421,12 +421,12 @@ test.describe("Testing g5u web module", () => {
     try {
       expect(
         await actor.asks(
-          Element.notToBe.enabled(
+          Element.of(
             page
               .frameLocator("#output-iframe")
               .locator('input[name="firstName"]'),
             { timeout: 1000 },
-          ),
+          ).not.enabled(),
         ),
       ).toBe(true);
     } catch (error) {

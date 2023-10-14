@@ -1,7 +1,10 @@
 import { Actor, Question } from "@testla/screenplay";
+import { Page } from "playwright";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 import { ScreenOptions } from "../types";
+
+type Mode = "haveUrl" | "haveTitle";
 
 /**
  * @category Questions
@@ -10,7 +13,8 @@ import { ScreenOptions } from "../types";
  * A mode operator must be prepended.
  */
 export class Screen extends Question<boolean> {
-  private mode: "toHaveUrl" | "toHaveTitle" = "toHaveUrl";
+  private positive = true;
+  private mode: Mode = "haveUrl";
 
   // the expected URL or title.
   private payload: string | RegExp = "";
@@ -18,7 +22,10 @@ export class Screen extends Question<boolean> {
   // options.
   private options?: ScreenOptions;
 
-  private constructor(private checkMode: "toBe" | "notToBe") {
+  /**
+   * @param {Page} page the playwright page object to verify.
+   */
+  private constructor(private page?: Page) {
     super();
   }
 
@@ -29,21 +36,21 @@ export class Screen extends Question<boolean> {
    * @return {Promise<boolean>} true if the element has the specified state, false otherwise.
    */
   public async answeredBy(actor: Actor): Promise<boolean> {
-    if (this.mode === "toHaveUrl") {
+    if (this.mode === "haveUrl") {
       // if .is was called -> positive check, if .not was called -> negative check
       return Promise.resolve(
         await BrowseTheWeb.as(actor).checkPageUrl(
-          this.checkMode === "toBe" ? "toHaveUrl" : "notToHaveUrl",
+          this.positive ? "toHaveUrl" : "notToHaveUrl",
           this.payload,
           this.options,
         ),
       ); // if the ability method is not the expected result there will be an exception
     }
-    if (this.mode === "toHaveTitle") {
+    if (this.mode === "haveTitle") {
       // if .is was called -> positive check, if .not was called -> negative check
       return Promise.resolve(
         await BrowseTheWeb.as(actor).checkPageTitle(
-          this.checkMode === "toBe" ? "toHaveTitle" : "notToHaveTitle",
+          this.positive ? "toHaveTitle" : "notToHaveTitle",
           this.payload,
           this.options,
         ),
@@ -53,35 +60,28 @@ export class Screen extends Question<boolean> {
   }
 
   /**
-   * make the Question check for the positive.
+   * make the verifying for the positive.
    * @return {Screen} new Screen instance
+   * @example <caption>Verify with Screen class.</caption>
+   * actor.asks(
+   *  Screen.does.haveUrl("https://example.com")
+   * );
    */
-  static get toBe() {
-    return new Screen("toBe");
+  static get does() {
+    return new Screen();
   }
 
   /**
    * make the Question check for the negative.
    * @return {Screen} new Screen instance
+   * @example <caption>Verify with Element class.</caption>
+   * actor.asks(
+   *  Screen.does.not.haveURL("https://example.com")
+   * );
    */
-  static get notToBe() {
-    return new Screen("notToBe");
-  }
-
-  /**
-   * make the Question check for the positive.
-   * @return {Screen} new Screen instance
-   */
-  static get toHave() {
-    return new Screen("toBe");
-  }
-
-  /**
-   * make the Question check for the negative.
-   * @return {Screen} new Screen instance
-   */
-  static get notToHave() {
-    return new Screen("notToBe");
+  public get not() {
+    this.positive = false;
+    return this;
   }
 
   /**
@@ -98,8 +98,8 @@ export class Screen extends Question<boolean> {
    * // or with options
    * Screen.notToHave.title('Title', { timeout: 1000 });
    */
-  public title(title: string | RegExp, options?: ScreenOptions): Screen {
-    this.mode = "toHaveTitle";
+  public haveTitle(title: string | RegExp, options?: ScreenOptions): Screen {
+    this.mode = "haveTitle";
     this.payload = title;
     this.options = options;
 
@@ -118,11 +118,21 @@ export class Screen extends Question<boolean> {
    * // or with options
    * Screen.notToHave.url('https://www.example.com', { timeout: 1000 });
    */
-  public url(url: string | RegExp, options?: ScreenOptions): Screen {
-    this.mode = "toHaveUrl";
+  public haveUrl(url: string | RegExp, options?: ScreenOptions): Screen {
+    this.mode = "haveUrl";
     this.payload = url;
     this.options = options;
 
     return this;
+  }
+
+  /**
+   * Prompt a question to verify the page.
+   *
+   * @param {page} page the page object of the Playwright
+   * @return {Screen} Screen instance
+   */
+  public static of(page?: Page): Screen {
+    return new Screen(page);
   }
 }
