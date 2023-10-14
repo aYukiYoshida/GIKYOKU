@@ -124,11 +124,8 @@ export class BrowseTheWeb extends Ability {
    * @param {Selector} selector the selector of the source element.
    * @param {string} input string of characters to sequentially press into a focused element
    * @return {void} Returns when the `keys` can specify the intended values or characters to generate the text for.
-   * @example
-   * // Press a single button
+   * @example <caption>simple call with just selector and input value</caption>
    * BrowseTheWeb.as(actor).pressSequentially('ABC');
-   * // or multiple buttons
-   * BrowseTheWeb.as(actor).press('Control+A');
    */
   public async pressSequentially(
     selector: Selector,
@@ -137,7 +134,7 @@ export class BrowseTheWeb extends Ability {
   ): Promise<void> {
     return (
       await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).pressSequentially(input);
+    ).pressSequentially(input, { timeout: options?.timeout });
   }
 
   /**
