@@ -1,7 +1,7 @@
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { Selector, SelectorOptions } from "../types";
+import { DragAndDropActionOptions, Selector, SelectorOptions } from "../types";
 
 /**
  * @group Actions
@@ -16,6 +16,7 @@ export class DragAndDrop extends Action {
     private options?: {
       source?: SelectorOptions;
       target?: SelectorOptions;
+      action?: DragAndDropActionOptions;
     },
   ) {
     super();
@@ -56,6 +57,7 @@ export class DragAndDrop extends Action {
     options?: {
       source?: SelectorOptions;
       target?: SelectorOptions;
+      action?: DragAndDropActionOptions;
     },
   ): DragAndDrop {
     return new DragAndDrop(sourceSelector, targetSelector, options);

@@ -1,7 +1,7 @@
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { Selector, SelectorOptions } from "../types";
+import { DblclickActionOptions, Selector, SelectorOptions } from "../types";
 
 /**
  * @group Actions
@@ -12,7 +12,7 @@ export class DoubleClick extends Action {
   // eslint-disable-next-line no-useless-constructor
   private constructor(
     private selector: Selector,
-    private options?: SelectorOptions,
+    private options?: SelectorOptions & DblclickActionOptions,
   ) {
     super();
   }
@@ -31,7 +31,7 @@ export class DoubleClick extends Action {
    * specify which element should be double-clicked on
    *
    * @param {Selector} selector the string representing the selector.
-   * @param {SelectorOptions} options (optional): advanced selector lookup options.
+   * @param {SelectorOptions & DblclickActionOptions} options (optional): advanced selector lookup options.
    * @return {DoubleClick} new DoubleClick instance
    * @example
    * // simple call with just selector
@@ -44,7 +44,10 @@ export class DoubleClick extends Action {
    *   }
    * );
    */
-  public static on(selector: Selector, options?: SelectorOptions): DoubleClick {
+  public static on(
+    selector: Selector,
+    options?: SelectorOptions & DblclickActionOptions,
+  ): DoubleClick {
     return new DoubleClick(selector, options);
   }
 }

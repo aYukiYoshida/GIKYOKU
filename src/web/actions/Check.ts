@@ -1,7 +1,7 @@
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { Selector, SelectorOptions } from "../types";
+import { Selector, SelectorOptions, CheckActionOptions } from "../types";
 
 /**
  * @group Actions
@@ -11,7 +11,7 @@ import { Selector, SelectorOptions } from "../types";
 export class Check extends Action {
   private constructor(
     private selector: Selector,
-    private options?: SelectorOptions,
+    private options?: SelectorOptions & CheckActionOptions,
   ) {
     super();
   }
@@ -30,7 +30,7 @@ export class Check extends Action {
    * specify which element should be clicked on
    *
    * @param {Selector} selector the string representing the selector.
-   * @param {SelectorOptions} options (optional): advanced selector lookup options.
+   * @param {SelectorOptions & CheckActionOptions} options (optional): advanced selector lookup options.
    * @return {Check} new Check instance
    * @example
    * // simple call with just selector
@@ -43,7 +43,10 @@ export class Check extends Action {
    *   }
    * );
    */
-  public static element(selector: Selector, options?: SelectorOptions): Check {
+  public static element(
+    selector: Selector,
+    options?: SelectorOptions & CheckActionOptions,
+  ): Check {
     return new Check(selector, options);
   }
 }

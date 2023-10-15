@@ -1,7 +1,7 @@
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { Selector, SelectorOptions } from "../types";
+import { SelectActionOptions, Selector, SelectorOptions } from "../types";
 /**
  * @group Actions
  *
@@ -11,7 +11,7 @@ export class Select extends Action {
   private constructor(
     private selector: Selector,
     private option: string | { value?: string; label?: string; index?: number },
-    private selectorOptions?: SelectorOptions,
+    private options?: SelectorOptions & SelectActionOptions,
   ) {
     super();
   }
@@ -26,7 +26,7 @@ export class Select extends Action {
     await BrowseTheWeb.as(actor).selectOption(
       this.selector,
       this.option,
-      this.selectorOptions,
+      this.options,
     );
   }
 
@@ -35,7 +35,7 @@ export class Select extends Action {
    *
    * @param {Selector} selector the string representing the (select) selector.
    * @param {string|number} option optionLabel the label of the option.
-   * @param {SelectorOptions} selectorOptions (optional): advanced selector lookup options.
+   * @param {SelectorOptions & SelectActionOptions} options (optional): advanced selector lookup options.
    * @return {Select} new Select instance
    * @example
    * // simple call with just selector
@@ -52,8 +52,8 @@ export class Select extends Action {
   public static option(
     selector: Selector,
     option: string | { value?: string; label?: string; index?: number },
-    selectorOptions?: SelectorOptions,
+    options?: SelectorOptions & SelectActionOptions,
   ): Select {
-    return new Select(selector, option, selectorOptions);
+    return new Select(selector, option, options);
   }
 }

@@ -42,7 +42,6 @@ const test = base.extend<MyActors>({
   },
 });
 
-// TODO: implement test for DoubleClick
 test.describe("Testing g5u web module", () => {
   test("Navigate", async ({ actor }) => {
     await test.step("Navigate to playwright page", async () => {
