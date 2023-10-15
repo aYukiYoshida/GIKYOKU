@@ -1,7 +1,22 @@
 import { Cookie, expect, Locator, Page, Response } from "@playwright/test";
 import { Ability, Actor } from "@testla/screenplay";
 
-import { Selector, SelectorOptions, ScreenOptions } from "../types";
+import {
+  Selector,
+  SelectorOptions,
+  ScreenOptions,
+  CheckActionOptions,
+  ClickActionOptions,
+  DblclickActionOptions,
+  DragAndDropActionOptions,
+  FillActionOptions,
+  HoverActionOptions,
+  NavigateActionOptions,
+  PressActionOptions,
+  SelectActionOptions,
+  TypeActionOptions,
+  WaitActionOptions,
+} from "../types";
 import { recursiveLocatorLookup } from "../utils";
 
 /**
@@ -54,33 +69,39 @@ export class BrowseTheWeb extends Ability {
    * Use the page to navigate to the specified URL.
    *
    * @param {string} url the url to access.
+   * @param {NavigateActionOptions} options
    * @return {Response} Returns the main resource response
    * @example
    * BrowseTheWeb.as(actor).goto('myURL');
    */
-  public async goto(url: string): Promise<Response | null> {
-    return this.page.goto(url);
+  public async goto(
+    url: string,
+    options?: NavigateActionOptions,
+  ): Promise<Response | null> {
+    return this.page.goto(url, options);
   }
 
   /**
    * Wait for the specified loading state.
    *
    * @param {string} status the status to wait for. Allowed: "load" | "domcontentloaded" | "networkidle".
+   * @param {WaitActionOptions} options
    * @return {void} Returns when the required load state has been reached.
    * @example
    * BrowseTheWeb.as(actor).waitForLoadState('networkidle');
    */
   public async waitForLoadState(
     status: "load" | "domcontentloaded" | "networkidle",
+    options?: WaitActionOptions,
   ): Promise<void> {
-    return this.page.waitForLoadState(status);
+    return this.page.waitForLoadState(status, options);
   }
 
   /**
    * Use the page mouse to hover over the specified element.
    *
    * @param {Selector} selector the selector of the element to hover over.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options + Modifier keys to press. Ensures that only these modifiers are pressed during the operation.
+   * @param {SelectorOptions & HoverActionOptions} options
    * @return {void} Returns when hovered over the element
    * @example
    * // simple call with just selector
@@ -94,19 +115,25 @@ export class BrowseTheWeb extends Ability {
    */
   public async hover(
     selector: Selector,
-    options?: SelectorOptions & {
-      modifiers?: ("Alt" | "Control" | "Meta" | "Shift")[];
-    },
+    options?: SelectorOptions & HoverActionOptions,
   ): Promise<void> {
     return (
       await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).hover({ modifiers: options?.modifiers });
+    ).hover({
+      force: options?.force,
+      modifiers: options?.modifiers,
+      noWaitAfter: options?.noWaitAfter,
+      position: options?.position,
+      timeout: options?.timeout,
+      trial: options?.trial,
+    });
   }
 
   /**
    * Press the specified key(s) on the keyboard.
    *
    * @param {string} input the key(s). multiple keys can be pressed by concatenating with "+"
+   * @param {PressActionOptions} options
    * @return {void} Returns when the `key` can specify the intended value or a single character to generate the text for.
    * @example
    * // Press a single button
@@ -114,14 +141,20 @@ export class BrowseTheWeb extends Ability {
    * // or multiple buttons
    * BrowseTheWeb.as(actor).press('Control+A');
    */
-  public async press(input: string): Promise<void> {
-    return this.page.keyboard.press(input);
+  public async press(
+    input: string,
+    options?: PressActionOptions,
+  ): Promise<void> {
+    return this.page.keyboard.press(input, {
+      delay: options?.delay,
+    });
   }
 
   /**
    * Press the specified keys sequentially for each string character.
    * To press a special key, like Control or ArrowDown, use {@link press}.
    * @param {Selector} selector the selector of the source element.
+   * @param {SelectorOptions & PressSequentiallyActionOptions} options
    * @param {string} input string of characters to sequentially press into a focused element
    * @return {void} Returns when the `keys` can specify the intended values or characters to generate the text for.
    * @example <caption>simple call with just selector and input value</caption>
@@ -130,18 +163,22 @@ export class BrowseTheWeb extends Ability {
   public async pressSequentially(
     selector: Selector,
     input: string,
-    options?: SelectorOptions,
+    options?: SelectorOptions & PressActionOptions,
   ): Promise<void> {
     return (
       await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).pressSequentially(input, { timeout: options?.timeout });
+    ).pressSequentially(input, {
+      delay: options?.delay,
+      noWaitAfter: options?.noWaitAfter,
+      timeout: options?.timeout,
+    });
   }
 
   /**
    * Check the specified checkbox.
    *
    * @param {Selector} selector the selector of the checkbox.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {SelectorOptions & CheckActionOptions} options
    * @return {void} Returns after checking the element
    * @example
    * // simple call with just selector
@@ -156,11 +193,17 @@ export class BrowseTheWeb extends Ability {
    */
   public async checkBox(
     selector: Selector,
-    options?: SelectorOptions,
+    options?: SelectorOptions & CheckActionOptions,
   ): Promise<void> {
     return (
       await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).check();
+    ).check({
+      force: options?.force,
+      noWaitAfter: options?.noWaitAfter,
+      position: options?.position,
+      timeout: options?.timeout,
+      trial: options?.trial,
+    });
   }
 
   /**
@@ -192,7 +235,7 @@ export class BrowseTheWeb extends Ability {
    *
    * @param {Selector} sourceSelector the selector of the source element.
    * @param {Selector} targetSelector the selector of the target element.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {SelectorOptions} options
    * @return {void} Returns after dragging the locator to another target locator or target position
    * @example
    * // simple call with just source and target selector
@@ -201,8 +244,7 @@ export class BrowseTheWeb extends Ability {
    * BrowseTheWeb.as(actor).dragAndDrop('sourceSelector', 'targetSelector', {
    *     source: { hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]},
    *     target: { hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]}
-});
-
+   * });
    */
   public async dragAndDrop(
     sourceSelector: Selector,
@@ -210,6 +252,7 @@ export class BrowseTheWeb extends Ability {
     options?: {
       source?: SelectorOptions;
       target?: SelectorOptions;
+      action?: DragAndDropActionOptions;
     },
   ): Promise<void> {
     const target = await recursiveLocatorLookup({
@@ -223,7 +266,14 @@ export class BrowseTheWeb extends Ability {
         selector: sourceSelector,
         options: options?.source,
       })
-    ).dragTo(target, { targetPosition: { x: 0, y: 0 } });
+    ).dragTo(target, {
+      force: options?.action?.force,
+      noWaitAfter: options?.action?.noWaitAfter,
+      sourcePosition: options?.action?.sourcePosition,
+      targetPosition: options?.action?.targetPosition,
+      timeout: options?.action?.timeout,
+      trial: options?.action?.trial,
+    });
   }
 
   /**
@@ -231,7 +281,7 @@ export class BrowseTheWeb extends Ability {
    *
    * @param {Selector} selector the selector of the source element.
    * @param {string} input the input to fill the element with.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {SelectorOptions & FillActionOptions} options
    * @return {void} Returns after checks, focuses the element, fills it and triggers an `input` event after filling.
    * @example
    * // simple call with just selector and input value
@@ -242,11 +292,14 @@ export class BrowseTheWeb extends Ability {
   public async fill(
     selector: Selector,
     input: string,
-    options?: SelectorOptions,
+    options?: SelectorOptions & FillActionOptions,
   ): Promise<void> {
     return (
       await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).fill(input);
+    ).fill(input, {
+      force: options?.force,
+      noWaitAfter: options?.noWaitAfter,
+    });
   }
 
   /**
@@ -254,7 +307,7 @@ export class BrowseTheWeb extends Ability {
    * @deprecated Use {@link fill} instead.
    * @param {Selector} selector the selector of the source element.
    * @param {string} input the input to type into the element.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {SelectorOptions & TypeActionOptions} options
    * @return {void} Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
    * @example
    * // simple call with just selector and input value
@@ -271,18 +324,22 @@ export class BrowseTheWeb extends Ability {
   public async type(
     selector: Selector,
     input: string,
-    options?: SelectorOptions,
+    options?: SelectorOptions & TypeActionOptions,
   ): Promise<void> {
     return (
       await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).type(input);
+    ).type(input, {
+      delay: options?.delay,
+      noWaitAfter: options?.noWaitAfter,
+      timeout: options?.timeout,
+    });
   }
 
   /**
    * Click the element specified by the selector.
    *
    * @param {Selector} selector the selector of the element to click.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {SelectorOptions & ClickActionOptions} options
    * @return {void} Returns after clicking the element
    * @example
    * // simple call with just selector
@@ -293,18 +350,28 @@ export class BrowseTheWeb extends Ability {
    */
   public async click(
     selector: Selector,
-    options?: SelectorOptions,
+    options?: SelectorOptions & ClickActionOptions,
   ): Promise<void> {
     return (
       await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).click();
+    ).click({
+      button: options?.button,
+      clickCount: options?.clickCount,
+      delay: options?.delay,
+      force: options?.force,
+      modifiers: options?.modifiers,
+      noWaitAfter: options?.noWaitAfter,
+      position: options?.position,
+      timeout: options?.timeout,
+      trial: options?.trial,
+    });
   }
 
   /**
    * Double click the element specified by the selector.
    *
    * @param {Selector} selector the selector of the element to double click.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {SelectorOptions & DblclickActionOptions} options
    * @return {void} Returns after double clicking the element
    * @example
    * // simple call with just selector
@@ -315,11 +382,20 @@ export class BrowseTheWeb extends Ability {
    */
   public async dblclick(
     selector: Selector,
-    options?: SelectorOptions,
+    options?: SelectorOptions & DblclickActionOptions,
   ): Promise<void> {
     return (
       await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).dblclick();
+    ).dblclick({
+      button: options?.button,
+      delay: options?.delay,
+      force: options?.force,
+      modifiers: options?.modifiers,
+      noWaitAfter: options?.noWaitAfter,
+      position: options?.position,
+      timeout: options?.timeout,
+      trial: options?.trial,
+    });
   }
 
   /**
@@ -731,14 +807,18 @@ export class BrowseTheWeb extends Ability {
   public async selectOption(
     selector: Selector,
     option: string | { value?: string; label?: string; index?: number },
-    selectorOptions?: SelectorOptions,
+    options?: SelectorOptions & SelectActionOptions,
   ): Promise<any> {
     return (
       await recursiveLocatorLookup({
         page: this.page,
         selector,
-        options: selectorOptions,
+        options: options,
       })
-    ).selectOption(option);
+    ).selectOption(option, {
+      force: options?.force,
+      noWaitAfter: options?.noWaitAfter,
+      timeout: options?.timeout,
+    });
   }
 }

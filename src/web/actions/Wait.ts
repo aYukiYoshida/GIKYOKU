@@ -1,8 +1,13 @@
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { Selector, SelectorOptions } from "../types";
+import { Selector, SelectorOptions, WaitActionOptions } from "../types";
 
+type Payload = {
+  state?: "load" | "domcontentloaded" | "networkidle";
+  selector?: Selector;
+  options?: SelectorOptions;
+};
 /**
  * @group Actions
  *
@@ -13,12 +18,12 @@ export class Wait extends Action {
   // only 1 property is active at all times.
   private action: {
     mode: "selector" | "loadState";
-    payload?: any;
+    payload: Payload;
   };
 
   private constructor(action: {
     mode: "selector" | "loadState";
-    payload?: any;
+    payload: Payload;
   }) {
     super();
     this.action = action;
@@ -32,9 +37,13 @@ export class Wait extends Action {
    */
   public performAs(actor: Actor): Promise<any> {
     if (this.action.mode === "loadState") {
+      if (!this.action.payload.state)
+        throw new Error("Error: no state specified for Wait.performAs()");
       return BrowseTheWeb.as(actor).waitForLoadState(this.action.payload.state);
     }
     if (this.action.mode === "selector") {
+      if (!this.action.payload.selector)
+        throw new Error("Error: no selector specified for Wait.performAs()");
       return BrowseTheWeb.as(actor).waitForSelector(
         this.action.payload.selector,
         this.action.payload.options,
@@ -47,14 +56,16 @@ export class Wait extends Action {
    * Wait for a specific status of the page.
    *
    * @param {string} state either 'load', 'domcontentloaded' or 'networkidle'
+   * @param {WaitActionOptions} options
    * @return {Wait} new Wait instance
    * @example
    * Wait.forLoadState('networkidle');
    */
   public static forLoadState(
     state: "load" | "domcontentloaded" | "networkidle",
+    options?: WaitActionOptions,
   ): Wait {
-    return new Wait({ mode: "loadState", payload: { state } });
+    return new Wait({ mode: "loadState", payload: { state, options } });
   }
 
   /**

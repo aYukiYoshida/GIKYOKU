@@ -1,7 +1,7 @@
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { Selector, SelectorOptions } from "../types";
+import { Selector, SelectorOptions, ClickActionOptions } from "../types";
 
 /**
  * @group Actions
@@ -11,7 +11,7 @@ import { Selector, SelectorOptions } from "../types";
 export class Click extends Action {
   private constructor(
     private selector: Selector,
-    private options?: SelectorOptions,
+    private options?: SelectorOptions & ClickActionOptions,
   ) {
     super();
   }
@@ -30,7 +30,7 @@ export class Click extends Action {
    * specify which element should be clicked on
    *
    * @param {Selector} selector the string representing the selector.
-   * @param {SelectorOptions} options (optional): advanced selector lookup options.
+   * @param {SelectorOptions & ClickActionOptions} options (optional): advanced selector lookup options.
    * @return {Click} new Click instance
    * @example
    * // simple call with just selector
@@ -43,7 +43,10 @@ export class Click extends Action {
    *   }
    * );
    */
-  public static on(selector: Selector, options?: SelectorOptions): Click {
+  public static on(
+    selector: Selector,
+    options?: SelectorOptions & ClickActionOptions,
+  ): Click {
     return new Click(selector, options);
   }
 }

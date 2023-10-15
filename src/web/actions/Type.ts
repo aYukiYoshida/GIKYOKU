@@ -1,7 +1,7 @@
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { Selector, SelectorOptions } from "../types";
+import { Selector, SelectorOptions, TypeActionOptions } from "../types";
 
 /**
  * @group Actions
@@ -12,7 +12,7 @@ export class Type extends Action {
   private constructor(
     private selector: Selector,
     private input: string,
-    private options?: SelectorOptions,
+    private options?: SelectorOptions & TypeActionOptions,
   ) {
     super();
   }
@@ -32,7 +32,7 @@ export class Type extends Action {
    *
    * @param {Selector} selector the selector.
    * @param {string} input the input.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {SelectorOptions & TypeActionOptions} options (optional) advanced selector lookup options.
    * @return {Type} new Type instance
    * @example
    * // simple call with just selector
@@ -49,7 +49,7 @@ export class Type extends Action {
   public static in(
     selector: Selector,
     input: string,
-    options?: SelectorOptions,
+    options?: SelectorOptions & TypeActionOptions,
   ): Type {
     return new Type(selector, input, options);
   }

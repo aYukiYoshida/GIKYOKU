@@ -1,7 +1,7 @@
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { Selector, SelectorOptions } from "../types";
+import { HoverActionOptions, Selector, SelectorOptions } from "../types";
 
 /**
  * @group Actions
@@ -11,9 +11,7 @@ import { Selector, SelectorOptions } from "../types";
 export class Hover extends Action {
   private constructor(
     private selector: Selector,
-    private options?: SelectorOptions & {
-      modifiers?: ("Alt" | "Control" | "Meta" | "Shift")[];
-    },
+    private options?: SelectorOptions & HoverActionOptions,
   ) {
     super();
   }
@@ -32,7 +30,7 @@ export class Hover extends Action {
    * Specify which selector should be hovered over
    *
    * @param {Selector} selector The selector that should be hovered over.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options + Modifier keys to press. Ensures that only these modifiers are pressed during the operation.
+   * @param {SelectorOptions & HoverActionOptions} options (optional) advanced selector lookup options + Modifier keys to press. Ensures that only these modifiers are pressed during the operation.
    * @return {Hover} new Hover instance
    * @example
    * // simple call with just selector
@@ -46,9 +44,7 @@ export class Hover extends Action {
    */
   public static over(
     selector: Selector,
-    options?: SelectorOptions & {
-      modifiers?: ("Alt" | "Control" | "Meta" | "Shift")[];
-    },
+    options?: SelectorOptions & HoverActionOptions,
   ): Hover {
     return new Hover(selector, options);
   }
