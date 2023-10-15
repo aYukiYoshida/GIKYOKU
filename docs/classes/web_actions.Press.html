@@ -23,7 +23,7 @@
 <ul class="tsd-hierarchy">
 <li><span class="target">Press</span></li></ul></li></ul></section><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/aYukiYoshida/GIKYOKU/blob/fec3544/src/web/actions/Press.ts#L11">src/web/actions/Press.ts:11</a></li></ul></aside>
+<li>Defined in <a href="https://github.com/aYukiYoshida/GIKYOKU/blob/758bbe4/src/web/actions/Press.ts#L11">src/web/actions/Press.ts:11</a></li></ul></aside>
 <section class="tsd-panel-group tsd-index-group">
 <section class="tsd-panel tsd-index-panel">
 <details class="tsd-index-content tsd-index-accordion" open><summary class="tsd-accordion-summary tsd-index-summary">
@@ -70,7 +70,7 @@
 <div class="tsd-comment tsd-typography"></div><aside class="tsd-sources">
 <p>Overrides <a href="index.Action.html">Action</a>.<a href="index.Action.html#performAs">performAs</a></p>
 <ul>
-<li>Defined in <a href="https://github.com/aYukiYoshida/GIKYOKU/blob/fec3544/src/web/actions/Press.ts#L26">src/web/actions/Press.ts:26</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/aYukiYoshida/GIKYOKU/blob/758bbe4/src/web/actions/Press.ts#L29">src/web/actions/Press.ts:29</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member tsd-is-inherited tsd-is-external"><a id="withAbilityAlias" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><span>with<wbr/>Ability<wbr/>Alias</span><a href="#withAbilityAlias" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures tsd-is-inherited tsd-is-external">
@@ -114,9 +114,7 @@ To press a special key, like Control or ArrowDown, use <a href="web_actions.Pres
 </div>
 <div class="tsd-comment tsd-typography"></div></li>
 <li>
-<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">options</span>: <a href="../types/web_types.SelectorOptions.html" class="tsd-signature-type tsd-kind-type-alias">SelectorOptions</a></h5>
-<div class="tsd-comment tsd-typography"><p>(optional) advanced selector lookup options.</p>
-</div>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">options</span>: <a href="../types/web_types.SelectorOptions.html" class="tsd-signature-type tsd-kind-type-alias">SelectorOptions</a><span class="tsd-signature-symbol"> &amp; </span><a href="../types/web_types.PressActionOptions.html" class="tsd-signature-type tsd-kind-type-alias">PressActionOptions</a></h5>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="web_actions.Press.html" class="tsd-signature-type tsd-kind-class">Press</a></h4><p>new Press instance</p>
 
@@ -125,11 +123,11 @@ To press a special key, like Control or ArrowDown, use <a href="web_actions.Pres
 </code><button>Copy</button></pre>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/aYukiYoshida/GIKYOKU/blob/fec3544/src/web/actions/Press.ts#L60">src/web/actions/Press.ts:60</a></li></ul></aside></li></ul></section>
+<li>Defined in <a href="https://github.com/aYukiYoshida/GIKYOKU/blob/758bbe4/src/web/actions/Press.ts#L70">src/web/actions/Press.ts:70</a></li></ul></aside></li></ul></section>
 <section class="tsd-panel tsd-member"><a id="key" class="tsd-anchor"></a>
 <h3 class="tsd-anchor-link"><code class="tsd-tag ts-flagStatic">Static</code> <span>key</span><a href="#key" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></h3>
 <ul class="tsd-signatures">
-<li class="tsd-signature tsd-anchor-link" id="key.key-1"><span class="tsd-kind-call-signature">key</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">keys</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="web_actions.Press.html" class="tsd-signature-type tsd-kind-class">Press</a><a href="#key.key-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
+<li class="tsd-signature tsd-anchor-link" id="key.key-1"><span class="tsd-kind-call-signature">key</span><span class="tsd-signature-symbol">(</span><span class="tsd-kind-parameter">keys</span>, <span class="tsd-kind-parameter">options</span><span class="tsd-signature-symbol">?</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="web_actions.Press.html" class="tsd-signature-type tsd-kind-class">Press</a><a href="#key.key-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24"><use href="#icon-anchor"></use></svg></a></li>
 <li class="tsd-description">
 <div class="tsd-comment tsd-typography"><p>Press a key on the keyboard. (or multiple keys with +, e.g. Shift+A)</p>
 </div>
@@ -140,6 +138,9 @@ To press a special key, like Control or ArrowDown, use <a href="web_actions.Pres
 <h5><span class="tsd-kind-parameter">keys</span>: <span class="tsd-signature-type">string</span></h5>
 <div class="tsd-comment tsd-typography"><p>the key(s) to press.</p>
 </div>
+<div class="tsd-comment tsd-typography"></div></li>
+<li>
+<h5><code class="tsd-tag ts-flagOptional">Optional</code> <span class="tsd-kind-parameter">options</span>: <a href="../types/web_types.PressActionOptions.html" class="tsd-signature-type tsd-kind-type-alias">PressActionOptions</a></h5>
 <div class="tsd-comment tsd-typography"></div></li></ul></div>
 <h4 class="tsd-returns-title">Returns <a href="web_actions.Press.html" class="tsd-signature-type tsd-kind-class">Press</a></h4><p>new Press instance</p>
 
@@ -148,7 +149,7 @@ To press a special key, like Control or ArrowDown, use <a href="web_actions.Pres
 </code><button>Copy</button></pre>
 </div><aside class="tsd-sources">
 <ul>
-<li>Defined in <a href="https://github.com/aYukiYoshida/GIKYOKU/blob/fec3544/src/web/actions/Press.ts#L45">src/web/actions/Press.ts:45</a></li></ul></aside></li></ul></section></section></div>
+<li>Defined in <a href="https://github.com/aYukiYoshida/GIKYOKU/blob/758bbe4/src/web/actions/Press.ts#L55">src/web/actions/Press.ts:55</a></li></ul></aside></li></ul></section></section></div>
 <div class="col-sidebar">
 <div class="page-menu">
 <div class="tsd-navigation settings">
