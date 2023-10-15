@@ -41,6 +41,8 @@ jobs:
         run: npm run build:docs
 
       - name: Commit changes of documentation
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           hash=$(git rev-parse --short HEAD)
           branch_name="docs-${hash}"
