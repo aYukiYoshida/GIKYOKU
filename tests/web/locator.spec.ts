@@ -1,19 +1,23 @@
-import { BrowseTheWeb } from "@g5u/web/abilities/BrowseTheWeb";
-import { Add } from "@g5u/web/actions/Add";
-import { Check } from "@g5u/web/actions/Check";
-import { Clear } from "@g5u/web/actions/Clear";
-import { Click } from "@g5u/web/actions/Click";
-import { DragAndDrop } from "@g5u/web/actions/DragAndDrop";
-import { Fill } from "@g5u/web/actions/Fill";
-import { Get } from "@g5u/web/actions/Get";
-import { Hover } from "@g5u/web/actions/Hover";
-import { Navigate } from "@g5u/web/actions/Navigate";
-import { Press } from "@g5u/web/actions/Press";
-import { Remove } from "@g5u/web/actions/Remove";
-import { Set } from "@g5u/web/actions/Set";
-import { Type } from "@g5u/web/actions/Type";
-import { Wait } from "@g5u/web/actions/Wait";
-import { Element } from "@g5u/web/questions/Element";
+import {
+  BrowseTheWeb,
+  Add,
+  Check,
+  Clear,
+  Click,
+  DoubleClick,
+  DragAndDrop,
+  Fill,
+  Get,
+  Hover,
+  Navigate,
+  Press,
+  Remove,
+  Select,
+  Set,
+  Type,
+  Wait,
+  Element,
+} from "@g5u/web";
 import {
   BrowserContext,
   Cookie,
@@ -39,7 +43,6 @@ const test = base.extend<MyActors>({
 });
 
 // TODO: implement test for DoubleClick
-// TODO: test different details between Fill and Type
 test.describe("Testing g5u web module", () => {
   test("Navigate", async ({ actor }) => {
     await test.step("Navigate to playwright page", async () => {
@@ -105,14 +108,60 @@ test.describe("Testing g5u web module", () => {
     await expect(page.locator('[class="added-manually"]')).toHaveCount(1);
   });
 
-  test("Fill+Type", async ({ actor }) => {
+  test("DoubleClick", async ({ actor }) => {
+    const page: Page = actor.states("page");
+
+    await actor.attemptsTo(
+      Navigate.to("https://the-internet.herokuapp.com/checkboxes"),
+      Wait.forLoadState("networkidle"),
+    );
+    // assert that checkbox is checked before we click it at twice.
+    await expect(page.locator("//input[2]")).toBeChecked();
+
+    await actor.attemptsTo(DoubleClick.on(page.locator("//input[2]")));
+    // assert that the checkbox is checked after we click it at twice
+    await expect(page.locator("//input[2]")).toBeChecked();
+  });
+
+  test("Fill", async ({ actor }) => {
     const page: Page = actor.states("page");
 
     await actor.attemptsTo(
       Navigate.to("https://the-internet.herokuapp.com/login"),
       Wait.forLoadState("networkidle"),
+    );
+
+    // assert that text boxes are empty before we fill it.
+    await expect(page.locator('[id="username"]')).toHaveText("");
+    await expect(page.locator('[id="password"]')).toHaveText("");
+
+    await actor.attemptsTo(
       Fill.in(page.locator('[id="username"]'), "tomsmith"),
-      Type.in(page.locator('[id="password"]'), "SuperSecretPassword!"),
+      Fill.in(page.locator('[id="password"]'), "SuperSecretPassword!"),
+      Click.on(page.locator('[class="radius"]')),
+      Wait.forLoadState("networkidle"),
+    );
+    // assert that the login worked
+    await expect(page).toHaveURL("https://the-internet.herokuapp.com/secure");
+  });
+
+  test("Type", async ({ actor }) => {
+    const page: Page = actor.states("page");
+
+    await actor.attemptsTo(
+      Navigate.to("https://the-internet.herokuapp.com/login"),
+      Wait.forLoadState("networkidle"),
+    );
+    // assert that text boxes are empty before we fill it.
+    await expect(page.locator('[id="username"]')).toHaveText("");
+    await expect(page.locator('[id="password"]')).toHaveText("");
+
+    await actor.attemptsTo(
+      Type.in(page.locator('[id="username"]'), "tomsmith"),
+      Type.in(page.locator('[id="password"]'), "Super"),
+      Type.in(page.locator('[id="password"]'), "Secret"),
+      Type.in(page.locator('[id="password"]'), "Password"),
+      Type.in(page.locator('[id="password"]'), "!"),
       Click.on(page.locator('[class="radius"]')),
       Wait.forLoadState("networkidle"),
     );
@@ -137,22 +186,65 @@ test.describe("Testing g5u web module", () => {
     await expect(page.locator('[href="/users/1"]')).toBeVisible();
   });
 
-  test("Press", async ({ actor }) => {
+  test.describe("Press", () => {
+    test("single key", async ({ actor }) => {
+      const page: Page = actor.states("page");
+
+      await actor.attemptsTo(
+        Navigate.to("https://the-internet.herokuapp.com/key_presses"),
+        Wait.forLoadState("networkidle"),
+      );
+      // assert that there is nothing in the result box
+      await expect(page.locator('[id="result"]')).toHaveText("");
+
+      await actor.attemptsTo(
+        Click.on(page.locator('[id="target"]')),
+        Press.key("a"),
+      );
+      // assert that the pressed button was recognized
+      await expect(page.locator('[id="result"]')).toHaveText("You entered: A");
+    });
+
+    test("multiple keys", async ({ actor }) => {
+      const page: Page = actor.states("page");
+
+      await actor.attemptsTo(
+        Navigate.to("https://the-internet.herokuapp.com/login"),
+        Wait.forLoadState("networkidle"),
+      );
+      // assert that checkbox is checked before we click it at twice.
+      await expect(page.locator('[id="username"]')).toHaveText("");
+      await expect(page.locator('[id="password"]')).toHaveText("");
+
+      await actor.attemptsTo(
+        Press.characters(page.locator('[id="username"]'), "tomsmith"),
+        Press.characters(page.locator('[id="password"]'), "Super"),
+        Press.characters(page.locator('[id="password"]'), "Secret"),
+        Press.characters(page.locator('[id="password"]'), "Password"),
+        Press.characters(page.locator('[id="password"]'), "!"),
+        Click.on(page.locator('[class="radius"]')),
+        Wait.forLoadState("networkidle"),
+      );
+      // assert that the login worked
+      await expect(page).toHaveURL("https://the-internet.herokuapp.com/secure");
+    });
+  });
+
+  test("Select", async ({ actor }) => {
     const page: Page = actor.states("page");
 
     await actor.attemptsTo(
-      Navigate.to("https://the-internet.herokuapp.com/key_presses"),
+      Navigate.to("https://the-internet.herokuapp.com/dropdown"),
       Wait.forLoadState("networkidle"),
     );
-    // assert that there is nothing in the result box
-    await expect(page.locator('[id="result"]')).toHaveText("");
+    // assert that there is nothing in the dropdown
+    await expect(page.locator('[id="dropdown"]')).toHaveValue("");
 
     await actor.attemptsTo(
-      Click.on(page.locator('[id="target"]')),
-      Press.key("a"),
+      Select.option(page.locator('[id="dropdown"]'), "Option 1"),
     );
     // assert that the pressed button was recognized
-    await expect(page.locator('[id="result"]')).toHaveText("You entered: A");
+    await expect(page.locator('[id="dropdown"]')).toHaveValue("1");
   });
 
   test("Wait + Recursive Locators", async ({ actor }) => {
