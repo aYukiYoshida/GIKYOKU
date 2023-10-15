@@ -126,9 +126,7 @@ test.describe("Testing g5u web module", () => {
     // assert that checkbox is checked before we click it at twice.
     await expect(actor.states("page").locator("//input[2]")).toBeChecked();
 
-    await actor.attemptsTo(
-      DoubleClick.on(actor.states("page").locator("//input[2]")),
-    );
+    await actor.attemptsTo(DoubleClick.on("//input[2]"));
     // assert that the checkbox is checked after we click it at twice
     await expect(actor.states("page").locator("//input[2]")).toBeChecked();
   });
@@ -137,6 +135,15 @@ test.describe("Testing g5u web module", () => {
     await actor.attemptsTo(
       Navigate.to("https://the-internet.herokuapp.com/login"),
       Wait.forLoadState("networkidle"),
+    );
+    // assert that text boxes are empty before we fill it.
+    await expect(actor.states("page").locator('[id="username"]')).toHaveText(
+      "",
+    );
+    await expect(actor.states("page").locator('[id="password"]')).toHaveText(
+      "",
+    );
+    await actor.attemptsTo(
       Fill.in('[id="username"]', "tomsmith"),
       Fill.in('[id="password"]', "SuperSecretPassword!"),
       Click.on('[class="radius"]'),
@@ -153,7 +160,7 @@ test.describe("Testing g5u web module", () => {
       Navigate.to("https://the-internet.herokuapp.com/login"),
       Wait.forLoadState("networkidle"),
     );
-    // assert that checkbox is checked before we click it at twice.
+    // assert that text boxes are empty before we fill it.
     await expect(actor.states("page").locator('[id="username"]')).toHaveText(
       "",
     );
