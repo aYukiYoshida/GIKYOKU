@@ -16,6 +16,11 @@ import {
   SelectActionOptions,
   TypeActionOptions,
   WaitActionOptions,
+  TextPayload,
+  ValuePayload,
+  StylePayload,
+  CountPayload,
+  ScreenshotPayload,
 } from "../types";
 import { recursiveLocatorLookup } from "../utils";
 
@@ -401,17 +406,17 @@ export class BrowseTheWeb extends Ability {
   /**
    * Validate if the page has specified URL.
    *
-   * @param {string} mode the expected property of the page that needs to be checked. either 'toHaveUrl' or 'notToHaveUrl'.
+   * @param {boolean} positive whether to check the property of the page positive or not.
    * @param {string|RegExp} expectedUrl the expected url of the page.
    * @param {number} options (optional) timeout in milliseconds to wait for the element to be visible/hidden.
    * @returns {boolean} Promise<boolean> true if the page has URL as expected, false if the timeout was reached.
    */
   public async checkPageUrl(
-    mode: "toHaveUrl" | "notToHaveUrl",
+    positive: boolean,
     expectedUrl: string | RegExp,
     options?: ScreenOptions,
   ): Promise<boolean> {
-    if (mode === "toHaveUrl") {
+    if (positive) {
       await expect(this.page).toHaveURL(expectedUrl, options);
     } else {
       await expect(this.page).not.toHaveURL(expectedUrl, options);
@@ -422,17 +427,17 @@ export class BrowseTheWeb extends Ability {
   /**
    * Validate if the page has specified title.
    *
-   * @param {string} mode the expected property of the page that needs to be checked. either 'toHaveTitle' or 'notToHaveTitle'.
+   * @param {boolean} positive whether to check the property of the page positive or not.
    * @param {string|RegExp} expectedTitle the expected title of the page.
-   * @param {number} timeout (optional) time in milliseconds to wait for the element to be visible/hidden. Defaults to {@link defaultWaitTimeout}
+   * @param {number} timeout (optional) time in milliseconds to wait for the element to be visible/hidden.
    * @returns {boolean} Promise<boolean> true if the page has title as expected, false if the timeout was reached.
    */
   public async checkPageTitle(
-    mode: "toHaveTitle" | "notToHaveTitle",
+    positive: boolean,
     expectedTitle: string | RegExp,
     options?: ScreenOptions,
   ): Promise<boolean> {
-    if (mode === "toHaveTitle") {
+    if (positive) {
       await expect(this.page).toHaveTitle(expectedTitle, options);
     } else {
       await expect(this.page).not.toHaveTitle(expectedTitle, options);
@@ -441,19 +446,40 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
+   * Validate if the page has specified title.
+   *
+   * @param {boolean} positive whether to check the property of the page positive or not.
+   * @param {string|string[]} name the screenshot name
+   * @param {number} timeout (optional) time in milliseconds to wait for.
+   * @returns {boolean} Promise<boolean> true if the page has title as expected, false if the timeout was reached.
+   */
+  public async checkPageScreenshot(
+    positive: boolean,
+    name: string | string[],
+    options?: ScreenOptions,
+  ): Promise<boolean> {
+    if (positive) {
+      await expect(this.page).toHaveScreenshot(name, options);
+    } else {
+      await expect(this.page).not.toHaveScreenshot(name, options);
+    }
+    return Promise.resolve(true);
+  }
+
+  /**
    * Verify if a locator on the page is visible or hidden.
    *
    * @param {Selector} selector the locator to search for.
-   * @param {string} mode the expected property of the selector that needs to be checked. either 'visible' or 'hidden'.
+   * @param {boolean} positive whether to check the property of the selector positive or not.
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @returns {boolean} Promise<boolean> true if the element is visible/hidden as expected, false if the timeout was reached.
    * @example
    * // simple call with just selector
-   * BrowseTheWeb.as(actor).checkVisibilityState('mySelector', 'visible');
+   * BrowseTheWeb.as(actor).checkVisibilityState('mySelector', true);
    * // or with options
    * BrowseTheWeb.as(actor).checkVisibilityState(
    *   'mySelector',
-   *   'hidden', {
+   *   false, {
    *     hasText: 'myText',
    *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
    *   }
@@ -461,10 +487,10 @@ export class BrowseTheWeb extends Ability {
    */
   public async checkVisibilityState(
     selector: Selector,
-    mode: "visible" | "hidden",
+    positive: boolean,
     options?: SelectorOptions,
   ): Promise<boolean> {
-    if (mode === "visible") {
+    if (positive) {
       await expect(
         await recursiveLocatorLookup({
           page: this.page,
@@ -488,16 +514,16 @@ export class BrowseTheWeb extends Ability {
    * Verify if a locator on the page is enabled or disabled.
    *
    * @param {Selector} selector the locator to search for.
-   * @param {string} mode the expected property of the selector that needs to be checked. either 'enabled' or 'disabled'.
+   * @param {boolean} positive whether to check the property of the selector positive or not.
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @returns {boolean} true if the element is enabled/disabled as expected, false if the timeout was reached.
    * @example
    * // simple call with just selector
-   * BrowseTheWeb.as(actor).checkEnabledState('mySelector', 'enabled');
+   * BrowseTheWeb.as(actor).checkEnabledState('mySelector', true);
    * // or with options
    * BrowseTheWeb.as(actor).checkEnabledState(
    *   'mySelector',
-   *   'disabled', {
+   *   false, {
    *     hasText: 'myText',
    *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
    *   }
@@ -505,10 +531,10 @@ export class BrowseTheWeb extends Ability {
    */
   public async checkEnabledState(
     selector: Selector,
-    mode: "enabled" | "disabled",
+    positive: boolean,
     options?: SelectorOptions,
   ): Promise<boolean> {
-    if (mode === "enabled") {
+    if (positive) {
       await expect(
         await recursiveLocatorLookup({
           page: this.page,
@@ -532,16 +558,16 @@ export class BrowseTheWeb extends Ability {
    * Validate if a locator on the page is editable or not.
    *
    * @param {Selector} selector the locator to search for.
-   * @param {string} mode the expected property of the selector that needs to be checked. either 'editable' or 'notEditable'.
+   * @param {boolean} positive whether to check the property of the selector positive or not.
    * @param {SelectorOptions} options (optional) advanced selector lookup options.
    * @returns {boolean} true if the element is editable/not as expected, false if the timeout was reached.
    * @example
    * // simple call with just selector
-   * BrowseTheWeb.as(actor).checkEditableState('mySelector', 'editable');
+   * BrowseTheWeb.as(actor).checkEditableState('mySelector', true);
    * // or with options
    * BrowseTheWeb.as(actor).checkEditableState(
    *   'mySelector',
-   *   'notEditable', {
+   *   false, {
    *     hasText: 'myText',
    *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
    *   }
@@ -549,10 +575,10 @@ export class BrowseTheWeb extends Ability {
    */
   public async checkEditableState(
     selector: Selector,
-    mode: "editable" | "notEditable",
+    positive: boolean,
     options?: SelectorOptions,
   ): Promise<boolean> {
-    if (mode === "editable") {
+    if (positive) {
       await expect(
         await recursiveLocatorLookup({
           page: this.page,
@@ -573,19 +599,96 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
+   * Validate if a locator on the page is focused or not.
+   *
+   * @param {Selector} selector the locator to search for.
+   * @param {boolean} positive whether to check the property of the selector positive or not.
+   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @returns {boolean} true if the element is editable/not as expected, false if the timeout was reached.
+   * @example
+   * // simple call with just selector
+   * BrowseTheWeb.as(actor).checkFocusedState('mySelector', true);
+   * // or with options
+   * BrowseTheWeb.as(actor).checkFocusedState(
+   *   'mySelector',
+   *   false, {
+   *     hasText: 'myText',
+   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
+   *   }
+   * );
+   */
+  public async checkFocusedState(
+    selector: Selector,
+    positive: boolean,
+    options?: SelectorOptions,
+  ): Promise<boolean> {
+    if (positive) {
+      await expect(
+        await recursiveLocatorLookup({
+          page: this.page,
+          selector,
+          options: { ...options, state: "visible" },
+        }),
+      ).toBeFocused({ timeout: options?.timeout });
+    } else {
+      await expect(
+        await recursiveLocatorLookup({
+          page: this.page,
+          selector,
+          options: { ...options, state: "visible" },
+        }),
+      ).not.toBeFocused({ timeout: options?.timeout });
+    }
+    return Promise.resolve(true);
+  }
+
+  /**
+   * Validate if the given element is checked.
+   *
+   * @param {Selector} selector the selector of the element.
+   * @param {boolean} positive whether to check the property of the selector positive or not.
+   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   */
+  public async checkCheckedState(
+    selector: Selector,
+    positive: boolean,
+    options?: SelectorOptions,
+  ): Promise<boolean> {
+    if (positive) {
+      await expect(
+        await recursiveLocatorLookup({
+          page: this.page,
+          selector,
+          options: { ...options, state: "visible" },
+        }),
+      ).toBeChecked({ timeout: options?.timeout });
+    } else {
+      await expect(
+        await recursiveLocatorLookup({
+          page: this.page,
+          selector,
+          options: { ...options, state: "visible" },
+        }),
+      ).not.toBeChecked({ timeout: options?.timeout });
+    }
+    return Promise.resolve(true);
+  }
+
+  /**
    * Validate if the given element has the given text or not.
    *
-   * @param selector the selector of the element to hover over.
-   * @param text the text to check.
-   * @param options (optional) advanced selector lookup options.
+   * @param {Selector} selector the selector of the element to hover over.
+   * @param {string | RegExp | (string | RegExp)[]} text the text to check.
+   * @param {boolean} positive whether to check the property of the selector positive or not.
+   * @param {SelectorOptions} options (optional) advanced selector lookup options.
    */
   public async checkSelectorText(
     selector: Selector,
-    text: string | RegExp | (string | RegExp)[],
-    mode: "has" | "hasNot",
+    text: TextPayload,
+    positive: boolean,
     options?: SelectorOptions,
   ): Promise<boolean> {
-    if (mode === "has") {
+    if (positive) {
       await expect(
         await recursiveLocatorLookup({
           page: this.page,
@@ -606,19 +709,54 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
+   * Validate if the given element contains the given text or not.
+   *
+   * @param {Selector} selector the selector of the element to hover over.
+   * @param {TextPayload} text the text to check.
+   * @param {boolean} positive whether to check the property of the selector positive or not.
+   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   */
+  public async checkSelectorContainText(
+    selector: Selector,
+    text: TextPayload,
+    positive: boolean,
+    options?: SelectorOptions,
+  ): Promise<boolean> {
+    if (positive) {
+      await expect(
+        await recursiveLocatorLookup({
+          page: this.page,
+          selector,
+          options: { ...options, state: "visible" },
+        }),
+      ).toContainText(text, { timeout: options?.timeout });
+    } else {
+      await expect(
+        await recursiveLocatorLookup({
+          page: this.page,
+          selector,
+          options: { ...options, state: "visible" },
+        }),
+      ).not.toContainText(text, { timeout: options?.timeout });
+    }
+    return Promise.resolve(true);
+  }
+
+  /**
    * Validate if the given element has the given input value or not.
    *
-   * @param selector the selector of the element to hover over.
-   * @param value the single value to check.
-   * @param options (optional) advanced selector lookup options.
+   * @param {Selector} selector the selector of the element to hover over.
+   * @param {ValuePayload} value the single value to check.
+   * @param {boolean} positive whether to check the property of the selector positive or not.
+   * @param {SelectorOptions} options (optional) advanced selector lookup options.
    */
   public async checkSelectorValue(
     selector: Selector,
-    value: string | RegExp,
-    mode: "has" | "hasNot",
+    value: ValuePayload,
+    positive: boolean,
     options?: SelectorOptions,
   ): Promise<boolean> {
-    if (mode === "has") {
+    if (positive) {
       await expect(
         await recursiveLocatorLookup({
           page: this.page,
@@ -634,6 +772,98 @@ export class BrowseTheWeb extends Ability {
           options: { ...options, state: "visible" },
         }),
       ).not.toHaveValue(value, { timeout: options?.timeout });
+    }
+    return Promise.resolve(true);
+  }
+
+  /**
+   * Validate if the element has exact number of DOM node.
+   *
+   * @param {Selector} selector the selector of the element.
+   * @param {CountPayload} count the minimum count of the element to be visible.
+   * @param {boolean} positive whether to check the property of the selector positive or not.
+   * @param options (optional) options for assertion.
+   */
+  public async checkSelectorCount(
+    selector: Selector,
+    count: CountPayload,
+    positive: boolean,
+    options?: { timeout?: number },
+  ): Promise<boolean> {
+    const locator =
+      typeof selector === "string" ? this.page.locator(selector) : selector;
+    if (positive) {
+      await expect(locator).toHaveCount(count, options);
+    } else {
+      await expect(locator).not.toHaveCount(count, options);
+    }
+    return Promise.resolve(true);
+  }
+
+  /**
+   * Validate if the given element has the given CSS or not.
+   *
+   * @param {Selector} selector the selector of the element to hover over.
+   * @param {StylePayload} style the style name and value to check.
+   * @param {boolean} positive whether to check the property of the selector positive or not.
+   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   */
+  public async checkSelectorCSS(
+    selector: Selector,
+    style: StylePayload,
+    positive: boolean,
+    options?: SelectorOptions,
+  ): Promise<boolean> {
+    if (positive) {
+      await expect(
+        await recursiveLocatorLookup({
+          page: this.page,
+          selector,
+          options: { ...options, state: "visible" },
+        }),
+      ).toHaveCSS(style.name, style.value, { timeout: options?.timeout });
+    } else {
+      await expect(
+        await recursiveLocatorLookup({
+          page: this.page,
+          selector,
+          options: { ...options, state: "visible" },
+        }),
+      ).not.toHaveCSS(style.name, style.value, { timeout: options?.timeout });
+    }
+    return Promise.resolve(true);
+  }
+
+  /**
+   * Validate if the given element has the given screenshot or not.
+   *
+   * @param {Selector} selector the selector of the element to hover over.
+   * @param {ScreenshotPayload} name the screenshot name.
+   * @param {boolean} positive whether to check the property of the selector positive or not.
+   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   */
+  public async checkSelectorScreenshot(
+    selector: Selector,
+    name: ScreenshotPayload,
+    positive: boolean,
+    options?: SelectorOptions,
+  ): Promise<boolean> {
+    if (positive) {
+      await expect(
+        await recursiveLocatorLookup({
+          page: this.page,
+          selector,
+          options: { ...options, state: "visible" },
+        }),
+      ).toHaveScreenshot(name, { timeout: options?.timeout });
+    } else {
+      await expect(
+        await recursiveLocatorLookup({
+          page: this.page,
+          selector,
+          options: { ...options, state: "visible" },
+        }),
+      ).not.toHaveScreenshot(name, { timeout: options?.timeout });
     }
     return Promise.resolve(true);
   }

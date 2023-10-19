@@ -1,4 +1,5 @@
 import { Locator } from "@playwright/test";
+import z from "zod";
 
 export type Selector = string | Locator;
 
@@ -308,4 +309,79 @@ export type WaitActionOptions = {
    * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
    */
   timeout?: number;
+};
+
+export type ScreenQuestionMode = "haveUrl" | "haveTitle" | "haveScreenshot";
+
+export type ElementQuestionMode =
+  | "visible"
+  | "enabled"
+  | "editable"
+  | "checked"
+  | "focused"
+  | "haveText"
+  | "haveValue"
+  | "haveCount"
+  | "haveCSS"
+  | "haveScreenshot"
+  | "containText";
+
+// for Element.haveText and Element.containText
+const textPayloadSchema = z.union([
+  z.string(),
+  z.instanceof(RegExp),
+  z.array(z.union([z.string(), z.instanceof(RegExp)])),
+]);
+
+export type TextPayload = z.infer<typeof textPayloadSchema>;
+export const isTextPayload = (value: unknown): value is TextPayload => {
+  return textPayloadSchema.safeParse(value).success;
+};
+
+// for Element.haveValue
+const valuePayloadSchema = z.union([z.string(), z.instanceof(RegExp)]);
+
+export type ValuePayload = z.infer<typeof valuePayloadSchema>;
+export const isValuePayload = (value: unknown): value is ValuePayload => {
+  return valuePayloadSchema.safeParse(value).success;
+};
+
+// for Element.haveCount
+const countPayloadSchema = z.number();
+export type CountPayload = z.infer<typeof countPayloadSchema>;
+export const isCountPayload = (value: unknown): value is CountPayload => {
+  return countPayloadSchema.safeParse(value).success;
+};
+
+// for Element.haveCSS
+const stylePayloadSchema = z.object({
+  name: z.string(),
+  value: z.union([z.string(), z.instanceof(RegExp)]),
+});
+
+export type StylePayload = z.infer<typeof stylePayloadSchema>;
+export const isStylePayload = (value: unknown): value is StylePayload => {
+  return stylePayloadSchema.safeParse(value).success;
+};
+
+// for Element.haveScreenshot and Screen.haveScreenshot
+const screenshotPayloadSchema = z.union([z.string(), z.array(z.string())]);
+
+export type ScreenshotPayload = z.infer<typeof screenshotPayloadSchema>;
+export const isScreenshotPayload = (
+  value: unknown,
+): value is ScreenshotPayload => {
+  return screenshotPayloadSchema.safeParse(value).success;
+};
+
+// for Screen.haveUrl
+export type UrlPayload = z.infer<typeof valuePayloadSchema>;
+export const isUrlPayload = (value: unknown): value is UrlPayload => {
+  return valuePayloadSchema.safeParse(value).success;
+};
+
+// for Screen.haveTitle
+export type TitlePayload = z.infer<typeof valuePayloadSchema>;
+export const isTitlePayload = (value: unknown): value is TitlePayload => {
+  return valuePayloadSchema.safeParse(value).success;
 };
