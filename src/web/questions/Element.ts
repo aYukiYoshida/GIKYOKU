@@ -2,8 +2,19 @@ import { Actor, Question } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 import { Selector, SelectorOptions } from "../types";
-
-type Mode = "visible" | "enabled" | "editable" | "haveText" | "haveValue";
+import {
+  ElementQuestionMode,
+  TextPayload,
+  isTextPayload,
+  ValuePayload,
+  isValuePayload,
+  CountPayload,
+  isCountPayload,
+  StylePayload,
+  isStylePayload,
+  ScreenshotPayload,
+  isScreenshotPayload,
+} from "../types";
 
 /**
  * @group Questions
@@ -13,8 +24,13 @@ type Mode = "visible" | "enabled" | "editable" | "haveText" | "haveValue";
  */
 export class Element extends Question<boolean> {
   private positive = true;
-  private mode: Mode = "visible";
-  private payload: string | RegExp | (string | RegExp)[] = "";
+  private mode: ElementQuestionMode = "visible";
+  private payload:
+    | TextPayload
+    | ValuePayload
+    | CountPayload
+    | StylePayload
+    | ScreenshotPayload = "";
 
   /**
    * @param {Selector} selector the selector of the element to check.
@@ -33,66 +49,130 @@ export class Element extends Question<boolean> {
    *
    * @param {Actor} actor the actor
    * @return {Promise<boolean>} true if the element has the specified state, false otherwise.
-   * @example
    */
   public async answeredBy(actor: Actor): Promise<boolean> {
     if (this.mode === "visible") {
-      // if .is was called -> positive check, if .not was called -> negative check
       return Promise.resolve(
         await BrowseTheWeb.as(actor).checkVisibilityState(
           this.selector,
-          this.positive ? "visible" : "hidden",
+          this.positive,
           this.options,
         ),
       ); // if the ability method is not the expected result there will be an exception
     }
     if (this.mode === "enabled") {
-      // if .is was called -> positive check, if .not was called -> negative check
       return Promise.resolve(
         await BrowseTheWeb.as(actor).checkEnabledState(
           this.selector,
-          this.positive ? "enabled" : "disabled",
+          this.positive,
           this.options,
         ),
       ); // if the ability method is not the expected result there will be an exception
     }
     if (this.mode === "editable") {
-      // if .is was called -> positive check, if .not was called -> negative check
       return Promise.resolve(
         await BrowseTheWeb.as(actor).checkEditableState(
           this.selector,
-          this.positive ? "editable" : "notEditable",
+          this.positive,
+          this.options,
+        ),
+      ); // if the ability method is not the expected result there will be an exception
+    }
+    if (this.mode === "checked") {
+      return Promise.resolve(
+        await BrowseTheWeb.as(actor).checkCheckedState(
+          this.selector,
+          this.positive,
+          this.options,
+        ),
+      ); // if the ability method is not the expected result there will be an exception
+    }
+    if (this.mode === "focused") {
+      return Promise.resolve(
+        await BrowseTheWeb.as(actor).checkFocusedState(
+          this.selector,
+          this.positive,
           this.options,
         ),
       ); // if the ability method is not the expected result there will be an exception
     }
     if (this.mode === "haveText") {
-      // if .is was called -> positive check, if .not was called -> negative check
-      return Promise.resolve(
-        await BrowseTheWeb.as(actor).checkSelectorText(
-          this.selector,
-          this.payload,
-          this.positive ? "has" : "hasNot",
-          this.options,
-        ),
-      ); // if the ability method is not the expected result there will be an exception
-    }
-    if (this.mode === "haveValue") {
-      // Element.values was called -> need to check multiple values
-      if (!Array.isArray(this.payload)) {
-        // Element.value was called -> need to check single values
+      if (isTextPayload(this.payload)) {
         return Promise.resolve(
-          await BrowseTheWeb.as(actor).checkSelectorValue(
+          await BrowseTheWeb.as(actor).checkSelectorText(
             this.selector,
             this.payload,
-            this.positive ? "has" : "hasNot",
+            this.positive,
             this.options,
           ),
         ); // if the ability method is not the expected result there will be an exception
       }
-      throw new Error(
-        "Element.value: incompatible payload! Arrays can not be checked.",
-      );
+      throw new Error("Element.haveText: incompatible payload.");
+    }
+    if (this.mode === "containText") {
+      if (isTextPayload(this.payload)) {
+        return Promise.resolve(
+          await BrowseTheWeb.as(actor).checkSelectorContainText(
+            this.selector,
+            this.payload,
+            this.positive,
+            this.options,
+          ),
+        ); // if the ability method is not the expected result there will be an exception
+      }
+      throw new Error("Element.containText: incompatible payload.");
+    }
+    if (this.mode === "haveValue") {
+      if (isValuePayload(this.payload)) {
+        return Promise.resolve(
+          await BrowseTheWeb.as(actor).checkSelectorValue(
+            this.selector,
+            this.payload,
+            this.positive,
+            this.options,
+          ),
+        ); // if the ability method is not the expected result there will be an exception
+      }
+      throw new Error("Element.haveValue: incompatible payload.");
+    }
+    if (this.mode === "haveCount") {
+      if (isCountPayload(this.payload)) {
+        return Promise.resolve(
+          await BrowseTheWeb.as(actor).checkSelectorCount(
+            this.selector,
+            this.payload,
+            this.positive,
+            this.options,
+          ),
+        ); // if the ability method is not the expected result there will be an exception
+      }
+      throw new Error("Element.haveCount: incompatible payload.");
+    }
+    if (this.mode === "haveCSS") {
+      if (isStylePayload(this.payload)) {
+        return Promise.resolve(
+          await BrowseTheWeb.as(actor).checkSelectorCSS(
+            this.selector,
+            this.payload,
+            this.positive,
+            this.options,
+          ),
+        ); // if the ability method is not the expected result there will be an exception
+      }
+      throw new Error("Element.haveCSS: incompatible payload.");
+    }
+    if (this.mode === "haveScreenshot") {
+      if (isScreenshotPayload(this.payload)) {
+        return Promise.resolve(
+          await BrowseTheWeb.as(actor).checkSelectorScreenshot(
+            this.selector,
+            this.payload,
+            this.positive,
+            this.options,
+          ),
+        ); // if the ability method is not the expected result there will be an exception
+      }
+      throw new Error("Element.haveScreenshot: incompatible payload.");
     }
     throw new Error("Unknown mode: Element.answeredBy");
   }
@@ -176,11 +256,64 @@ export class Element extends Question<boolean> {
   /**
    * @category mode operators
    *
+   * Verify if an element is checked.
+   *
+   * @return {Element} this Element instance
+   * @example <caption>simple call with just selector or with options</caption>
+   * Element.of('mySelector').checked();
+   * Element.of(
+   *   'mySelector', {
+   *     hasText: 'myText',
+   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
+   *   }
+   * ).not.checked();
+   */
+  public checked(): Element {
+    this.mode = "checked";
+    return this;
+  }
+
+  /**
+   * @category mode operators
+   *
+   * Verify if an element is focused.
+   *
+   * @return {Element} this Element instance
+   * @example <caption>simple call with just selector or with options</caption>
+   * Element.of('mySelector').focused();
+   * Element.of(
+   *   'mySelector', {
+   *     hasText: 'myText',
+   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
+   *   }
+   * ).not.focused();
+   */
+  public focused(): Element {
+    this.mode = "focused";
+    return this;
+  }
+
+  /**
+   * @category mode operators
+   *
    * Verify if an element has the given text.
    * @param text the text to check.
    */
-  public haveText(text: string | RegExp | (string | RegExp)[]): Element {
+  public haveText(text: TextPayload): Element {
     this.mode = "haveText";
+    this.payload = text;
+
+    return this;
+  }
+
+  /**
+   * @category mode operators
+   *
+   * Verify if an element contains the given text.
+   * @param text the text to check.
+   */
+  public containText(text: TextPayload): Element {
+    this.mode = "containText";
     this.payload = text;
 
     return this;
@@ -193,9 +326,52 @@ export class Element extends Question<boolean> {
    *
    * @param value the value to check.
    */
-  public haveValue(value: string | RegExp): Element {
+  public haveValue(value: ValuePayload): Element {
     this.mode = "haveValue";
     this.payload = value;
+
+    return this;
+  }
+
+  /**
+   * @category mode operators
+   *
+   * Verify if an element has exact number of DOM node.
+   *
+   * @param count the value to check.
+   */
+  public haveCount(count: CountPayload): Element {
+    this.mode = "haveCount";
+    this.payload = count;
+
+    return this;
+  }
+
+  /**
+   * @category mode operators
+   *
+   * Verify if an element has the given style.
+   *
+   * @param name the style name.
+   * @param value the style value.
+   */
+  public haveCSS(name: string, value: string | RegExp): Element {
+    this.mode = "haveCSS";
+    this.payload = { name, value };
+
+    return this;
+  }
+
+  /**
+   * @category mode operators
+   *
+   * Verify if an element has the given screenshot.
+   *
+   * @param name the style name.
+   */
+  public haveScreenshot(name: string): Element {
+    this.mode = "haveScreenshot";
+    this.payload = name;
 
     return this;
   }
