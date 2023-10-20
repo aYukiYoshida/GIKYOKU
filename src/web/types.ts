@@ -1,4 +1,5 @@
 import { Locator } from "@playwright/test";
+import z from "zod";
 
 export type Selector = string | Locator;
 
@@ -256,6 +257,29 @@ export type NavigateActionOptions = {
   waitUntil?: "load" | "domcontentloaded" | "networkidle" | "commit";
 };
 
+export type ReloadActionOptions = {
+  /**
+   * Maximum operation time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via
+   * `navigationTimeout` option in the config, or by using the
+   * [browserContext.setDefaultNavigationTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-navigation-timeout),
+   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout),
+   * [page.setDefaultNavigationTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-navigation-timeout)
+   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+   */
+  timeout?: number;
+
+  /**
+   * When to consider operation succeeded, defaults to `load`. Events can be either:
+   * - `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+   * - `'load'` - consider operation to be finished when the `load` event is fired.
+   * - `'networkidle'` - **DISCOURAGED** consider operation to be finished when there are no network connections for
+   *   at least `500` ms. Don't use this method for testing, rely on web assertions to assess readiness instead.
+   * - `'commit'` - consider operation to be finished when network response is received and the document started
+   *   loading.
+   */
+  waitUntil?: "load" | "domcontentloaded" | "networkidle" | "commit";
+};
+
 export type PressActionOptions = {
   /**
    * Time to wait between `keydown` and `keyup` in milliseconds. Defaults to 0.
@@ -298,7 +322,7 @@ export type TypeActionOptions = {
   noWaitAfter?: boolean;
 };
 
-export type WaitActionOptions = {
+export type WaitForLoadStateActionOptions = {
   /**
    * Maximum operation time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via
    * `navigationTimeout` option in the config, or by using the
@@ -308,4 +332,102 @@ export type WaitActionOptions = {
    * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
    */
   timeout?: number;
+};
+
+export type WaitForUrlActionOptions = {
+  /**
+   * Maximum operation time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via
+   * `navigationTimeout` option in the config, or by using the
+   * [browserContext.setDefaultNavigationTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-navigation-timeout),
+   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout),
+   * [page.setDefaultNavigationTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-navigation-timeout)
+   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+   */
+  timeout?: number;
+
+  /**
+   * When to consider operation succeeded, defaults to `load`. Events can be either:
+   * - `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+   * - `'load'` - consider operation to be finished when the `load` event is fired.
+   * - `'networkidle'` - **DISCOURAGED** consider operation to be finished when there are no network connections for
+   *   at least `500` ms. Don't use this method for testing, rely on web assertions to assess readiness instead.
+   * - `'commit'` - consider operation to be finished when network response is received and the document started
+   *   loading.
+   */
+  waitUntil?: "load" | "domcontentloaded" | "networkidle" | "commit";
+};
+
+export type ScreenQuestionMode = "haveUrl" | "haveTitle" | "haveScreenshot";
+
+export type ElementQuestionMode =
+  | "visible"
+  | "enabled"
+  | "editable"
+  | "checked"
+  | "focused"
+  | "haveText"
+  | "haveValue"
+  | "haveCount"
+  | "haveCSS"
+  | "haveScreenshot"
+  | "containText";
+
+// for Element.haveText and Element.containText
+const textPayloadSchema = z.union([
+  z.string(),
+  z.instanceof(RegExp),
+  z.array(z.union([z.string(), z.instanceof(RegExp)])),
+]);
+
+export type TextPayload = z.infer<typeof textPayloadSchema>;
+export const isTextPayload = (value: unknown): value is TextPayload => {
+  return textPayloadSchema.safeParse(value).success;
+};
+
+// for Element.haveValue
+const valuePayloadSchema = z.union([z.string(), z.instanceof(RegExp)]);
+
+export type ValuePayload = z.infer<typeof valuePayloadSchema>;
+export const isValuePayload = (value: unknown): value is ValuePayload => {
+  return valuePayloadSchema.safeParse(value).success;
+};
+
+// for Element.haveCount
+const countPayloadSchema = z.number();
+export type CountPayload = z.infer<typeof countPayloadSchema>;
+export const isCountPayload = (value: unknown): value is CountPayload => {
+  return countPayloadSchema.safeParse(value).success;
+};
+
+// for Element.haveCSS
+const stylePayloadSchema = z.object({
+  name: z.string(),
+  value: z.union([z.string(), z.instanceof(RegExp)]),
+});
+
+export type StylePayload = z.infer<typeof stylePayloadSchema>;
+export const isStylePayload = (value: unknown): value is StylePayload => {
+  return stylePayloadSchema.safeParse(value).success;
+};
+
+// for Element.haveScreenshot and Screen.haveScreenshot
+const screenshotPayloadSchema = z.union([z.string(), z.array(z.string())]);
+
+export type ScreenshotPayload = z.infer<typeof screenshotPayloadSchema>;
+export const isScreenshotPayload = (
+  value: unknown,
+): value is ScreenshotPayload => {
+  return screenshotPayloadSchema.safeParse(value).success;
+};
+
+// for Screen.haveUrl
+export type UrlPayload = z.infer<typeof valuePayloadSchema>;
+export const isUrlPayload = (value: unknown): value is UrlPayload => {
+  return valuePayloadSchema.safeParse(value).success;
+};
+
+// for Screen.haveTitle
+export type TitlePayload = z.infer<typeof valuePayloadSchema>;
+export const isTitlePayload = (value: unknown): value is TitlePayload => {
+  return valuePayloadSchema.safeParse(value).success;
 };

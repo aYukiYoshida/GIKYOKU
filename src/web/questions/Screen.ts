@@ -2,9 +2,16 @@ import { Actor, Question } from "@testla/screenplay";
 import { Page } from "playwright";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { ScreenOptions } from "../types";
-
-type Mode = "haveUrl" | "haveTitle";
+import {
+  ScreenOptions,
+  ScreenQuestionMode,
+  UrlPayload,
+  isUrlPayload,
+  ScreenshotPayload,
+  isScreenshotPayload,
+  TitlePayload,
+  isTitlePayload,
+} from "../types";
 
 /**
  * @category Questions
@@ -14,10 +21,10 @@ type Mode = "haveUrl" | "haveTitle";
  */
 export class Screen extends Question<boolean> {
   private positive = true;
-  private mode: Mode = "haveUrl";
+  private mode: ScreenQuestionMode = "haveUrl";
 
   // the expected URL or title.
-  private payload: string | RegExp = "";
+  private payload: UrlPayload | TitlePayload | ScreenshotPayload = "";
 
   // options.
   private options?: ScreenOptions;
@@ -37,24 +44,43 @@ export class Screen extends Question<boolean> {
    */
   public async answeredBy(actor: Actor): Promise<boolean> {
     if (this.mode === "haveUrl") {
-      // if .is was called -> positive check, if .not was called -> negative check
-      return Promise.resolve(
-        await BrowseTheWeb.as(actor).checkPageUrl(
-          this.positive ? "toHaveUrl" : "notToHaveUrl",
-          this.payload,
-          this.options,
-        ),
-      ); // if the ability method is not the expected result there will be an exception
+      if (isUrlPayload(this.payload)) {
+        return Promise.resolve(
+          await BrowseTheWeb.as(actor).checkPageUrl(
+            this.positive,
+            this.payload,
+            this.options,
+          ),
+        ); // if the ability method is not the expected result there will be an exception
+      } else {
+        throw Error("Screen.haveUrl: incompatible payload.");
+      }
     }
     if (this.mode === "haveTitle") {
-      // if .is was called -> positive check, if .not was called -> negative check
-      return Promise.resolve(
-        await BrowseTheWeb.as(actor).checkPageTitle(
-          this.positive ? "toHaveTitle" : "notToHaveTitle",
-          this.payload,
-          this.options,
-        ),
-      ); // if the ability method is not the expected result there will be an exception
+      if (isTitlePayload(this.payload)) {
+        return Promise.resolve(
+          await BrowseTheWeb.as(actor).checkPageTitle(
+            this.positive,
+            this.payload,
+            this.options,
+          ),
+        ); // if the ability method is not the expected result there will be an exception
+      } else {
+        throw Error("Screen.haveTitle: incompatible payload.");
+      }
+    }
+    if (this.mode === "haveScreenshot") {
+      if (isScreenshotPayload(this.payload)) {
+        return Promise.resolve(
+          await BrowseTheWeb.as(actor).checkPageScreenshot(
+            this.positive,
+            this.payload,
+            this.options,
+          ),
+        ); // if the ability method is not the expected result there will be an exception
+      } else {
+        throw Error("Screen.haveScreenshot: incompatible payload.");
+      }
     }
     throw new Error("Unknown mode: Element.answeredBy");
   }
@@ -89,16 +115,16 @@ export class Screen extends Question<boolean> {
    *
    * Verifies if the page has URL.
    *
-   * @param {string|RegExp} url the expected URL.
+   * @param {TitlePayload} url the expected URL.
    * @param {ScreenOptions} options the timeout in milliseconds.
    * @return {Screen} this Screen instance
    * @example
    * // simple call with just selector
-   * Screen.toHave.title('Title');
+   * Screen.toHaveTitle('Title');
    * // or with options
-   * Screen.notToHave.title('Title', { timeout: 1000 });
+   * Screen.not.toHaveTitle('Title', { timeout: 1000 });
    */
-  public haveTitle(title: string | RegExp, options?: ScreenOptions): Screen {
+  public haveTitle(title: TitlePayload, options?: ScreenOptions): Screen {
     this.mode = "haveTitle";
     this.payload = title;
     this.options = options;
@@ -109,18 +135,41 @@ export class Screen extends Question<boolean> {
   /**
    * Verifies if the page has URL.
    *
-   * @param {string|RegExp} url the expected URL.
-   * @param {number} options the timeout in milliseconds.
+   * @param {UrlPayload} url the expected URL.
+   * @param {ScreenOptions} options the timeout in milliseconds.
    * @return {Screen} this Screen instance
    * @example
    * // simple call with just selector
-   * Screen.toHave.url('https://www.example.com');
+   * Screen.toHaveUrl('https://www.example.com');
    * // or with options
-   * Screen.notToHave.url('https://www.example.com', { timeout: 1000 });
+   * Screen.not.toHaveUrl('https://www.example.com', { timeout: 1000 });
    */
-  public haveUrl(url: string | RegExp, options?: ScreenOptions): Screen {
+  public haveUrl(url: UrlPayload, options?: ScreenOptions): Screen {
     this.mode = "haveUrl";
     this.payload = url;
+    this.options = options;
+
+    return this;
+  }
+
+  /**
+   * Verifies if the page has URL.
+   *
+   * @param {ScreenshotPayload} name the screenshot name.
+   * @param {ScreenOptions} options the timeout in milliseconds.
+   * @return {Screen} this Screen instance
+   * @example
+   * // simple call with just selector
+   * Screen.toHaveScreenshot('example.png');
+   * // or with options
+   * Screen.not.toHaveScreenshot('example.png', { timeout: 1000 });
+   */
+  public haveScreenshot(
+    name: ScreenshotPayload,
+    options?: ScreenOptions,
+  ): Screen {
+    this.mode = "haveScreenshot";
+    this.payload = name;
     this.options = options;
 
     return this;
