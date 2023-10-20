@@ -10,6 +10,7 @@ export { Get } from "./Get";
 export { Hover } from "./Hover";
 export { Navigate } from "./Navigate";
 export { Press } from "./Press";
+export { Reload } from "./Reload";
 export { Remove } from "./Remove";
 export { Select } from "./Select";
 export { Set } from "./Set";

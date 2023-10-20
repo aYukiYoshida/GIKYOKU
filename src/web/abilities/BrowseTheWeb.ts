@@ -12,6 +12,7 @@ import {
   FillActionOptions,
   HoverActionOptions,
   NavigateActionOptions,
+  ReloadActionOptions,
   PressActionOptions,
   SelectActionOptions,
   TypeActionOptions,
@@ -84,6 +85,18 @@ export class BrowseTheWeb extends Ability {
     options?: NavigateActionOptions,
   ): Promise<Response | null> {
     return this.page.goto(url, options);
+  }
+
+  /**
+   * Reload the current page.
+   *
+   * @param {ReloadActionOptions} options
+   * @return {Response} Returns the main resource response
+   * @example
+   * BrowseTheWeb.as(actor).reload();
+   */
+  public async reload(options?: ReloadActionOptions): Promise<Response | null> {
+    return this.page.reload(options);
   }
 
   /**
