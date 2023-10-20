@@ -1,4 +1,5 @@
 export { Add } from "./Add";
+export { Bring } from "./Bring";
 export { Check } from "./Check";
 export { Clear } from "./Clear";
 export { Click } from "./Click";

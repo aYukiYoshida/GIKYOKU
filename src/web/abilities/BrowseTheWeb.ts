@@ -101,6 +101,18 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
+   * Brings page to front to activate it.
+   *
+   * @return {void}
+   * @example
+   * BrowseTheWeb.as(actor).bringToFront(page);
+   */
+  public async bringToFront(page: Page): Promise<void> {
+    this.page = page;
+    return this.page.bringToFront();
+  }
+
+  /**
    * Wait for the specified loading state.
    *
    * @param {string} status the status to wait for. Allowed: "load" | "domcontentloaded" | "networkidle".
