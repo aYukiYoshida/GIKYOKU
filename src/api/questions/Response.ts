@@ -97,8 +97,6 @@ export class Response extends Question<boolean> {
   }
 
   /**
-   * @category mode operators
-   *
    * Verify if the response has a given status code.
    *
    * @param {ResponseType} response the response to check.
@@ -107,6 +105,7 @@ export class Response extends Question<boolean> {
    * @example
    * Response.has.statusCode(response, 200);
    * Response.hasNot.statusCode(response, 200);
+   * @category mode operators
    */
   public statusCode(response: ResponseType, statusCode: number): Response {
     this.response = response;
@@ -116,20 +115,25 @@ export class Response extends Question<boolean> {
   }
 
   /**
-   * @category mode operators
-   *
    * Verify if the response body equals given one.
    *
    * @param {ResponseType} response the response to check.
    * @param {ResponseBodyType} body the expected body.
    * @return {Response} the Response instance
    * @example
-   * // json format
+   * json format
+   * ```typescript
    * Response.has.body(response, { key: value });
-   * // text format
+   * ```
+   * text format
+   * ```typescript
    * Response.hasNot.body(response, 'text' );
-   * // buffer format
+   * ```
+   * buffer format
+   * ```typescript
    * Response.has.body(response, Buffer.from('abc') );
+   * ```
+   * @category mode operators
    */
   public body(response: ResponseType, body: ResponseBodyType): Response {
     this.response = response;
@@ -139,18 +143,24 @@ export class Response extends Question<boolean> {
   }
 
   /**
-   * @category mode operators
-   *
    * Verify if the response has the given headers either by key (value to be set to undefined) or key/value lookup.
    *
    * @param {ResponseType} response the response to check.
    * @param {Headers} headers the expected header.
    * @return {Response} the Response instance
    * @example
-   * // only check for header presence by passing undefined as the value
+   * only check for header presence by passing undefined as the value
+   * ```typescript
    * Response.has.headers(response, { 'content-type': undefined });
-   * // lookup for key/value combination to be present
-   * Response.hasNot.headers(response, { 'content-type': 'application/json' });
+   * ```
+   * lookup for key/value combination to be present
+   * ```typescript
+   * Response.hasNot.headers(
+   *   response,
+   *   { 'content-type': 'application/json' }
+   * );
+   * ```
+   * @category mode operators
    */
   public headers(response: ResponseType, headers: Headers): Response {
     this.response = response;
@@ -160,18 +170,21 @@ export class Response extends Question<boolean> {
   }
 
   /**
-   * @category mode operators
-   *
    * Verify if the response (including receiving body) is received within a given duration.
    *
    * @param {ResponseType} response the response to check
    * @param {number} duration expected duration (in milliseconds) not to be exceeded
    * @return {Response} the Response instance
    * @example
-   * // check if response was received within 2s
+   * check if response was received within 2s
+   * ```typescript
    * Response.has.beenReceivedWithin(response, 2000);
-   * // check if response was not received within 2s
+   * ```
+   * check if response was not received within 2s
+   * ```
    * Response.hasNot.beenReceivedWithin(response, 2000);
+   * ```
+   * @category mode operators
    */
   public beenReceivedWithin(
     response: ResponseType,

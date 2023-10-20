@@ -1,56 +1,62 @@
+import { Locator } from "@playwright/test";
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { FillActionOptions, Selector, SelectorOptions } from "../types";
+import { FillActionOptions } from "../types";
 
 /**
- * @group Actions
+ * Fill an element specified by a locator string with the specified input.
  *
- * Fill an element specified by a selector string with the specified input.
+ * @group Actions
  */
 export class Fill extends Action {
   private constructor(
-    private selector: Selector,
+    private locator: Locator,
     private input: string,
-    private options?: SelectorOptions & FillActionOptions,
+    private options?: FillActionOptions,
   ) {
     super();
   }
 
   /**
-   * find the specified selector and fill it.
+   * find the specified locator and fill it.
    *
    * @param {Actor} actor Actor performing this action
    * @return {void} Returns after checks, focuses the element, fills it and triggers an `input` event after filling.
    */
   public async performAs(actor: Actor): Promise<void> {
-    return BrowseTheWeb.as(actor).fill(this.selector, this.input, this.options);
+    return BrowseTheWeb.as(actor).fill(this.locator, this.input, this.options);
   }
 
   /**
-   * Finds the specified selector and will it with the specified input string.
+   * Finds the specified locator and will it with the specified input string.
    *
-   * @param {Selector} selector the selector.
+   * @param {Locator} locator the locator.
    * @param {string} input the input.
-   * @param {SelectorOptions & FillActionOptions} options (optional) advanced selector lookup options.
+   * @param {FillActionOptions} options (optional) options for the fill action.
    * @return {Fill} new Fill instance
    * @example
-   * // simple call with just selector
-   * Fill.in('mySelector', 'myInput');
-   * // or with options
+   * simple call with just locator
+   * ```typescript
    * Fill.in(
-   *   'mySelector',
-   *   'myInput', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
+   *   page.locator('myLocator'),
+   *   'myInput'
    * );
+   * ```
+   * with options
+   * ```typescript
+   * Fill.in(
+   *   page.locator('myLocator'),
+   *   'myInput',
+   *   { timeout: 3000 }
+   * );
+   * ```
    */
   public static in(
-    selector: Selector,
+    locator: Locator,
     input: string,
-    options?: SelectorOptions & FillActionOptions,
+    options?: FillActionOptions,
   ): Fill {
-    return new Fill(selector, input, options);
+    return new Fill(locator, input, options);
   }
 }

@@ -2,9 +2,6 @@ import { Cookie, expect, Locator, Page, Response } from "@playwright/test";
 import { Ability, Actor } from "@testla/screenplay";
 
 import {
-  Selector,
-  SelectorOptions,
-  ScreenOptions,
   CheckActionOptions,
   ClickActionOptions,
   DblclickActionOptions,
@@ -18,13 +15,13 @@ import {
   TypeActionOptions,
   WaitForLoadStateActionOptions,
   WaitForUrlActionOptions,
+  WaitForLocatorActionOptions,
   TextPayload,
   ValuePayload,
   StylePayload,
   CountPayload,
   ScreenshotPayload,
 } from "../types";
-import { recursiveLocatorLookup } from "../utils";
 
 /**
  * @group Abilities
@@ -76,10 +73,12 @@ export class BrowseTheWeb extends Ability {
    * Use the page to navigate to the specified URL.
    *
    * @param {string} url the url to access.
-   * @param {NavigateActionOptions} options
+   * @param {NavigateActionOptions} options (optional) options for interaction.
    * @return {Response} Returns the main resource response
    * @example
-   * BrowseTheWeb.as(actor).goto('myURL');
+   * ```ts
+   * await BrowseTheWeb.as(actor).goto('myURL');
+   * ```
    */
   public async goto(
     url: string,
@@ -91,10 +90,12 @@ export class BrowseTheWeb extends Ability {
   /**
    * Reload the current page.
    *
-   * @param {ReloadActionOptions} options
+   * @param {ReloadActionOptions} options (optional) options for interaction.
    * @return {Response} Returns the main resource response
    * @example
-   * BrowseTheWeb.as(actor).reload();
+   * ```ts
+   * await BrowseTheWeb.as(actor).reload();
+   * ```
    */
   public async reload(options?: ReloadActionOptions): Promise<Response | null> {
     return this.page.reload(options);
@@ -105,7 +106,9 @@ export class BrowseTheWeb extends Ability {
    *
    * @return {void}
    * @example
-   * BrowseTheWeb.as(actor).bringToFront(page);
+   * ```ts
+   * await BrowseTheWeb.as(actor).bringToFront(page);
+   * ```
    */
   public async bringToFront(page: Page): Promise<void> {
     this.page = page;
@@ -116,10 +119,12 @@ export class BrowseTheWeb extends Ability {
    * Wait for the specified loading state.
    *
    * @param {string} status the status to wait for. Allowed: "load" | "domcontentloaded" | "networkidle".
-   * @param {WaitForLoadStateActionOptions} options
+   * @param {WaitForLoadStateActionOptions} options (optional) options for interaction.
    * @return {void} Returns when the required load state has been reached.
    * @example
-   * BrowseTheWeb.as(actor).waitForLoadState('networkidle');
+   * ```ts
+   * await BrowseTheWeb.as(actor).waitForLoadState('networkidle');
+   * ```
    */
   public async waitForLoadState(
     status: "load" | "domcontentloaded" | "networkidle",
@@ -132,10 +137,12 @@ export class BrowseTheWeb extends Ability {
    * Wait for the specified URL.
    *
    * @param {string} url the url to wait for.
-   * @param options
+   * @param {WaitForUrlActionOptions} options (optional) options for interaction.
    * @return {void} Returns when the page specified url has been reached.
    * @example
-   * BrowseTheWeb.as(actor).waitForLoadState('networkidle');
+   * ```ts
+   * await BrowseTheWeb.as(actor).waitForUrl('example.com');
+   * ```
    */
   public async waitForUrl(
     url: string | RegExp | ((url: URL) => boolean),
@@ -147,46 +154,43 @@ export class BrowseTheWeb extends Ability {
   /**
    * Use the page mouse to hover over the specified element.
    *
-   * @param {Selector} selector the selector of the element to hover over.
-   * @param {SelectorOptions & HoverActionOptions} options
+   * @param {Locator} Locator the locator of the element to hover over.
+   * @param {HoverActionOptions} options (optional) options for interaction.
    * @return {void} Returns when hovered over the element
    * @example
-   * // simple call with just selector
-   * BrowseTheWeb.as(actor).hover('mySelector');
-   * // or with options
-   * BrowseTheWeb.as(actor).hover('mySelector', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
+   * simple call with just locator
+   * ```ts
+   * await BrowseTheWeb.as(actor).hover(page.locator("myLocator"));
+   * ```
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).hover(page.locator("myLocator"), {
    *     modifiers: ['Alt', 'Shift']
    * });
+   * ```
    */
   public async hover(
-    selector: Selector,
-    options?: SelectorOptions & HoverActionOptions,
+    locator: Locator,
+    options?: HoverActionOptions,
   ): Promise<void> {
-    return (
-      await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).hover({
-      force: options?.force,
-      modifiers: options?.modifiers,
-      noWaitAfter: options?.noWaitAfter,
-      position: options?.position,
-      timeout: options?.timeout,
-      trial: options?.trial,
-    });
+    return locator.hover(options);
   }
 
   /**
    * Press the specified key(s) on the keyboard.
    *
    * @param {string} input the key(s). multiple keys can be pressed by concatenating with "+"
-   * @param {PressActionOptions} options
+   * @param {PressActionOptions} options (optional) options for interaction.
    * @return {void} Returns when the `key` can specify the intended value or a single character to generate the text for.
    * @example
-   * // Press a single button
-   * BrowseTheWeb.as(actor).press('A');
-   * // or multiple buttons
-   * BrowseTheWeb.as(actor).press('Control+A');
+   * Press a single button
+   * ```ts
+   * await BrowseTheWeb.as(actor).press('A');
+   * ```
+   * Press multiple buttons
+   * ```ts
+   * await BrowseTheWeb.as(actor).press('Control+A');
+   * ```
    */
   public async press(
     input: string,
@@ -200,182 +204,173 @@ export class BrowseTheWeb extends Ability {
   /**
    * Press the specified keys sequentially for each string character.
    * To press a special key, like Control or ArrowDown, use {@link press}.
-   * @param {Selector} selector the selector of the source element.
-   * @param {SelectorOptions & PressSequentiallyActionOptions} options
+   * @param {Locator} locator the locator of the source element.
+   * @param {PressSequentiallyActionOptions} options (optional) options for interaction.
    * @param {string} input string of characters to sequentially press into a focused element
    * @return {void} Returns when the `keys` can specify the intended values or characters to generate the text for.
-   * @example <caption>simple call with just selector and input value</caption>
-   * BrowseTheWeb.as(actor).pressSequentially('ABC');
+   * @example
+   * simple call with just locator and input value
+   * ```ts
+   * await BrowseTheWeb.as(actor).pressSequentially('ABC');
+   * ```
    */
   public async pressSequentially(
-    selector: Selector,
+    locator: Locator,
     input: string,
-    options?: SelectorOptions & PressActionOptions,
+    options?: PressActionOptions,
   ): Promise<void> {
-    return (
-      await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).pressSequentially(input, {
-      delay: options?.delay,
-      noWaitAfter: options?.noWaitAfter,
-      timeout: options?.timeout,
-    });
+    return locator.pressSequentially(input, options);
   }
 
   /**
    * Check the specified checkbox.
    *
-   * @param {Selector} selector the selector of the checkbox.
-   * @param {SelectorOptions & CheckActionOptions} options
+   * @param {Locator} locator the locator of the checkbox.
+   * @param {CheckActionOptions} options (optional) options for interaction.
    * @return {void} Returns after checking the element
    * @example
-   * // simple call with just selector
-   * BrowseTheWeb.as(actor).checkBox('mySelector');
-   * // or with options
-   * BrowseTheWeb.as(actor)
-   *   .checkBox('mySelector', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', {
-   *       hasText: 'anotherText' }
-   * ]});
+   * simple call with just locator
+   * ```ts
+   * await BrowseTheWeb.as(actor).checkBox(page.locator('myLocator'));
+   * ```
+   * call with options
+   * ```ts
+   * await BrowseTheWeb.as(actor)
+   *   .checkBox(
+   *     page.locator('myLocator'),
+   *     { timeout: 1000 }
+   *   );
+   * ```
    */
   public async checkBox(
-    selector: Selector,
-    options?: SelectorOptions & CheckActionOptions,
+    locator: Locator,
+    options?: CheckActionOptions,
   ): Promise<void> {
-    return (
-      await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).check({
-      force: options?.force,
-      noWaitAfter: options?.noWaitAfter,
-      position: options?.position,
-      timeout: options?.timeout,
-      trial: options?.trial,
-    });
+    return locator.check(options);
   }
 
   /**
-   * Wait until the element of the specified selector exists.
+   * Wait until the element of the specified locator exists.
    *
-   * @param {Selector} selector the selector of the element.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
-   * @return {Locator} Promise<Locator> returns the locator
+   * @param {Locator} locator the locator of the element.
+   * @param {WaitForLocatorActionOptions} options (optional) options for interaction.
+   * @return {void} Returns when the element exists
    * @example
-   * // simple call with just selector
-   * BrowseTheWeb.as(actor).waitForSelector('mySelector');
-   * // or with options
-   * BrowseTheWeb.as(actor).waitForSelector(
-   *   'mySelector', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
+   * simple call with just locator
+   * ```ts
+   * await BrowseTheWeb.as(actor).waitForLocator(
+   *   page.locator('myLocator')
    * );
+   * ```
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).waitForLocator(
+   *   page.locator('myLocator'),
+   *   { state: "visible" }
+   * );
+   * ```
    */
-  public async waitForSelector(
-    selector: Selector,
-    options?: SelectorOptions,
-  ): Promise<Locator> {
-    return recursiveLocatorLookup({ page: this.page, selector, options });
+  public async waitForLocator(
+    locator: Locator,
+    options?: WaitForLocatorActionOptions,
+  ): Promise<void> {
+    return locator.waitFor(options);
   }
 
   /**
    * Drag the specified source element to the specified target element and drop it.
    *
-   * @param {Selector} sourceSelector the selector of the source element.
-   * @param {Selector} targetSelector the selector of the target element.
-   * @param {SelectorOptions} options
+   * @param {Locator} sourceLocator the locator of the source element.
+   * @param {Locator} targetLocator the locator of the target element.
+   * @param {DragAndDropActionOptions} options (optional) options for interaction.
    * @return {void} Returns after dragging the locator to another target locator or target position
    * @example
-   * // simple call with just source and target selector
-   * BrowseTheWeb.as(actor).dragAndDrop('sourceSelector', 'targetSelector');
-   * // or with options
-   * BrowseTheWeb.as(actor).dragAndDrop('sourceSelector', 'targetSelector', {
-   *     source: { hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]},
-   *     target: { hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]}
-   * });
+   * simple call with just source and target locator
+   * ```ts
+   * await BrowseTheWeb.as(actor).dragAndDrop(
+   *   page.locator('sourceLocator'),
+   *   page.locator('targetLocator')
+   * );
+   * ```
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).dragAndDrop(
+   *   page.locator('sourceLocator'),
+   *   page.locator('targetLocator'),
+   *   { timeout: 1000 }
+   * );
+   * ```
    */
   public async dragAndDrop(
-    sourceSelector: Selector,
-    targetSelector: Selector,
-    options?: {
-      source?: SelectorOptions;
-      target?: SelectorOptions;
-      action?: DragAndDropActionOptions;
-    },
+    sourceLocator: Locator,
+    targetLocator: Locator,
+    options?: DragAndDropActionOptions,
   ): Promise<void> {
-    const target = await recursiveLocatorLookup({
-      page: this.page,
-      selector: targetSelector,
-      options: options?.target,
-    });
-    return (
-      await recursiveLocatorLookup({
-        page: this.page,
-        selector: sourceSelector,
-        options: options?.source,
-      })
-    ).dragTo(target, {
-      force: options?.action?.force,
-      noWaitAfter: options?.action?.noWaitAfter,
-      sourcePosition: options?.action?.sourcePosition,
-      targetPosition: options?.action?.targetPosition,
-      timeout: options?.action?.timeout,
-      trial: options?.action?.trial,
-    });
+    return sourceLocator.dragTo(targetLocator, options);
   }
 
   /**
-   * Fill the element specified by the selector with the given input.
+   * Fill the element specified by the locator with the given input.
    *
-   * @param {Selector} selector the selector of the source element.
+   * @param {Locator} locator the locator of the source element.
    * @param {string} input the input to fill the element with.
-   * @param {SelectorOptions & FillActionOptions} options
+   * @param {FillActionOptions} options (optional) options for interaction.
    * @return {void} Returns after checks, focuses the element, fills it and triggers an `input` event after filling.
    * @example
-   * // simple call with just selector and input value
-   * BrowseTheWeb.as(actor).fill('mySelector', 'myInput');
-   * // or with options
-   * BrowseTheWeb.as(actor).fill('mySelector', 'myInput', { hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]});
+   * simple call with just locator and input value
+   * ```ts
+   * await BrowseTheWeb.as(actor).fill(
+   *   page.locator('myLocator'),
+   *   'myInput'
+   * );
+   * ```
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).fill(
+   *   page.locator('myLocator'),
+   *   'myInput',
+   *   { timeout: 1000 }
+   * );
+   * ```
    */
   public async fill(
-    selector: Selector,
+    locator: Locator,
     input: string,
-    options?: SelectorOptions & FillActionOptions,
+    options?: FillActionOptions,
   ): Promise<void> {
-    return (
-      await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).fill(input, {
-      force: options?.force,
-      noWaitAfter: options?.noWaitAfter,
-    });
+    return locator.fill(input, options);
   }
 
   /**
-   * Type the given input into the element specified by the selector.
+   * Type the given input into the element specified by the locator.
    * @deprecated Use {@link fill} instead.
-   * @param {Selector} selector the selector of the source element.
+   * @param {Locator} locator the locator of the source element.
    * @param {string} input the input to type into the element.
-   * @param {SelectorOptions & TypeActionOptions} options
+   * @param {TypeActionOptions} options (optional) options for interaction.
    * @return {void} Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
    * @example
-   * // simple call with just selector and input value
-   * BrowseTheWeb.as(actor).type('mySelector', 'myInput');
-   * // or with options
-   * BrowseTheWeb.as(actor).type(
-   *   'mySelector',
-   *   'myInput', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
+   * simple call with just locator and input value
+   * ```ts
+   * await BrowseTheWeb.as(actor).type(
+   *   page.locator('myLocator'),
+   *   'myInput'
    * );
+   * ```
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).type(
+   *   page.locator('myLocator'),
+   *   'myInput',
+   *   { timeout: 1000 }
+   * );
+   * ```
    */
   public async type(
-    selector: Selector,
+    locator: Locator,
     input: string,
-    options?: SelectorOptions & TypeActionOptions,
+    options?: TypeActionOptions,
   ): Promise<void> {
-    return (
-      await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).type(input, {
+    return locator.type(input, {
       delay: options?.delay,
       noWaitAfter: options?.noWaitAfter,
       timeout: options?.timeout,
@@ -383,152 +378,226 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
-   * Click the element specified by the selector.
+   * Click the element specified by the locator.
    *
-   * @param {Selector} selector the selector of the element to click.
-   * @param {SelectorOptions & ClickActionOptions} options
+   * @param {Locator} locator the locator of the element to click.
+   * @param {ClickActionOptions} options (optional) options for interaction.
    * @return {void} Returns after clicking the element
    * @example
-   * // simple call with just selector
-   * BrowseTheWeb.as(actor).click('mySelector');
-   * // or with options
-   * BrowseTheWeb.as(actor).click('mySelector', {
-   *   hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]});
+   * simple call with just locator
+   * ```ts
+   * await BrowseTheWeb.as(actor).click(
+   *   page.locator('myLocator')
+   * );
+   * ```
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).click(
+   *   page.locator('myLocator'),
+   *   { timeout: 1000 }
+   * );
+   * ```
    */
   public async click(
-    selector: Selector,
-    options?: SelectorOptions & ClickActionOptions,
+    locator: Locator,
+    options?: ClickActionOptions,
   ): Promise<void> {
-    return (
-      await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).click({
-      button: options?.button,
-      clickCount: options?.clickCount,
-      delay: options?.delay,
-      force: options?.force,
-      modifiers: options?.modifiers,
-      noWaitAfter: options?.noWaitAfter,
-      position: options?.position,
-      timeout: options?.timeout,
-      trial: options?.trial,
-    });
+    return locator.click(options);
   }
 
   /**
-   * Double click the element specified by the selector.
+   * Double click the element specified by the locator.
    *
-   * @param {Selector} selector the selector of the element to double click.
-   * @param {SelectorOptions & DblclickActionOptions} options
+   * @param {Locator} locator the locator of the element to double click.
+   * @param {DblclickActionOptions} options (optional) options for interaction.
    * @return {void} Returns after double clicking the element
    * @example
-   * // simple call with just selector
-   * BrowseTheWeb.as(actor).dblclick('mySelector');
-   * // or with options
-   * BrowseTheWeb.as(actor).dblclick('mySelector', {
-   *   hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]});
+   * simple call with just locator
+   * ```ts
+   * await BrowseTheWeb.as(actor).dblclick(
+   *   page.locator('myLocator')
+   * );
+   * ```
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).dblclick(
+   *   page.locator('myLocator'),
+   *   { timeout: 1000 }
+   * );
+   * ```
    */
   public async dblclick(
-    selector: Selector,
-    options?: SelectorOptions & DblclickActionOptions,
+    locator: Locator,
+    options?: DblclickActionOptions,
   ): Promise<void> {
-    return (
-      await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).dblclick({
-      button: options?.button,
-      delay: options?.delay,
-      force: options?.force,
-      modifiers: options?.modifiers,
-      noWaitAfter: options?.noWaitAfter,
-      position: options?.position,
-      timeout: options?.timeout,
-      trial: options?.trial,
-    });
+    return locator.dblclick(options);
   }
 
   /**
-   * Focus the element specified by the selector.
+   * Focus the element specified by the locator.
    *
-   * @param {Selector} selector the selector of the element to focus.
-   * @param {SelectorOptions} options
+   * @param {Locator} locator the locator of the element to focus.
+   * @param options (optional) options for interaction.
    * @return {void} Returns after focus the element
-   * @example <caption> simple call with just selector </caption>
-   * BrowseTheWeb.as(actor).focus('mySelector');
-   * @example <caption> with options </caption>
-   * ```
-   * BrowseTheWeb.as(actor).focus('mySelector', {
-   *   hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]});
+   * @example
+   * simple call with just locator
+   * ```ts
+   * await BrowseTheWeb.as(actor).focus(
+   *   page.locator('myLocator')
+   * );
+   * @example
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).focus(
+   *   page.locator('myLocator'),
+   *   { timeout: 1000 }
+   * );
    * ```
    */
   public async focus(
-    selector: Selector,
-    options?: SelectorOptions,
+    locator: Locator,
+    options?: { timeout?: number },
   ): Promise<void> {
-    return (
-      await recursiveLocatorLookup({ page: this.page, selector, options })
-    ).focus({
-      timeout: options?.timeout,
-    });
+    return locator.focus(options);
   }
 
   /**
-   * Validate if the page has specified URL.
+   * Set the value of a Locator of type select to the given option.
+   *
+   * @param {Locator} locator the string representing the (select) locator.
+   * @param values options to select.
+   * @param {SelectActionOptions} options (optional) options for interaction.
+   * @return {any} Returns the array of option values that have been successfully selected.
+   * @example
+   * simple call with just locator and input value
+   * ```ts
+   * await BrowseTheWeb.as(actor).selectOption(
+   *   page.locator('myLocator'),
+   *   'myOptionLabel'
+   * );
+   * ```
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).selectOption(
+   *   page.locator('myLocator'),
+   *   'myOptionLabel'
+   *   { timeout: 1000 }
+   * );
+   * ```
+   */
+  public async selectOption(
+    locator: Locator,
+    values:
+      | string
+      | Array<string>
+      | {
+          /**
+           * Matches by `option.value`. Optional.
+           */
+          value?: string;
+
+          /**
+           * Matches by `option.label`. Optional.
+           */
+          label?: string;
+
+          /**
+           * Matches by the index. Optional.
+           */
+          index?: number;
+        }
+      | Array<{
+          /**
+           * Matches by `option.value`. Optional.
+           */
+          value?: string;
+
+          /**
+           * Matches by `option.label`. Optional.
+           */
+          label?: string;
+
+          /**
+           * Matches by the index. Optional.
+           */
+          index?: number;
+        }>,
+    options?: SelectActionOptions,
+  ): Promise<Array<string>> {
+    return locator.selectOption(values, options);
+  }
+
+  /**
+   * Verify if the page has specified URL.
    *
    * @param {boolean} positive whether to check the property of the page positive or not.
    * @param {string|RegExp} expectedUrl the expected url of the page.
-   * @param {number} options (optional) timeout in milliseconds to wait for the element to be visible/hidden.
+   * @param options (optional) options for assertion.
+   * @param page (optional) the playwright page object to verify.
    * @returns {boolean} Promise<boolean> true if the page has URL as expected, false if the timeout was reached.
+   * @category method to ensure
    */
   public async checkPageUrl(
     positive: boolean,
     expectedUrl: string | RegExp,
-    options?: ScreenOptions,
+    options?: { timeout?: number },
+    page?: Page,
   ): Promise<boolean> {
+    const pageToUse = page ?? this.page;
     if (positive) {
-      await expect(this.page).toHaveURL(expectedUrl, options);
+      await expect(pageToUse).toHaveURL(expectedUrl, options);
     } else {
-      await expect(this.page).not.toHaveURL(expectedUrl, options);
+      await expect(pageToUse).not.toHaveURL(expectedUrl, options);
     }
     return Promise.resolve(true);
   }
 
   /**
-   * Validate if the page has specified title.
+   * Verify if the page has specified title.
    *
    * @param {boolean} positive whether to check the property of the page positive or not.
    * @param {string|RegExp} expectedTitle the expected title of the page.
-   * @param {number} timeout (optional) time in milliseconds to wait for the element to be visible/hidden.
+   * @param options (optional) options for assertion.
+   * @param page (optional) the playwright page object to verify.
    * @returns {boolean} Promise<boolean> true if the page has title as expected, false if the timeout was reached.
+   * @category method to ensure
    */
   public async checkPageTitle(
     positive: boolean,
     expectedTitle: string | RegExp,
-    options?: ScreenOptions,
+    options?: { timeout?: number },
+    page?: Page,
   ): Promise<boolean> {
+    const pageToUse = page ?? this.page;
     if (positive) {
-      await expect(this.page).toHaveTitle(expectedTitle, options);
+      await expect(pageToUse).toHaveTitle(expectedTitle, options);
     } else {
-      await expect(this.page).not.toHaveTitle(expectedTitle, options);
+      await expect(pageToUse).not.toHaveTitle(expectedTitle, options);
     }
     return Promise.resolve(true);
   }
 
   /**
-   * Validate if the page has specified title.
+   * Verify if the page has specified title.
    *
    * @param {boolean} positive whether to check the property of the page positive or not.
    * @param {string|string[]} name the screenshot name
-   * @param {number} timeout (optional) time in milliseconds to wait for.
+   * @param options (optional) options for assertion.
+   * @param page (optional) the playwright page object to verify.
    * @returns {boolean} Promise<boolean> true if the page has title as expected, false if the timeout was reached.
+   * @category method to ensure
    */
   public async checkPageScreenshot(
     positive: boolean,
     name: string | string[],
-    options?: ScreenOptions,
+    options?: { timeout?: number },
+    page?: Page,
   ): Promise<boolean> {
+    const pageToUse = page ?? this.page;
     if (positive) {
-      await expect(this.page).toHaveScreenshot(name, options);
+      await expect(pageToUse).toHaveScreenshot(name, options);
     } else {
-      await expect(this.page).not.toHaveScreenshot(name, options);
+      await expect(pageToUse).not.toHaveScreenshot(name, options);
     }
     return Promise.resolve(true);
   }
@@ -536,43 +605,44 @@ export class BrowseTheWeb extends Ability {
   /**
    * Verify if a locator on the page is visible or hidden.
    *
-   * @param {Selector} selector the locator to search for.
-   * @param {boolean} positive whether to check the property of the selector positive or not.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {Locator} locator the locator to search for.
+   * @param {boolean} positive whether to check the visibility of the locator positive or not.
+   * @param options (optional) options for assertion.
    * @returns {boolean} Promise<boolean> true if the element is visible/hidden as expected, false if the timeout was reached.
    * @example
-   * // simple call with just selector
-   * BrowseTheWeb.as(actor).checkVisibilityState('mySelector', true);
-   * // or with options
-   * BrowseTheWeb.as(actor).checkVisibilityState(
-   *   'mySelector',
-   *   false, {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
+   * simple call with just locator
+   * ```ts
+   * await BrowseTheWeb.as(actor).checkVisibilityState(
+   *   page.locator('myLocator'),
+   *   true
    * );
+   * ```
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).checkVisibilityState(
+   *   page.locator('myLocator'),
+   *   false,
+   *   { timeout: 1000 }
+   * );
+   * ```
+   * @category method to ensure
    */
   public async checkVisibilityState(
-    selector: Selector,
+    locator: Locator,
     positive: boolean,
-    options?: SelectorOptions,
+    options?: {
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+
+      visible?: boolean;
+    },
   ): Promise<boolean> {
     if (positive) {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).toBeVisible({ timeout: options?.timeout });
+      await expect(locator).toBeVisible(options);
     } else {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "hidden" },
-        }),
-      ).toBeHidden({ timeout: options?.timeout });
+      await expect(locator).toBeHidden({ timeout: options?.timeout });
     }
     return Promise.resolve(true);
   }
@@ -580,285 +650,292 @@ export class BrowseTheWeb extends Ability {
   /**
    * Verify if a locator on the page is enabled or disabled.
    *
-   * @param {Selector} selector the locator to search for.
-   * @param {boolean} positive whether to check the property of the selector positive or not.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {Locator} locator the locator to search for.
+   * @param {boolean} positive whether to check the state of the locator positive or not.
+   * @param options (optional) options for assertion.
    * @returns {boolean} true if the element is enabled/disabled as expected, false if the timeout was reached.
    * @example
-   * // simple call with just selector
-   * BrowseTheWeb.as(actor).checkEnabledState('mySelector', true);
-   * // or with options
-   * BrowseTheWeb.as(actor).checkEnabledState(
-   *   'mySelector',
-   *   false, {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
+   * simple call with just locator
+   * ```ts
+   * await BrowseTheWeb.as(actor).checkEnabledState(
+   *   page.locator('myLocator'),
+   *   true
    * );
+   * ```
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).checkEnabledState(
+   *   page.locator('myLocator'),
+   *   false,
+   *   { timeout: 1000 }
+   * );
+   * ```
+   * @category method to ensure
    */
   public async checkEnabledState(
-    selector: Selector,
+    locator: Locator,
     positive: boolean,
-    options?: SelectorOptions,
+    options?: {
+      enabled?: boolean;
+
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
   ): Promise<boolean> {
     if (positive) {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).toBeEnabled({ timeout: options?.timeout });
+      await expect(locator).toBeEnabled(options);
     } else {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).toBeDisabled({ timeout: options?.timeout });
+      await expect(locator).toBeDisabled({ timeout: options?.timeout });
     }
     return Promise.resolve(true);
   }
 
   /**
-   * Validate if a locator on the page is editable or not.
+   * Verify if a locator on the page is editable or not.
    *
-   * @param {Selector} selector the locator to search for.
-   * @param {boolean} positive whether to check the property of the selector positive or not.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {Locator} locator the locator to search for.
+   * @param {boolean} positive whether to check the state of the locator positive or not.
+   * @param options (optional) options for assertion.
    * @returns {boolean} true if the element is editable/not as expected, false if the timeout was reached.
    * @example
-   * // simple call with just selector
-   * BrowseTheWeb.as(actor).checkEditableState('mySelector', true);
-   * // or with options
-   * BrowseTheWeb.as(actor).checkEditableState(
-   *   'mySelector',
-   *   false, {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
+   * simple call with just locator
+   * ```ts
+   * await BrowseTheWeb.as(actor).checkEditableState(
+   *   page.locator('myLocator'),
+   *   true
    * );
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).checkEditableState(
+   *   page.locator('myLocator'),
+   *   false,
+   *   { timeout: 1000 }
+   * );
+   * ```
+   * @category method to ensure
    */
   public async checkEditableState(
-    selector: Selector,
+    locator: Locator,
     positive: boolean,
-    options?: SelectorOptions,
+    options?: {
+      editable?: boolean;
+
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
   ): Promise<boolean> {
     if (positive) {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).toBeEditable({ timeout: options?.timeout });
+      await expect(locator).toBeEditable(options);
     } else {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).not.toBeEditable({ timeout: options?.timeout });
+      await expect(locator).not.toBeEditable(options);
     }
     return Promise.resolve(true);
   }
 
   /**
-   * Validate if a locator on the page is focused or not.
+   * Verify if a locator on the page is focused or not.
    *
-   * @param {Selector} selector the locator to search for.
-   * @param {boolean} positive whether to check the property of the selector positive or not.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {Locator} locator the locator to search for.
+   * @param {boolean} positive whether to check the property of the locator positive or not.
+   * @param options (optional) options for assertion.
    * @returns {boolean} true if the element is editable/not as expected, false if the timeout was reached.
    * @example
-   * // simple call with just selector
-   * BrowseTheWeb.as(actor).checkFocusedState('mySelector', true);
-   * // or with options
-   * BrowseTheWeb.as(actor).checkFocusedState(
-   *   'mySelector',
-   *   false, {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
+   * simple call with just locator
+   * ```ts
+   * await BrowseTheWeb.as(actor).checkFocusedState(
+   *   page.locator('myLocator'),
+   *   true
    * );
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).checkFocusedState(
+   *   page.locator('myLocator'),
+   *   false,
+   *   { timeout: 1000 }
+   * );
+   * ```
+   * @category method to ensure
    */
   public async checkFocusedState(
-    selector: Selector,
+    locator: Locator,
     positive: boolean,
-    options?: SelectorOptions,
+    options?: {
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
   ): Promise<boolean> {
     if (positive) {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).toBeFocused({ timeout: options?.timeout });
+      await expect(locator).toBeFocused(options);
     } else {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).not.toBeFocused({ timeout: options?.timeout });
+      await expect(locator).not.toBeFocused(options);
     }
     return Promise.resolve(true);
   }
 
   /**
-   * Validate if the given element is checked.
+   * Verify if the given element is checked.
    *
-   * @param {Selector} selector the selector of the element.
-   * @param {boolean} positive whether to check the property of the selector positive or not.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {Locator} locator the locator of the element.
+   * @param {boolean} positive whether to check the property of the locator positive or not.
+   * @param options
+   * @returns {boolean} true if the element is checked/not as expected, false if the timeout was reached.
+   * @category method to ensure
    */
   public async checkCheckedState(
-    selector: Selector,
+    locator: Locator,
     positive: boolean,
-    options?: SelectorOptions,
+    options?: {
+      checked?: boolean;
+
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
   ): Promise<boolean> {
     if (positive) {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).toBeChecked({ timeout: options?.timeout });
+      await expect(locator).toBeChecked(options);
     } else {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).not.toBeChecked({ timeout: options?.timeout });
+      await expect(locator).not.toBeChecked(options);
     }
     return Promise.resolve(true);
   }
 
   /**
-   * Validate if the given element has the given text or not.
+   * Verify if the given element has the given text or not.
    *
-   * @param {Selector} selector the selector of the element to hover over.
+   * @param {Locator} locator the locator of the element to hover over.
    * @param {string | RegExp | (string | RegExp)[]} text the text to check.
-   * @param {boolean} positive whether to check the property of the selector positive or not.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {boolean} positive whether to check the property of the locator positive or not.
+   * @param options options for assertion.
+   * @returns {boolean} true if the element has text/not as expected, false if the timeout was reached.
+   * @category method to ensure
    */
-  public async checkSelectorText(
-    selector: Selector,
+  public async checkLocatorHasText(
+    locator: Locator,
     text: TextPayload,
     positive: boolean,
-    options?: SelectorOptions,
+    options?: {
+      /**
+       * Whether to perform case-insensitive match. `ignoreCase` option takes precedence over the corresponding regular
+       * expression flag if specified.
+       */
+      ignoreCase?: boolean;
+
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+
+      /**
+       * Whether to use `element.innerText` instead of `element.textContent` when retrieving DOM node text.
+       */
+      useInnerText?: boolean;
+    },
   ): Promise<boolean> {
     if (positive) {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).toHaveText(text, { timeout: options?.timeout });
+      await expect(locator).toHaveText(text, options);
     } else {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).not.toHaveText(text, { timeout: options?.timeout });
+      await expect(locator).not.toHaveText(text, options);
     }
     return Promise.resolve(true);
   }
 
   /**
-   * Validate if the given element contains the given text or not.
+   * Verify if the given element contains the given text or not.
    *
-   * @param {Selector} selector the selector of the element to hover over.
+   * @param {Locator} locator the locator of the element to hover over.
    * @param {TextPayload} text the text to check.
-   * @param {boolean} positive whether to check the property of the selector positive or not.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {boolean} positive whether to check the property of the locator positive or not.
+   * @param options (optional) options for assertion.
+   * @category method to ensure
    */
-  public async checkSelectorContainText(
-    selector: Selector,
+  public async checkLocatorContainsText(
+    locator: Locator,
     text: TextPayload,
     positive: boolean,
-    options?: SelectorOptions,
+    options?: {
+      /**
+       * Whether to perform case-insensitive match. `ignoreCase` option takes precedence over the corresponding regular
+       * expression flag if specified.
+       */
+      ignoreCase?: boolean;
+
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+
+      /**
+       * Whether to use `element.innerText` instead of `element.textContent` when retrieving DOM node text.
+       */
+      useInnerText?: boolean;
+    },
   ): Promise<boolean> {
     if (positive) {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).toContainText(text, { timeout: options?.timeout });
+      await expect(locator).toContainText(text, options);
     } else {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).not.toContainText(text, { timeout: options?.timeout });
+      await expect(locator).not.toContainText(text, options);
     }
     return Promise.resolve(true);
   }
 
   /**
-   * Validate if the given element has the given input value or not.
+   * Verify if the given element has the given input value or not.
    *
-   * @param {Selector} selector the selector of the element to hover over.
+   * @param {Locator} locator the locator of the element to hover over.
    * @param {ValuePayload} value the single value to check.
-   * @param {boolean} positive whether to check the property of the selector positive or not.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {boolean} positive whether to check the property of the locator positive or not.
+   * @param options (optional) options for assertion.
+   * @returns {boolean} true if the element has value/not as expected, false if the timeout was reached.
+   * @category method to ensure
    */
-  public async checkSelectorValue(
-    selector: Selector,
+  public async checkLocatorHasValue(
+    locator: Locator,
     value: ValuePayload,
     positive: boolean,
-    options?: SelectorOptions,
+    options?: {
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
   ): Promise<boolean> {
     if (positive) {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).toHaveValue(value, { timeout: options?.timeout });
+      await expect(locator).toHaveValue(value, options);
     } else {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).not.toHaveValue(value, { timeout: options?.timeout });
+      await expect(locator).not.toHaveValue(value, options);
     }
     return Promise.resolve(true);
   }
 
   /**
-   * Validate if the element has exact number of DOM node.
+   * Verify if the element has exact number of DOM node.
    *
-   * @param {Selector} selector the selector of the element.
+   * @param {Locator} locator the locator of the element.
    * @param {CountPayload} count the minimum count of the element to be visible.
-   * @param {boolean} positive whether to check the property of the selector positive or not.
+   * @param {boolean} positive whether to check the property of the locator positive or not.
    * @param options (optional) options for assertion.
+   * @returns {boolean} true if the element has exact number of DOM node, false if the timeout was reached.
+   * @category method to ensure
    */
-  public async checkSelectorCount(
-    selector: Selector,
+  public async checkLocatorHasCount(
+    locator: Locator,
     count: CountPayload,
     positive: boolean,
-    options?: { timeout?: number },
+    options?: {
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
   ): Promise<boolean> {
-    const locator =
-      typeof selector === "string" ? this.page.locator(selector) : selector;
     if (positive) {
       await expect(locator).toHaveCount(count, options);
     } else {
@@ -868,69 +945,121 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
-   * Validate if the given element has the given CSS or not.
+   * Verify if the given element has the given CSS or not.
    *
-   * @param {Selector} selector the selector of the element to hover over.
+   * @param {Locator} locator the locator of the element to hover over.
    * @param {StylePayload} style the style name and value to check.
-   * @param {boolean} positive whether to check the property of the selector positive or not.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {boolean} positive whether to check the property of the locator positive or not.
+   * @param options (optional) options for assertion.
+   * @returns {boolean} true if the element has CSS/not as expected, false if the timeout was reached.
+   * @category method to ensure
    */
-  public async checkSelectorCSS(
-    selector: Selector,
+  public async checkLocatorHasCSS(
+    locator: Locator,
     style: StylePayload,
     positive: boolean,
-    options?: SelectorOptions,
+    options?: {
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
   ): Promise<boolean> {
     if (positive) {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).toHaveCSS(style.name, style.value, { timeout: options?.timeout });
+      await expect(locator).toHaveCSS(style.name, style.value, options);
     } else {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).not.toHaveCSS(style.name, style.value, { timeout: options?.timeout });
+      await expect(locator).not.toHaveCSS(style.name, style.value, options);
     }
     return Promise.resolve(true);
   }
 
   /**
-   * Validate if the given element has the given screenshot or not.
+   * Verify if the given element has the given screenshot or not.
    *
-   * @param {Selector} selector the selector of the element to hover over.
+   * @param {Locator} locator the locator of the element to hover over.
    * @param {ScreenshotPayload} name the screenshot name.
-   * @param {boolean} positive whether to check the property of the selector positive or not.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {boolean} positive whether to check the property of the locator positive or not.
+   * @param options (optional) options for assertion.
+   * @returns {boolean} true if the element has screenshot/not as expected, false if the timeout was reached.
+   * @category method to ensure
    */
-  public async checkSelectorScreenshot(
-    selector: Selector,
+  public async checkLocatorHasScreenshot(
+    locator: Locator,
     name: ScreenshotPayload,
     positive: boolean,
-    options?: SelectorOptions,
+    options?: {
+      /**
+       * When set to `"disabled"`, stops CSS animations, CSS transitions and Web Animations. Animations get different
+       * treatment depending on their duration:
+       * - finite animations are fast-forwarded to completion, so they'll fire `transitionend` event.
+       * - infinite animations are canceled to initial state, and then played over after the screenshot.
+       *
+       * Defaults to `"disabled"` that disables animations.
+       */
+      animations?: "disabled" | "allow";
+
+      /**
+       * When set to `"hide"`, screenshot will hide text caret. When set to `"initial"`, text caret behavior will not be
+       * changed.  Defaults to `"hide"`.
+       */
+      caret?: "hide" | "initial";
+
+      /**
+       * Specify locators that should be masked when the screenshot is taken. Masked elements will be overlaid with a pink
+       * box `#FF00FF` (customized by `maskColor`) that completely covers its bounding box.
+       */
+      mask?: Array<Locator>;
+
+      /**
+       * Specify the color of the overlay box for masked elements, in
+       * [CSS color format](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value). Default color is pink `#FF00FF`.
+       */
+      maskColor?: string;
+
+      /**
+       * An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is
+       * configurable with `TestConfig.expect`. Unset by default.
+       */
+      maxDiffPixelRatio?: number;
+
+      /**
+       * An acceptable amount of pixels that could be different. Default is configurable with `TestConfig.expect`. Unset by
+       * default.
+       */
+      maxDiffPixels?: number;
+
+      /**
+       * Hides default white background and allows capturing screenshots with transparency. Not applicable to `jpeg` images.
+       * Defaults to `false`.
+       */
+      omitBackground?: boolean;
+
+      /**
+       * When set to `"css"`, screenshot will have a single pixel per each css pixel on the page. For high-dpi devices, this
+       * will keep screenshots small. Using `"device"` option will produce a single pixel per each device pixel, so
+       * screenshots of high-dpi devices will be twice as large or even larger.
+       *
+       * Defaults to `"css"`.
+       */
+      scale?: "css" | "device";
+
+      /**
+       * An acceptable perceived color difference in the [YIQ color space](https://en.wikipedia.org/wiki/YIQ) between the
+       * same pixel in compared images, between zero (strict) and one (lax), default is configurable with
+       * `TestConfig.expect`. Defaults to `0.2`.
+       */
+      threshold?: number;
+
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
   ): Promise<boolean> {
     if (positive) {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).toHaveScreenshot(name, { timeout: options?.timeout });
+      await expect(locator).toHaveScreenshot(name, options);
     } else {
-      await expect(
-        await recursiveLocatorLookup({
-          page: this.page,
-          selector,
-          options: { ...options, state: "visible" },
-        }),
-      ).not.toHaveScreenshot(name, { timeout: options?.timeout });
+      await expect(locator).not.toHaveScreenshot(name, options);
     }
     return Promise.resolve(true);
   }
@@ -940,16 +1069,20 @@ export class BrowseTheWeb extends Ability {
    * @param {string|string[]} urls affected urls
    * @return {Cookie[]} Returns the cookies of the current browser context.
    * @example
-   * // get all cookies
-   * BrowseTheWeb.as(actor).getCookies();
-   * // get cookies for one single domain
-   * BrowseTheWeb.as(actor).getCookies('https:www.myapp.com');
-   * // get cookies for two domains
-   * BrowseTheWeb.as(actor).getCookies(['https:www.myapp.com', 'https:www.another-app.com']);
+   * get all cookies
+   * ```ts
+   * await BrowseTheWeb.as(actor).getCookies();
+   * ```
+   * get cookies for one single domain
+   * ```ts
+   * await BrowseTheWeb.as(actor).getCookies('https://example.com');
+   * ```
+   * get cookies for two domains
+   * ```ts
+   * await BrowseTheWeb.as(actor).getCookies(['https://example.com', 'https://www.com']);
+   * ```
    */
-  public async getCookies(
-    urls?: string | string[] | undefined,
-  ): Promise<Cookie[]> {
+  public async getCookies(urls?: string | string[]): Promise<Cookie[]> {
     return this.page.context().cookies(urls);
   }
 
@@ -958,11 +1091,13 @@ export class BrowseTheWeb extends Ability {
    * @param {Cookie[]} cookies Cookies to add at browser context
    * @return {void} Returns after adding cookies into this browser context.
    * @example
-   * BrowseTheWeb.as(actor).addCookies([{
+   * ```ts
+   * await BrowseTheWeb.as(actor).addCookies([{
    *   name: 'my cookie',
    *   value: 'my value',
    *   url: 'http://www.myapp.com',
    * }]);
+   * ```
    */
   public async addCookies(cookies: Cookie[]): Promise<void> {
     return this.page.context().addCookies(cookies);
@@ -972,7 +1107,9 @@ export class BrowseTheWeb extends Ability {
    * Clear the browser context cookies.
    * @return {void} Clears context cookies.
    * @example
-   * BrowseTheWeb.as(actor).clearCookies();
+   * ```ts
+   * await BrowseTheWeb.as(actor).clearCookies();
+   * ```
    */
   public async clearCookies(): Promise<void> {
     return this.page.context().clearCookies();
@@ -984,7 +1121,9 @@ export class BrowseTheWeb extends Ability {
    * @param {string} key the key that specifies the item.
    * @return {any} Returns the local storage item
    * @example
-   * BrowseTheWeb.as(actor).getLocalStorageItem('some key');
+   * ```ts
+   * await BrowseTheWeb.as(actor).getLocalStorageItem('some key');
+   * ```
    */
   public async getLocalStorageItem(key: string): Promise<any> {
     return this.page.evaluate((k) => {
@@ -1003,7 +1142,9 @@ export class BrowseTheWeb extends Ability {
    * @param {any} value the value to set.
    * @return {void} Returns after adding the local storage item
    * @example
-   * BrowseTheWeb.as(actor).setLocalStorageItem('some key', 'some value');
+   * ```ts
+   * await BrowseTheWeb.as(actor).setLocalStorageItem('some key', 'some value');
+   * ```
    */
   public async setLocalStorageItem(key: string, value: any): Promise<void> {
     return this.page.evaluate(
@@ -1021,7 +1162,9 @@ export class BrowseTheWeb extends Ability {
    * @param {string} key the key that specifies the item.
    * @return {void} Returns after deleting a local storage item
    * @example
-   * BrowseTheWeb.as(actor).removeLocalStorageItem('some key');
+   * ```ts
+   * await BrowseTheWeb.as(actor).removeLocalStorageItem('some key');
+   * ```
    */
   public async removeLocalStorageItem(key: string): Promise<void> {
     return this.page.evaluate((k) => {
@@ -1036,7 +1179,9 @@ export class BrowseTheWeb extends Ability {
    * @param {string} key the key that specifies the item.
    * @return {any} Retrieves a session storage item
    * @example
-   * BrowseTheWeb.as(actor).getSessionStorageItem('some key');
+   * ```ts
+   * await BrowseTheWeb.as(actor).getSessionStorageItem('some key');
+   * ```
    */
   public async getSessionStorageItem(key: string): Promise<any> {
     return this.page.evaluate((k) => {
@@ -1055,7 +1200,9 @@ export class BrowseTheWeb extends Ability {
    * @param {any} value the value to set.
    * @return {void} Set the session storage item
    * @example
-   * BrowseTheWeb.as(actor).setSessionStorageItem('some key', 'some value');
+   * ```ts
+   * await BrowseTheWeb.as(actor).setSessionStorageItem('some key', 'some value');
+   * ```
    */
   public async setSessionStorageItem(key: string, value: any): Promise<void> {
     return this.page.evaluate(
@@ -1073,49 +1220,14 @@ export class BrowseTheWeb extends Ability {
    * @param {string} key the key that specifies the item.
    * @return {void} Returns after removing a session storage item.
    * @example
-   * BrowseTheWeb.as(actor).removeSessionStorageItem('some key');
+   * ```ts
+   * await BrowseTheWeb.as(actor).removeSessionStorageItem('some key');
+   * ```
    */
   public async removeSessionStorageItem(key: string): Promise<void> {
     return this.page.evaluate((k) => {
       sessionStorage.removeItem(k);
       return Promise.resolve();
     }, key);
-  }
-
-  /**
-   * Set the value of a Selector of type select to the given option.
-   *
-   * @param {Selector} selector the string representing the (select) selector.
-   * @param {string} option the label of the option.
-   * @param {SelectorOptions} selectorOptions (optional): advanced selector lookup options.
-   * @return {any} Returns the array of option values that have been successfully selected.
-   * @example
-   * // simple call with just selector and input value
-   * BrowseTheWeb.as(actor).selectOption('mySelector', 'myOptionLabel');
-   * // or with options
-   * BrowseTheWeb.as(actor).selectOption(
-   *   'mySelector',
-   *   'myOptionLabel', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
-   * );
-   */
-  public async selectOption(
-    selector: Selector,
-    option: string | { value?: string; label?: string; index?: number },
-    options?: SelectorOptions & SelectActionOptions,
-  ): Promise<any> {
-    return (
-      await recursiveLocatorLookup({
-        page: this.page,
-        selector,
-        options: options,
-      })
-    ).selectOption(option, {
-      force: options?.force,
-      noWaitAfter: options?.noWaitAfter,
-      timeout: options?.timeout,
-    });
   }
 }

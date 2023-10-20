@@ -1,7 +1,7 @@
+import { Locator } from "@playwright/test";
 import { Actor, Question } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { Selector, SelectorOptions } from "../types";
 import {
   ElementQuestionMode,
   TextPayload,
@@ -16,11 +16,19 @@ import {
   isScreenshotPayload,
 } from "../types";
 
+type Options =
+  | { timeout?: number }
+  | { timeout?: number; visible?: boolean }
+  | { timeout?: number; enabled?: boolean }
+  | { timeout?: number; editable?: boolean }
+  | { timeout?: number; checked?: boolean }
+  | { timeout?: number; ignoreCase?: boolean; useInnerText?: boolean };
+
 /**
- * @group Questions
- *
- * Get a specified state for selector.
+ * Get a specified state for locator.
  * A mode operator must be prepended.
+ *
+ * @group Questions
  */
 export class Element extends Question<boolean> {
   private positive = true;
@@ -31,16 +39,12 @@ export class Element extends Question<boolean> {
     | CountPayload
     | StylePayload
     | ScreenshotPayload = "";
+  private options?: Options;
 
   /**
-   * @param {Selector} selector the selector of the element to check.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
-   *
+   * @param {Locator} locator the locator of the element to check.
    */
-  private constructor(
-    private selector: Selector,
-    private options?: SelectorOptions,
-  ) {
+  private constructor(private locator: Locator) {
     super();
   }
 
@@ -54,7 +58,7 @@ export class Element extends Question<boolean> {
     if (this.mode === "visible") {
       return Promise.resolve(
         await BrowseTheWeb.as(actor).checkVisibilityState(
-          this.selector,
+          this.locator,
           this.positive,
           this.options,
         ),
@@ -63,7 +67,7 @@ export class Element extends Question<boolean> {
     if (this.mode === "enabled") {
       return Promise.resolve(
         await BrowseTheWeb.as(actor).checkEnabledState(
-          this.selector,
+          this.locator,
           this.positive,
           this.options,
         ),
@@ -72,7 +76,7 @@ export class Element extends Question<boolean> {
     if (this.mode === "editable") {
       return Promise.resolve(
         await BrowseTheWeb.as(actor).checkEditableState(
-          this.selector,
+          this.locator,
           this.positive,
           this.options,
         ),
@@ -81,7 +85,7 @@ export class Element extends Question<boolean> {
     if (this.mode === "checked") {
       return Promise.resolve(
         await BrowseTheWeb.as(actor).checkCheckedState(
-          this.selector,
+          this.locator,
           this.positive,
           this.options,
         ),
@@ -90,7 +94,7 @@ export class Element extends Question<boolean> {
     if (this.mode === "focused") {
       return Promise.resolve(
         await BrowseTheWeb.as(actor).checkFocusedState(
-          this.selector,
+          this.locator,
           this.positive,
           this.options,
         ),
@@ -99,8 +103,8 @@ export class Element extends Question<boolean> {
     if (this.mode === "haveText") {
       if (isTextPayload(this.payload)) {
         return Promise.resolve(
-          await BrowseTheWeb.as(actor).checkSelectorText(
-            this.selector,
+          await BrowseTheWeb.as(actor).checkLocatorHasText(
+            this.locator,
             this.payload,
             this.positive,
             this.options,
@@ -112,8 +116,8 @@ export class Element extends Question<boolean> {
     if (this.mode === "containText") {
       if (isTextPayload(this.payload)) {
         return Promise.resolve(
-          await BrowseTheWeb.as(actor).checkSelectorContainText(
-            this.selector,
+          await BrowseTheWeb.as(actor).checkLocatorContainsText(
+            this.locator,
             this.payload,
             this.positive,
             this.options,
@@ -125,8 +129,8 @@ export class Element extends Question<boolean> {
     if (this.mode === "haveValue") {
       if (isValuePayload(this.payload)) {
         return Promise.resolve(
-          await BrowseTheWeb.as(actor).checkSelectorValue(
-            this.selector,
+          await BrowseTheWeb.as(actor).checkLocatorHasValue(
+            this.locator,
             this.payload,
             this.positive,
             this.options,
@@ -138,8 +142,8 @@ export class Element extends Question<boolean> {
     if (this.mode === "haveCount") {
       if (isCountPayload(this.payload)) {
         return Promise.resolve(
-          await BrowseTheWeb.as(actor).checkSelectorCount(
-            this.selector,
+          await BrowseTheWeb.as(actor).checkLocatorHasCount(
+            this.locator,
             this.payload,
             this.positive,
             this.options,
@@ -151,8 +155,8 @@ export class Element extends Question<boolean> {
     if (this.mode === "haveCSS") {
       if (isStylePayload(this.payload)) {
         return Promise.resolve(
-          await BrowseTheWeb.as(actor).checkSelectorCSS(
-            this.selector,
+          await BrowseTheWeb.as(actor).checkLocatorHasCSS(
+            this.locator,
             this.payload,
             this.positive,
             this.options,
@@ -164,8 +168,8 @@ export class Element extends Question<boolean> {
     if (this.mode === "haveScreenshot") {
       if (isScreenshotPayload(this.payload)) {
         return Promise.resolve(
-          await BrowseTheWeb.as(actor).checkSelectorScreenshot(
-            this.selector,
+          await BrowseTheWeb.as(actor).checkLocatorHasScreenshot(
+            this.locator,
             this.payload,
             this.positive,
             this.options,
@@ -180,10 +184,13 @@ export class Element extends Question<boolean> {
   /**
    * make the verifying for the negative.
    * @return {Element} this Element instance
-   * @example <caption>Verify with Element class.</caption>
+   * @example
+   * Verify with Element class
+   * ```typescript
    * actor.asks(
    *  Element.of(page.getByRole("heading")).not.visible()
    * );
+   * ```
    */
   public get not() {
     this.positive = false;
@@ -191,187 +198,393 @@ export class Element extends Question<boolean> {
   }
 
   /**
-   * @category mode operators
-   *
    * Verify if an element is visible.
    *
+   * @param options (optional) options for assertions.
    * @return {Element} this Element instance
-   *
-   * @example <caption>simple call with just selector or with options.</caption>
-   * Element.toBe.visible('mySelector');
-   * Element.notToBe.visible(
-   *   'mySelector', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
-   * );
+   * @example
+   * simple call with just locator or with options.
+   * ```typescript
+   * Element.of(page.locator("myLocator"))
+   *   .visible();
+   * ```
+   * with options
+   * ```typescript
+   * Element.of(page.locator("myLocator"))
+   *   .not.visible({ timeout: 1000 });
+   * ```
+   * @category mode operators
    */
-  public visible(): Element {
+  public visible(options?: {
+    /**
+     * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+     */
+    timeout?: number;
+
+    visible?: boolean;
+  }): Element {
     this.mode = "visible";
+    this.options = options;
 
     return this;
   }
 
   /**
-   * @category mode operators
-   *
    * Verify if an element is enabled.
    *
+   * @param options (optional) options for assertions.
    * @return {Element} this Element instance
-   * @example <caption>simple call with just selector or with options </caption>
-   * Element.of("mySelector").not.enabled();
-   * Element.of(
-   *   'mySelector', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
-   * ).enabled();
+   * @example
+   * simple call with just locator or with options </caption>
+   * ```typescript
+   * Element.of(page.locator("myLocator"))
+   *   .not.enabled();
+   * ```
+   * with options
+   * ```typescript
+   * Element.of(page.locator("myLocator"))
+   *   .enabled({timeout: 1000});
+   * ```
+   * @category mode operators
    */
-  public enabled(): Element {
+  public enabled(options?: {
+    enabled?: boolean;
+
+    /**
+     * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+     */
+    timeout?: number;
+  }): Element {
     this.mode = "enabled";
+    this.options = options;
 
     return this;
   }
 
   /**
-   * @category mode operators
-   *
    * Verify if an element is editable.
    *
+   * @param options (optional) options for assertions.
    * @return {Element} this Element instance
-   * @example <caption>simple call with just selector or with options</caption>
-   * Element.of('mySelector').editable();
+   * @example
+   * simple call with just locator or with options
+   * ```typescript
    * Element.of(
-   *   'mySelector', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
-   * ).not.editable();
+   *   page.locator('myLocator')
+   * ).editable();
+   * ```
+   * with options
+   * ```typescript
+   * Element.of(
+   *   page.locator('myLocator'),
+   * ).not.editable({ timeout: 1000 });
+   * ```
+   * @category mode operators
    */
-  public editable(): Element {
+  public editable(options?: {
+    editable?: boolean;
+
+    /**
+     * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+     */
+    timeout?: number;
+  }): Element {
     this.mode = "editable";
+    this.options = options;
+
     return this;
   }
 
   /**
-   * @category mode operators
-   *
    * Verify if an element is checked.
    *
+   * @param options (optional) options for assertions.
    * @return {Element} this Element instance
-   * @example <caption>simple call with just selector or with options</caption>
-   * Element.of('mySelector').checked();
+   * @example
+   * simple call with just locator or with options
+   * ```typescript
    * Element.of(
-   *   'mySelector', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
-   * ).not.checked();
+   *   page.locator('myLocator')
+   * ).checked();
+   * ```
+   * with options
+   * ```typescript
+   * Element.of(
+   *   page.locator('myLocator'),
+   * ).not.checked({ timeout: 1000 });
+   * ```
+   * @category mode operators
    */
-  public checked(): Element {
+  public checked(options?: {
+    checked?: boolean;
+
+    /**
+     * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+     */
+    timeout?: number;
+  }): Element {
     this.mode = "checked";
+    this.options = options;
+
     return this;
   }
 
   /**
-   * @category mode operators
-   *
    * Verify if an element is focused.
    *
+   * @param options (optional) options for assertions.
    * @return {Element} this Element instance
-   * @example <caption>simple call with just selector or with options</caption>
-   * Element.of('mySelector').focused();
+   * @example
+   * simple call with just locator or with options
+   * ```typescript
    * Element.of(
-   *   'mySelector', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
-   * ).not.focused();
+   *   page.locator('myLocator')
+   * ).focused();
+   * ```
+   * with options
+   * ```
+   * Element.of(
+   *   page.locator('myLocator'),
+   * ).not.focused({ timeout: 1000});
+   * ```
+   * @category mode operators
    */
-  public focused(): Element {
+  public focused(options?: {
+    /**
+     * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+     */
+    timeout?: number;
+  }): Element {
     this.mode = "focused";
+    this.options = options;
+
     return this;
   }
 
   /**
-   * @category mode operators
-   *
    * Verify if an element has the given text.
+   *
    * @param text the text to check.
+   * @param options (optional) options for assertions.
+   * @return {Element} this Element instance
+   * @category mode operators
    */
-  public haveText(text: TextPayload): Element {
+  public haveText(
+    text: TextPayload,
+    options?: {
+      /**
+       * Whether to perform case-insensitive match. `ignoreCase` option takes precedence over the corresponding regular
+       * expression flag if specified.
+       */
+      ignoreCase?: boolean;
+
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+
+      /**
+       * Whether to use `element.innerText` instead of `element.textContent` when retrieving DOM node text.
+       */
+      useInnerText?: boolean;
+    },
+  ): Element {
     this.mode = "haveText";
     this.payload = text;
+    this.options = options;
 
     return this;
   }
 
   /**
-   * @category mode operators
-   *
    * Verify if an element contains the given text.
+   *
    * @param text the text to check.
+   * @param options (optional) options for assertions.
+   * @return {Element} this Element instance
+   * @category mode operators
    */
-  public containText(text: TextPayload): Element {
+  public containText(
+    text: TextPayload,
+    options?: {
+      /**
+       * Whether to perform case-insensitive match. `ignoreCase` option takes precedence over the corresponding regular
+       * expression flag if specified.
+       */
+      ignoreCase?: boolean;
+
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+
+      /**
+       * Whether to use `element.innerText` instead of `element.textContent` when retrieving DOM node text.
+       */
+      useInnerText?: boolean;
+    },
+  ): Element {
     this.mode = "containText";
     this.payload = text;
+    this.options = options;
 
     return this;
   }
 
   /**
-   * @category mode operators
-   *
    * Verify if an element has the given value.
    *
    * @param value the value to check.
+   * @param options (optional) options for assertions.
+   * @returns {Element} this Element instance
+   * @category mode operators
    */
-  public haveValue(value: ValuePayload): Element {
+  public haveValue(
+    value: ValuePayload,
+    options?: {
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
+  ): Element {
     this.mode = "haveValue";
     this.payload = value;
+    this.options = options;
 
     return this;
   }
 
   /**
-   * @category mode operators
-   *
    * Verify if an element has exact number of DOM node.
    *
    * @param count the value to check.
+   * @param options (optional) options for assertions.
+   * @returns {Element} this Element instance
+   * @category mode operators
    */
-  public haveCount(count: CountPayload): Element {
+  public haveCount(
+    count: CountPayload,
+    options?: {
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
+  ): Element {
     this.mode = "haveCount";
     this.payload = count;
+    this.options = options;
 
     return this;
   }
 
   /**
-   * @category mode operators
-   *
    * Verify if an element has the given style.
    *
    * @param name the style name.
    * @param value the style value.
+   * @param options (optional) options for assertions.
+   * @returns {Element} this Element instance
+   * @category mode operators
    */
-  public haveCSS(name: string, value: string | RegExp): Element {
+  public haveCSS(
+    name: string,
+    value: string | RegExp,
+    options?: {
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
+  ): Element {
     this.mode = "haveCSS";
     this.payload = { name, value };
+    this.options = options;
 
     return this;
   }
 
   /**
-   * @category mode operators
-   *
    * Verify if an element has the given screenshot.
    *
-   * @param name the style name.
+   * @param name the screenshot name.
+   * @category mode operators
    */
-  public haveScreenshot(name: string): Element {
+  public haveScreenshot(
+    name: string,
+    options?: {
+      /**
+       * When set to `"disabled"`, stops CSS animations, CSS transitions and Web Animations. Animations get different
+       * treatment depending on their duration:
+       * - finite animations are fast-forwarded to completion, so they'll fire `transitionend` event.
+       * - infinite animations are canceled to initial state, and then played over after the screenshot.
+       *
+       * Defaults to `"disabled"` that disables animations.
+       */
+      animations?: "disabled" | "allow";
+
+      /**
+       * When set to `"hide"`, screenshot will hide text caret. When set to `"initial"`, text caret behavior will not be
+       * changed.  Defaults to `"hide"`.
+       */
+      caret?: "hide" | "initial";
+
+      /**
+       * Specify locators that should be masked when the screenshot is taken. Masked elements will be overlaid with a pink
+       * box `#FF00FF` (customized by `maskColor`) that completely covers its bounding box.
+       */
+      mask?: Array<Locator>;
+
+      /**
+       * Specify the color of the overlay box for masked elements, in
+       * [CSS color format](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value). Default color is pink `#FF00FF`.
+       */
+      maskColor?: string;
+
+      /**
+       * An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is
+       * configurable with `TestConfig.expect`. Unset by default.
+       */
+      maxDiffPixelRatio?: number;
+
+      /**
+       * An acceptable amount of pixels that could be different. Default is configurable with `TestConfig.expect`. Unset by
+       * default.
+       */
+      maxDiffPixels?: number;
+
+      /**
+       * Hides default white background and allows capturing screenshots with transparency. Not applicable to `jpeg` images.
+       * Defaults to `false`.
+       */
+      omitBackground?: boolean;
+
+      /**
+       * When set to `"css"`, screenshot will have a single pixel per each css pixel on the page. For high-dpi devices, this
+       * will keep screenshots small. Using `"device"` option will produce a single pixel per each device pixel, so
+       * screenshots of high-dpi devices will be twice as large or even larger.
+       *
+       * Defaults to `"css"`.
+       */
+      scale?: "css" | "device";
+
+      /**
+       * An acceptable perceived color difference in the [YIQ color space](https://en.wikipedia.org/wiki/YIQ) between the
+       * same pixel in compared images, between zero (strict) and one (lax), default is configurable with
+       * `TestConfig.expect`. Defaults to `0.2`.
+       */
+      threshold?: number;
+
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
+  ): Element {
     this.mode = "haveScreenshot";
     this.payload = name;
+    this.options = options;
 
     return this;
   }
@@ -379,10 +592,10 @@ export class Element extends Question<boolean> {
   /**
    * Prompt a question to verify the element.
    *
-   * @param {Selector} locator the selector of the element to check.
-   * @return {Element} Element instance
+   * @param {Locator} locator the locator of the element to check.
+   * @return {Element} new Element instance
    */
-  public static of(selector: Selector, options?: SelectorOptions) {
-    return new Element(selector, options);
+  public static of(locator: Locator) {
+    return new Element(locator);
   }
 }

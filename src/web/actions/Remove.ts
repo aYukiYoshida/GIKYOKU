@@ -3,9 +3,9 @@ import { Action, Actor } from "@testla/screenplay";
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 
 /**
- * @group Actions
- *
  * Remove either Session Storage Items or Local Storage Items from the Browser.
+ *
+ * @group Actions
  */
 export class Remove extends Action {
   private constructor(
@@ -16,7 +16,7 @@ export class Remove extends Action {
   }
 
   /**
-   * wait for either a specified loading state or for a selector to become visible/active.
+   * wait for either a specified loading state or for a locator to become visible/active.
    *
    * @param {Actor} actor Actor performing this action
    * @return {any} Returns the value of the `pageFunction` invocation.
@@ -37,7 +37,9 @@ export class Remove extends Action {
    * @param {string} key the key that specifies the item.
    * @return {Remove} new Remove instance for session storage
    * @example
+   * ```typescript
    * Remove.sessionStorageItem('some key');
+   * ```
    */
   public static sessionStorageItem(key: string): Remove {
     return new Remove("sessionStorage", key);
@@ -49,7 +51,9 @@ export class Remove extends Action {
    * @param {string} key the key that specifies the item.
    * @return {Remove} new Remove instance for local storage
    * @example
+   * ```typescript
    * Remove.localStorageItem('some key');
+   * ```
    */
   public static localStorageItem(key: string): Remove {
     return new Remove("localStorage", key);

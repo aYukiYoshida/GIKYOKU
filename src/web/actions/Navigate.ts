@@ -4,9 +4,9 @@ import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 import { NavigateActionOptions } from "../types";
 
 /**
- * @group Actions
- *
  * Navigate to a URL using the specified url string.
+ *
+ * @group Actions
  */
 export class Navigate extends Action {
   private constructor(
@@ -33,7 +33,9 @@ export class Navigate extends Action {
    * @param {NavigateActionOptions} options (optional) navigation options.
    * @return {Navigate} new Navigate instance
    * @example
+   * ```typescript
    * Navigate.to('https://www.example.com');
+   * ```
    */
   public static to(url: string, options?: NavigateActionOptions): Navigate {
     return new Navigate(url, options);

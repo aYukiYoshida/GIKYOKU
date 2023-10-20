@@ -4,9 +4,9 @@ import { Action, Actor } from "@testla/screenplay";
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 
 /**
- * @group Actions
- *
  * Add Cookies to the Browser.
+ *
+ * @group Actions
  */
 export class Add extends Action {
   private constructor(private cookies: Cookie[]) {
@@ -29,11 +29,13 @@ export class Add extends Action {
    * @param {Cookie} cookies the cookies to add.
    * @return {Add} new Add instance
    * @example
+   * ```typescript
    * Add.cookies([{
    *   name: 'my cookie',
    *   value: 'my value',
    *   url: 'http://www.myapp.com',
    * }]);
+   * ```
    */
   public static cookies(cookies: Cookie[]): Add {
     return new Add(cookies);

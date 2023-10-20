@@ -1,19 +1,20 @@
+import { Locator } from "@playwright/test";
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { PressActionOptions, Selector, SelectorOptions } from "../types";
+import { PressActionOptions } from "../types";
 
 /**
- * @group Actions
- *
  * Press the specified key on the keyboard.
+ *
+ * @group Actions
  */
 export class Press extends Action {
   private constructor(
     private input: string,
     private action: {
-      selector?: Selector;
-      options?: SelectorOptions & PressActionOptions;
+      locator?: Locator;
+      options?: PressActionOptions;
       sequential: boolean;
     },
   ) {
@@ -28,10 +29,10 @@ export class Press extends Action {
    */
   public async performAs(actor: Actor): Promise<void> {
     if (this.action.sequential) {
-      if (!this.action.selector)
-        throw new Error("Error: no selector specified for Press.performAs()");
+      if (!this.action.locator)
+        throw new Error("Error: no locator specified for Press.performAs()");
       return BrowseTheWeb.as(actor).pressSequentially(
-        this.action.selector,
+        this.action.locator,
         this.input,
         this.action.options,
       );
@@ -44,13 +45,17 @@ export class Press extends Action {
    * Press a key on the keyboard. (or multiple keys with +, e.g. Shift+A)
    *
    * @param {string} keys the key(s) to press.
-   * @param {PressActionOptions} options
+   * @param {PressActionOptions} options (optional) options for the press action.
    * @return {Press} new Press instance
    * @example
-   * // single key
+   * single key
+   * ```typescript
    * Press.key('A');
-   * // multiple keys
+   * ```
+   * multiple keys
+   * ```typescript
    * Press.key('Control+A')
+   * ```
    */
   public static key(keys: string, options?: PressActionOptions): Press {
     return new Press(keys, { options, sequential: false });
@@ -59,19 +64,19 @@ export class Press extends Action {
   /**
    * Press the specified keys sequentially for each string character
    * To press a special key, like Control or ArrowDown, use {@link key}.
-   * @param {Selector} selector the selector.
+   * @param {Locator} locator the locator.
    * @param {string} input the keys of characters to press.
-   * @param {SelectorOptions & PressActionOptions} options
+   * @param {PressActionOptions} options (optional) options for the press action.
    * @return {Press} new Press instance
    * @example
    * // keys of characters
    * Press.characters('abcdefghijklmnopqrstuvwxyz');
    */
   public static characters(
-    selector: Selector,
+    locator: Locator,
     input: string,
-    options?: SelectorOptions & PressActionOptions,
+    options?: PressActionOptions,
   ): Press {
-    return new Press(input, { selector, options, sequential: true });
+    return new Press(input, { locator, options, sequential: true });
   }
 }

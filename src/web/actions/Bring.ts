@@ -3,6 +3,11 @@ import { Actor, Action } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 
+/**
+ * Bring the page to front to activate it.
+ *
+ * @group Actions
+ */
 export class Bring extends Action {
   private constructor(private page: Page) {
     super();
@@ -13,7 +18,7 @@ export class Bring extends Action {
   }
 
   /**
-   * Brings page to front to activate it.
+   * Brings page to front.
    *
    * @param {Page} page Page to bring to front
    * @return {Bring} new Bring instance

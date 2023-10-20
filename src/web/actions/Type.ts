@@ -1,56 +1,61 @@
+import { Locator } from "@playwright/test";
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { Selector, SelectorOptions, TypeActionOptions } from "../types";
+import { TypeActionOptions } from "../types";
 
 /**
- * @group Actions
+ * Type specified input into an element specified by a locator.
  *
- * Type specified input into an element specified by a selector string.
+ * @group Actions
  */
 export class Type extends Action {
   private constructor(
-    private selector: Selector,
+    private locator: Locator,
     private input: string,
-    private options?: SelectorOptions & TypeActionOptions,
+    private options?: TypeActionOptions,
   ) {
     super();
   }
 
   /**
-   * find the specified selector and fill it.
+   * find the specified locator and fill it.
    *
    * @param {Actor} actor the actor which is used
    * @return {void} Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
    */
   public async performAs(actor: Actor): Promise<void> {
-    return BrowseTheWeb.as(actor).type(this.selector, this.input, this.options);
+    return BrowseTheWeb.as(actor).type(this.locator, this.input, this.options);
   }
 
   /**
-   * Finds the specified selector and will it with the specified input string.
+   * Finds the specified locator and will it with the specified input string.
    *
-   * @param {Selector} selector the selector.
+   * @param {Locator} locator the locator.
    * @param {string} input the input.
-   * @param {SelectorOptions & TypeActionOptions} options (optional) advanced selector lookup options.
+   * @param {LocatorOptions & TypeActionOptions} options (optional) options for the type action.
    * @return {Type} new Type instance
    * @example
-   * // simple call with just selector
-   * Type.in('mySelector', 'myInput');
-   * // or with options
+   * simple call with just locator
+   * ```typescript
    * Type.in(
-   *   'mySelector',
-   *   'myInput', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
+   *   page.locator('myLocator'),
+   *   'myInput'
    * );
+   * with options
+   * ```typescript
+   * Type.in(
+   *   page.locator('myLocator'),
+   *   'myInput',
+   *   { timeout: 3000 }
+   * );
+   * ```
    */
   public static in(
-    selector: Selector,
+    locator: Locator,
     input: string,
-    options?: SelectorOptions & TypeActionOptions,
+    options?: TypeActionOptions,
   ): Type {
-    return new Type(selector, input, options);
+    return new Type(locator, input, options);
   }
 }

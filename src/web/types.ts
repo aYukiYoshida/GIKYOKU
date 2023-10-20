@@ -26,10 +26,6 @@ export type SelectorOptions = {
   state?: SelectorOptionsState;
 };
 
-export type ScreenOptions = {
-  timeout?: number;
-};
-
 export type Point = {
   x: number;
   y: number;
@@ -55,6 +51,14 @@ export type CheckActionOptions = {
    * the element.
    */
   position?: Point;
+
+  /**
+   * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
+   * option in the config, or by using the
+   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
+   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+   */
+  timeout?: number;
 
   /**
    * When set, this method only performs the [actionability](https://playwright.dev/docs/actionability) checks and skips the action. Defaults
@@ -104,6 +108,14 @@ export type ClickActionOptions = {
   position?: Point;
 
   /**
+   * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
+   * option in the config, or by using the
+   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
+   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+   */
+  timeout?: number;
+
+  /**
    * When set, this method only performs the [actionability](https://playwright.dev/docs/actionability) checks and skips the action. Defaults
    * to `false`. Useful to wait until the element is ready for the action without performing it.
    */
@@ -144,6 +156,14 @@ export type DblclickActionOptions = {
    * the element.
    */
   position?: Point;
+
+  /**
+   * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
+   * option in the config, or by using the
+   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
+   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+   */
+  timeout?: number;
 
   /**
    * When set, this method only performs the [actionability](https://playwright.dev/docs/actionability) checks and skips the action. Defaults
@@ -204,6 +224,14 @@ export type FillActionOptions = {
    * navigating to inaccessible pages. Defaults to `false`.
    */
   noWaitAfter?: boolean;
+
+  /**
+   * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
+   * option in the config, or by using the
+   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
+   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+   */
+  timeout?: number;
 };
 
 export type HoverActionOptions = {
@@ -230,6 +258,14 @@ export type HoverActionOptions = {
    * the element.
    */
   position?: Point;
+
+  /**
+   * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
+   * option in the config, or by using the
+   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
+   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+   */
+  timeout?: number;
 
   /**
    * When set, this method only performs the [actionability](https://playwright.dev/docs/actionability) checks and skips the action. Defaults
@@ -292,6 +328,14 @@ export type PressActionOptions = {
    * navigating to inaccessible pages. Defaults to `false`.
    */
   noWaitAfter?: boolean;
+
+  /**
+   * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
+   * option in the config, or by using the
+   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
+   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+   */
+  timeout?: number;
 };
 
 export type SelectActionOptions = {
@@ -306,6 +350,14 @@ export type SelectActionOptions = {
    * navigating to inaccessible pages. Defaults to `false`.
    */
   noWaitAfter?: boolean;
+
+  /**
+   * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
+   * option in the config, or by using the
+   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
+   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+   */
+  timeout?: number;
 };
 
 export type TypeActionOptions = {
@@ -320,6 +372,14 @@ export type TypeActionOptions = {
    * navigating to inaccessible pages. Defaults to `false`.
    */
   noWaitAfter?: boolean;
+
+  /**
+   * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
+   * option in the config, or by using the
+   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
+   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+   */
+  timeout?: number;
 };
 
 export type WaitForLoadStateActionOptions = {
@@ -355,6 +415,27 @@ export type WaitForUrlActionOptions = {
    *   loading.
    */
   waitUntil?: "load" | "domcontentloaded" | "networkidle" | "commit";
+};
+
+export type WaitForLocatorActionOptions = {
+  /**
+   * Defaults to `'visible'`. Can be either:
+   * - `'attached'` - wait for element to be present in DOM.
+   * - `'detached'` - wait for element to not be present in DOM.
+   * - `'visible'` - wait for element to have non-empty bounding box and no `visibility:hidden`. Note that element
+   *   without any content or with `display:none` has an empty bounding box and is not considered visible.
+   * - `'hidden'` - wait for element to be either detached from DOM, or have an empty bounding box or
+   *   `visibility:hidden`. This is opposite to the `'visible'` option.
+   */
+  state?: "attached" | "detached" | "visible" | "hidden";
+
+  /**
+   * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
+   * option in the config, or by using the
+   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
+   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+   */
+  timeout?: number;
 };
 
 export type ScreenQuestionMode = "haveUrl" | "haveTitle" | "haveScreenshot";

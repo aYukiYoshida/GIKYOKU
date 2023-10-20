@@ -3,9 +3,9 @@ import { Action, Actor } from "@testla/screenplay";
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 
 /**
- * @group Actions
- *
  * Get either Cookies, Session Storage Items or Local Storage Items from the Browser.
+ *
+ * @group Actions
  */
 export class Get extends Action {
   private constructor(
@@ -16,7 +16,7 @@ export class Get extends Action {
   }
 
   /**
-   * wait for either a specified loading state or for a selector to become visible/active.
+   * wait for either a specified loading state or for a locator to become visible/active.
    *
    * @param {Actor} actor Actor performing this action
    * @return {any} Returns cookies, session storage items or local storage items
@@ -40,12 +40,18 @@ export class Get extends Action {
    * @param {string} urls (optional): If URLs are specified, only cookies that affect those URLs are returned. If no URLs are specified, this all cookies are returned.
    * @return {Get} new Get instance for cookies
    * @example
-   * // get all cookies
+   * get all cookies
+   * ```typescript
    * Get.cookies();
-   * // get cookies for a single domain
+   * ```
+   * get cookies for a single domain
+   * ```typescript
    * Get.cookies('https://www.myapp.com');
-   * // get cookies for two domains
+   * ```
+   * get cookies for two domains
+   * ```typescript
    * Get.cookies(['https://www.myapp.com', 'https://www.another-app.com']);
+   * ```
    */
   public static cookies(urls?: string | string[] | undefined): Get {
     return new Get("cookies", urls);
@@ -57,7 +63,9 @@ export class Get extends Action {
    * @param {string} key the key that specifies the item.
    * @return {Get} new Get instance for session storage
    * @example
+   * ```typescript
    * Get.sessionStorageItem('some key');
+   * ```
    */
   public static sessionStorageItem(key: string): Get {
     return new Get("sessionStorage", key);
@@ -69,7 +77,9 @@ export class Get extends Action {
    * @param {string} key the key that specifies the item.
    * @return {Get} new Get instance for local storage
    * @example
+   * ```typescript
    * Get.localStorageItem('some key');
+   * ```
    */
   public static localStorageItem(key: string): Get {
     return new Get("localStorage", key);
