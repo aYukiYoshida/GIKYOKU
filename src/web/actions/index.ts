@@ -5,6 +5,7 @@ export { Click } from "./Click";
 export { DoubleClick } from "./DoubleClick";
 export { DragAndDrop } from "./DragAndDrop";
 export { Fill } from "./Fill";
+export { Focus } from "./Focus";
 export { Get } from "./Get";
 export { Hover } from "./Hover";
 export { Navigate } from "./Navigate";

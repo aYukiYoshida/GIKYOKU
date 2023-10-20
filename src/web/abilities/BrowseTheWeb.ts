@@ -404,6 +404,31 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
+   * Focus the element specified by the selector.
+   *
+   * @param {Selector} selector the selector of the element to focus.
+   * @param {SelectorOptions} options
+   * @return {void} Returns after focus the element
+   * @example <caption> simple call with just selector </caption>
+   * BrowseTheWeb.as(actor).focus('mySelector');
+   * @example <caption> with options </caption>
+   * ```
+   * BrowseTheWeb.as(actor).focus('mySelector', {
+   *   hasText: 'myText', subSelector: ['mySubSelector', { hasText: 'anotherText' } ]});
+   * ```
+   */
+  public async focus(
+    selector: Selector,
+    options?: SelectorOptions,
+  ): Promise<void> {
+    return (
+      await recursiveLocatorLookup({ page: this.page, selector, options })
+    ).focus({
+      timeout: options?.timeout,
+    });
+  }
+
+  /**
    * Validate if the page has specified URL.
    *
    * @param {boolean} positive whether to check the property of the page positive or not.
