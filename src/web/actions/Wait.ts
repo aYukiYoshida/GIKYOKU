@@ -1,30 +1,29 @@
+import { Locator } from "@playwright/test";
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 import {
-  Selector,
-  SelectorOptions,
+  WaitForLocatorActionOptions,
   WaitForLoadStateActionOptions,
   WaitForUrlActionOptions,
 } from "../types";
 
-type Mode = "selector" | "loadState" | "url";
+type Mode = "locator" | "loadState" | "url";
 type Payload = {
   state?: "load" | "domcontentloaded" | "networkidle";
   url?: string | RegExp | ((url: URL) => boolean);
-  selector?: Selector;
+  locator?: Locator;
   options?:
-    | SelectorOptions
+    | WaitForLocatorActionOptions
     | WaitForLoadStateActionOptions
     | WaitForUrlActionOptions;
 };
 /**
- * @group Actions
+ * Wait for loading state or a locator or url.
  *
- * Wait for either a specified loading state or for a selector to become visible/active.
+ * @group Actions
  */
 export class Wait extends Action {
-  // the object that determines what to wait for (loading state, selector or selector == expected).
   // only 1 property is active at all times.
   private constructor(
     private mode: Mode,
@@ -34,7 +33,7 @@ export class Wait extends Action {
   }
 
   /**
-   * wait for either a specified loading state or for a selector to become visible/active.
+   * wait for either a specified loading state or for a locator to become visible/active or url.
    *
    * @param {Actor} actor the actor object
    * @return {any} Returns when the required load state has been reached.
@@ -56,11 +55,11 @@ export class Wait extends Action {
         this.payload.options,
       );
     }
-    if (this.mode === "selector") {
-      if (!this.payload.selector)
-        throw new Error("Error: no selector specified for Wait.forSelector()");
-      return BrowseTheWeb.as(actor).waitForSelector(
-        this.payload.selector,
+    if (this.mode === "locator") {
+      if (!this.payload.locator)
+        throw new Error("Error: no locator specified for Wait.forLocator()");
+      return BrowseTheWeb.as(actor).waitForLocator(
+        this.payload.locator,
         this.payload.options,
       );
     }
@@ -100,26 +99,26 @@ export class Wait extends Action {
   }
 
   /**
-   * Wait for a specific selector to exist.
+   * Wait for a specific locator to exist.
    *
-   * @param {Selector} selector the selector.
-   * @param {SelectorOptions} options (optional) advanced selector lookup options.
+   * @param {Locator} locator the locator.
+   * @param {WaitForLocatorActionOptions} options (optional) advanced locator lookup options.
    * @return {Wait} new Wait instance
    * @example
-   * // simple call with just selector
-   * Wait.forSelector('mySelector');
+   * // simple call with just locator
+   * Wait.forLocator('myLocator');
    * // or with options
-   * Wait.forSelector(
-   *   'mySelector', {
+   * Wait.forLocator(
+   *   'myLocator', {
    *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
+   *     subLocator: ['mySubLocator', { hasText: 'anotherText' } ]
    *   }
    * );
    */
-  public static forSelector(
-    selector: Selector,
-    options?: SelectorOptions,
+  public static forLocator(
+    locator: Locator,
+    options?: WaitForLocatorActionOptions,
   ): Wait {
-    return new Wait("selector", { selector, options });
+    return new Wait("locator", { locator, options });
   }
 }

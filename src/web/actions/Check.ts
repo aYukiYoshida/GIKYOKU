@@ -1,52 +1,54 @@
+import { Locator } from "@playwright/test";
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { Selector, SelectorOptions, CheckActionOptions } from "../types";
+import { CheckActionOptions } from "../types";
 
 /**
- * @group Actions
+ * Check a checkbox specified with locator.
  *
- * Check a checkbox specified by a selector string.
+ * @group Actions
  */
 export class Check extends Action {
   private constructor(
-    private selector: Selector,
-    private options?: SelectorOptions & CheckActionOptions,
+    private locator: Locator,
+    private options?: CheckActionOptions,
   ) {
     super();
   }
 
   /**
-   * find the specified selector and click on it.
+   * find the specified locator and click on it.
    *
    * @param {Actor} actor Actor performing this action
    * @return {void} Returns after checking the element
    */
   public async performAs(actor: Actor): Promise<void> {
-    await BrowseTheWeb.as(actor).checkBox(this.selector, this.options);
+    await BrowseTheWeb.as(actor).checkBox(this.locator, this.options);
   }
 
   /**
    * specify which element should be clicked on
    *
-   * @param {Selector} selector the string representing the selector.
-   * @param {SelectorOptions & CheckActionOptions} options (optional): advanced selector lookup options.
+   * @param {Locator} locator the string representing the locator.
+   * @param {CheckActionOptions} options (optional): options for the check action.
    * @return {Check} new Check instance
    * @example
-   * // simple call with just selector
-   * Check.element('mySelector');
-   * // or with options
+   * simple call with just locator
+   * ```typescript
    * Check.element(
-   *   'mySelector', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
+   *   page.locator('myLocator')
    * );
+   * ```
+   * with options
+   * ```typescript
+   * Check.element(
+   *   page.locator('myLocator'),
+   *   { timeout: 3000 }
+   * );
+   * ```
    */
-  public static element(
-    selector: Selector,
-    options?: SelectorOptions & CheckActionOptions,
-  ): Check {
-    return new Check(selector, options);
+  public static element(locator: Locator, options?: CheckActionOptions): Check {
+    return new Check(locator, options);
   }
 }

@@ -3,13 +3,13 @@ import { Action, Actor } from "@testla/screenplay";
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 
 /**
- * @group Actions
- *
  * Remove from the Browser.
+ *
+ * @group Actions
  */
 export class Clear extends Action {
   /**
-   * wait for either a specified loading state or for a selector to become visible/active.
+   * wait for either a specified loading state or for a locator to become visible/active.
    *
    * @param {Actor} actor Actor performing this action
    * @return {any} Clears context cookies
@@ -23,7 +23,9 @@ export class Clear extends Action {
    * Clear all browser cookies.
    * @return {Clear} new Clear instance
    * @example
+   * ```typescript
    * Clear.cookies();
+   * ```
    */
   public static cookies(): Clear {
     return new Clear();

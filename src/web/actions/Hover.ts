@@ -1,51 +1,53 @@
+import { Locator } from "@playwright/test";
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { HoverActionOptions, Selector, SelectorOptions } from "../types";
+import { HoverActionOptions } from "../types";
 
 /**
- * @group Actions
+ * Hover over an element specified by a locator.
  *
- * Hover over an element specified by a selector string.
+ * @group Actions
  */
 export class Hover extends Action {
   private constructor(
-    private selector: Selector,
-    private options?: SelectorOptions & HoverActionOptions,
+    private locator: Locator,
+    private options?: HoverActionOptions,
   ) {
     super();
   }
 
   /**
-   * find the specified selector and hover over it.
+   * find the specified locator and hover over it.
    *
    * @param {Actor} actor Actor performing this action
    * @return {void} Returns when hovered over the element
    */
   public performAs(actor: Actor): Promise<void> {
-    return BrowseTheWeb.as(actor).hover(this.selector, this.options);
+    return BrowseTheWeb.as(actor).hover(this.locator, this.options);
   }
 
   /**
-   * Specify which selector should be hovered over
+   * Specify which locator should be hovered over
    *
-   * @param {Selector} selector The selector that should be hovered over.
-   * @param {SelectorOptions & HoverActionOptions} options (optional) advanced selector lookup options + Modifier keys to press. Ensures that only these modifiers are pressed during the operation.
+   * @param {Locator} locator The locator that should be hovered over.
+   * @param {HoverActionOptions} options (optional) options for the hover action.
    * @return {Hover} new Hover instance
    * @example
-   * // simple call with just selector
-   * Hover.over('mySelector');
-   * // or with options
-   * Hover.over('mySelector', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *     modifiers: ['Alt', 'Shift']
-   * });
+   * simple call with just locator
+   * ```typescript
+   * Hover.over(
+   *   page.locator('myLocator')
+   * );
+   * with options
+   * ```typescript
+   * Hover.over(
+   *   page.locator('myLocator'),
+   *   { timeout: 3000 }
+   * );
+   * ```
    */
-  public static over(
-    selector: Selector,
-    options?: SelectorOptions & HoverActionOptions,
-  ): Hover {
-    return new Hover(selector, options);
+  public static over(locator: Locator, options?: HoverActionOptions): Hover {
+    return new Hover(locator, options);
   }
 }

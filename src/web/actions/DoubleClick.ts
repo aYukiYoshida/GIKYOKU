@@ -1,53 +1,57 @@
+import { Locator } from "@playwright/test";
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { DblclickActionOptions, Selector, SelectorOptions } from "../types";
+import { DblclickActionOptions } from "../types";
 
 /**
  * @group Actions
  *
- * Click on an element specified by a selector string.
+ * Click on an element specified by a locator string.
  */
 export class DoubleClick extends Action {
-  // eslint-disable-next-line no-useless-constructor
   private constructor(
-    private selector: Selector,
-    private options?: SelectorOptions & DblclickActionOptions,
+    private locator: Locator,
+    private options?: DblclickActionOptions,
   ) {
     super();
   }
 
   /**
-   * find the specified selector and click on it.
+   * find the specified locator and click on it.
    *
    * @param {Actor} actor Actor performing this action
    * @return {void} Returns after double clicking the element
    */
   public async performAs(actor: Actor): Promise<void> {
-    await BrowseTheWeb.as(actor).dblclick(this.selector, this.options);
+    await BrowseTheWeb.as(actor).dblclick(this.locator, this.options);
   }
 
   /**
    * specify which element should be double-clicked on
    *
-   * @param {Selector} selector the string representing the selector.
-   * @param {SelectorOptions & DblclickActionOptions} options (optional): advanced selector lookup options.
+   * @param {Locator} locator the string representing the locator.
+   * @param {DblclickActionOptions} options (optional) options for the double-click action.
    * @return {DoubleClick} new DoubleClick instance
    * @example
-   * // simple call with just selector
-   * DoubleClick.on('mySelector');
-   * // or with options
+   * simple call with just locator
+   * ```typescript
    * DoubleClick.on(
-   *   'mySelector', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
+   *   page.locator('myLocator')
    * );
+   * ```
+   * with options
+   * ```typescript
+   * DoubleClick.on(
+   *   page.locator('myLocator'),
+   *  { timeout: 3000 }
+   * );
+   * ```
    */
   public static on(
-    selector: Selector,
-    options?: SelectorOptions & DblclickActionOptions,
+    locator: Locator,
+    options?: DblclickActionOptions,
   ): DoubleClick {
-    return new DoubleClick(selector, options);
+    return new DoubleClick(locator, options);
   }
 }

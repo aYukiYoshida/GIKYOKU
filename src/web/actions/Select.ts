@@ -1,59 +1,133 @@
+import { Locator } from "@playwright/test";
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { SelectActionOptions, Selector, SelectorOptions } from "../types";
+import { SelectActionOptions } from "../types";
+
 /**
- * @group Actions
+ * Set the value of a Locator of type select to the given option.
  *
- * Set the value of a Selector of type select to the given option.
+ * @group Actions
  */
 export class Select extends Action {
   private constructor(
-    private selector: Selector,
-    private option: string | { value?: string; label?: string; index?: number },
-    private options?: SelectorOptions & SelectActionOptions,
+    private locator: Locator,
+    private values:
+      | string
+      | Array<string>
+      | {
+          /**
+           * Matches by `option.value`. Optional.
+           */
+          value?: string;
+
+          /**
+           * Matches by `option.label`. Optional.
+           */
+          label?: string;
+
+          /**
+           * Matches by the index. Optional.
+           */
+          index?: number;
+        }
+      | Array<{
+          /**
+           * Matches by `option.value`. Optional.
+           */
+          value?: string;
+
+          /**
+           * Matches by `option.label`. Optional.
+           */
+          label?: string;
+
+          /**
+           * Matches by the index. Optional.
+           */
+          index?: number;
+        }>,
+    private options?: SelectActionOptions,
   ) {
     super();
   }
 
   /**
-   * find the specified selector and click on it.
+   * find the specified locator and click on it.
    *
    * @param {Actor} actor Actor performing this action
    * @return {any} This method checks, waits until all specified options are present in the `<select>` element and selects these options.
    */
   public async performAs(actor: Actor): Promise<any> {
     await BrowseTheWeb.as(actor).selectOption(
-      this.selector,
-      this.option,
+      this.locator,
+      this.values,
       this.options,
     );
   }
 
   /**
-   * Set the value of a Selector of type select to the given option.
+   * Set the value of a Locator of type select to the given option.
    *
-   * @param {Selector} selector the string representing the (select) selector.
-   * @param {string|number} option optionLabel the label of the option.
-   * @param {SelectorOptions & SelectActionOptions} options (optional): advanced selector lookup options.
+   * @param {Locator} locator the string representing the (select) locator.
+   * @param values options to select.
+   * @param {SelectActionOptions} options (optional) options for the select action.
    * @return {Select} new Select instance
    * @example
-   * // simple call with just selector
-   * Select.option('mySelector', 'myOptionLabel');
-   * // or with options for select
+   * simple call with just locator
+   * ```typescript
    * Select.option(
-   *   'mySelector',
-   *   'myOptionLabel', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
+   *   page.locator('myLocator'),
+   *   'myOptionLabel'
    * );
+   * with options for select
+   * ```typescript
+   * Select.option(
+   *   page.locator('myLocator'),
+   *   'myOptionLabel',
+   *   { timeout: 3000 }
+   * );
+   * ```
    */
   public static option(
-    selector: Selector,
-    option: string | { value?: string; label?: string; index?: number },
-    options?: SelectorOptions & SelectActionOptions,
+    locator: Locator,
+    values:
+      | string
+      | Array<string>
+      | {
+          /**
+           * Matches by `option.value`. Optional.
+           */
+          value?: string;
+
+          /**
+           * Matches by `option.label`. Optional.
+           */
+          label?: string;
+
+          /**
+           * Matches by the index. Optional.
+           */
+          index?: number;
+        }
+      | Array<{
+          /**
+           * Matches by `option.value`. Optional.
+           */
+          value?: string;
+
+          /**
+           * Matches by `option.label`. Optional.
+           */
+          label?: string;
+
+          /**
+           * Matches by the index. Optional.
+           */
+          index?: number;
+        }>,
+    options?: SelectActionOptions,
   ): Select {
-    return new Select(selector, option, options);
+    return new Select(locator, values, options);
   }
 }

@@ -3,9 +3,9 @@ import { Action, Actor } from "@testla/screenplay";
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 
 /**
- * @group Actions
- *
  * Set either Session Storage Items or Local Storage Items on the Browser.
+ *
+ * @group Actions
  */
 export class Set extends Action {
   private constructor(
@@ -44,7 +44,9 @@ export class Set extends Action {
    * @param {any} value the value of the item.
    * @return {Set} new Set instance for session storage
    * @example
+   * ```typescript
    * Set.sessionStorageItem('some key', 'some value');
+   * ```
    */
   public static sessionStorageItem(key: string, value: any): Set {
     return new Set("sessionStorage", { key, value });
@@ -57,7 +59,9 @@ export class Set extends Action {
    * @param {any} value the value of the item.
    * @return {Set} new Set instance for local storage.
    * @example
+   * ```typescript
    * Set.localStorageItem('some key', 'some value');
+   * ```
    */
   public static localStorageItem(key: string, value: any): Set {
     return new Set("localStorage", { key, value });

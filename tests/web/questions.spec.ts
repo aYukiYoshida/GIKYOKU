@@ -21,16 +21,14 @@ const test = base.extend<MyActors>({
   actor: async ({ browser }, use) => {
     const context = await browser.newContext();
     const page = await context.newPage();
-    const actor = Actor.named("TestActor")
-      .can(BrowseTheWeb.using(page))
-      .with("page", page);
+    const actor = Actor.named("TestActor").can(BrowseTheWeb.using(page));
     await use(actor);
   },
 });
 
 test.describe("Web Questions", () => {
   test("Element.visible", async ({ actor }) => {
-    const page: Page = actor.states("page");
+    const page: Page = BrowseTheWeb.as(actor).getPage();
 
     await actor.attemptsTo(
       Navigate.to("https://the-internet.herokuapp.com/tables"),
@@ -39,7 +37,7 @@ test.describe("Web Questions", () => {
 
     expect(
       await actor.asks(
-        Element.of(page.locator("h3"), { hasText: "Data Tables" }).visible(),
+        Element.of(page.locator("h3", { hasText: "Data Tables" })).visible(),
       ),
     ).toBe(true);
 
@@ -47,10 +45,11 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of(page.locator("h3"), {
-            hasText: "this does not exist",
-            timeout: 1000,
-          }).visible(),
+          Element.of(
+            page.locator("h3", {
+              hasText: "this does not exist",
+            }),
+          ).visible({ timeout: 1000 }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -60,9 +59,11 @@ test.describe("Web Questions", () => {
 
     expect(
       await actor.asks(
-        Element.of(page.locator("h3"), {
-          hasText: "this does not exist",
-        }).not.visible(),
+        Element.of(
+          page.locator("h3", {
+            hasText: "this does not exist",
+          }),
+        ).not.visible(),
       ),
     ).toBe(true);
 
@@ -70,10 +71,9 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of(page.locator("h3"), {
-            hasText: "Data Tables",
-            timeout: 1000,
-          }).not.visible(),
+          Element.of(
+            page.locator("h3", { hasText: "Data Tables" }),
+          ).not.visible({ timeout: 1000 }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -83,12 +83,12 @@ test.describe("Web Questions", () => {
   });
 
   test("Element.enabled", async ({ actor }) => {
-    const page: Page = actor.states("page");
+    const page: Page = BrowseTheWeb.as(actor).getPage();
 
     await actor.attemptsTo(
       Navigate.to("https://the-internet.herokuapp.com/tinymce"),
       Wait.forLoadState("networkidle"),
-      Click.on('[aria-label="Bold"]'),
+      Click.on(page.locator('[aria-label="Bold"]')),
     );
 
     expect(
@@ -101,9 +101,9 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of(page.locator('[aria-label="Redo"]'), {
+          Element.of(page.locator('[aria-label="Redo"]')).enabled({
             timeout: 1000,
-          }).enabled(),
+          }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -121,9 +121,9 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of(page.locator('[aria-label="Undo"]'), {
+          Element.of(page.locator('[aria-label="Undo"]')).not.enabled({
             timeout: 1000,
-          }).not.enabled(),
+          }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -133,7 +133,7 @@ test.describe("Web Questions", () => {
   });
 
   test("Element.editable", async ({ actor }) => {
-    const page: Page = actor.states("page");
+    const page: Page = BrowseTheWeb.as(actor).getPage();
 
     await actor.attemptsTo(
       Navigate.to(
@@ -158,8 +158,7 @@ test.describe("Web Questions", () => {
         await actor.asks(
           Element.of(
             page.frameLocator("#output-iframe").getByRole("spinbutton"),
-            { timeout: 1000 },
-          ).editable(),
+          ).editable({ timeout: 1000 }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -183,8 +182,7 @@ test.describe("Web Questions", () => {
             page
               .frameLocator("#output-iframe")
               .locator('input[name="firstName"]'),
-            { timeout: 1000 },
-          ).not.enabled(),
+          ).not.enabled({ timeout: 1000 }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -194,30 +192,38 @@ test.describe("Web Questions", () => {
   });
 
   test("Element.checked", async ({ actor }) => {
+    const page: Page = BrowseTheWeb.as(actor).getPage();
+
     await actor.attemptsTo(
       Navigate.to("https://the-internet.herokuapp.com/checkboxes"),
       Wait.forLoadState("networkidle"),
     );
 
-    expect(await actor.asks(Element.of("//input[2]").checked())).toBe(true);
+    expect(
+      await actor.asks(Element.of(page.locator("//input[2]")).checked()),
+    ).toBe(true);
 
     let checkedRes = false;
     try {
       expect(
-        await actor.asks(Element.of("//input[1]", { timeout: 1000 }).checked()),
+        await actor.asks(
+          Element.of(page.locator("//input[1]")).checked({ timeout: 1000 }),
+        ),
       ).toBe(true);
     } catch (error) {
       checkedRes = true;
     }
     expect(checkedRes).toBeTruthy();
 
-    expect(await actor.asks(Element.of("//input[1]").not.checked())).toBe(true);
+    expect(
+      await actor.asks(Element.of(page.locator("//input[1]")).not.checked()),
+    ).toBe(true);
 
     let notCheckedRes = false;
     try {
       expect(
         await actor.asks(
-          Element.of("//input[2]", { timeout: 1000 }).not.checked(),
+          Element.of(page.locator("//input[2]")).not.checked({ timeout: 1000 }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -227,21 +233,25 @@ test.describe("Web Questions", () => {
   });
 
   test("Element.focused", async ({ actor }) => {
+    const page: Page = BrowseTheWeb.as(actor).getPage();
+
     await actor.attemptsTo(
       Navigate.to("https://the-internet.herokuapp.com/login"),
       Wait.forLoadState("networkidle"),
-      Focus.on('[id="username"]'),
+      Focus.on(page.locator('[id="username"]')),
     );
 
-    expect(await actor.asks(Element.of('[id="username"]').focused())).toBe(
-      true,
-    );
+    expect(
+      await actor.asks(Element.of(page.locator('[id="username"]')).focused()),
+    ).toBe(true);
 
     let focusedRes = false;
     try {
       expect(
         await actor.asks(
-          Element.of('[id="password"]', { timeout: 1000 }).focused(),
+          Element.of(page.locator('[id="password"]')).focused({
+            timeout: 1000,
+          }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -249,15 +259,19 @@ test.describe("Web Questions", () => {
     }
     expect(focusedRes).toBeTruthy();
 
-    expect(await actor.asks(Element.of('[id="password"]').not.focused())).toBe(
-      true,
-    );
+    expect(
+      await actor.asks(
+        Element.of(page.locator('[id="password"]')).not.focused(),
+      ),
+    ).toBe(true);
 
     let notFocusedRes = false;
     try {
       expect(
         await actor.asks(
-          Element.of('[id="username"]', { timeout: 1000 }).not.focused(),
+          Element.of(page.locator('[id="username"]')).not.focused({
+            timeout: 1000,
+          }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -267,22 +281,24 @@ test.describe("Web Questions", () => {
   });
 
   test("Element.haveText", async ({ actor }) => {
+    const page: Page = BrowseTheWeb.as(actor).getPage();
+
     await actor.attemptsTo(
       Navigate.to("https://the-internet.herokuapp.com/tables"),
       Wait.forLoadState("networkidle"),
     );
 
-    expect(await actor.asks(Element.of("h3").haveText("Data Tables"))).toBe(
-      true,
-    );
+    expect(
+      await actor.asks(Element.of(page.locator("h3")).haveText("Data Tables")),
+    ).toBe(true);
 
     let textRes = false;
     try {
       expect(
         await actor.asks(
-          Element.of("h3", {
+          Element.of(page.locator("h3")).haveText("this text does not exist", {
             timeout: 1000,
-          }).haveText("this text does not exist"),
+          }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -292,7 +308,7 @@ test.describe("Web Questions", () => {
 
     expect(
       await actor.asks(
-        Element.of("h3").not.haveText(/[0-9]/), // RegExp that does not exist
+        Element.of(page.locator("h3")).not.haveText(/[0-9]/), // RegExp that does not exist
       ),
     ).toBe(true);
 
@@ -300,7 +316,9 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of("h3", { timeout: 1000 }).not.haveText(["Data Tables"]),
+          Element.of(page.locator("h3")).not.haveText(["Data Tables"], {
+            timeout: 1000,
+          }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -310,20 +328,24 @@ test.describe("Web Questions", () => {
   });
 
   test("Element.containText", async ({ actor }) => {
+    const page: Page = BrowseTheWeb.as(actor).getPage();
+
     await actor.attemptsTo(
       Navigate.to("https://the-internet.herokuapp.com/tables"),
       Wait.forLoadState("networkidle"),
     );
 
-    expect(await actor.asks(Element.of("h3").containText("Tables"))).toBe(true);
+    expect(
+      await actor.asks(Element.of(page.locator("h3")).containText("Tables")),
+    ).toBe(true);
 
     let textRes = false;
     try {
       expect(
         await actor.asks(
-          Element.of("h3", {
+          Element.of(page.locator("h3")).containText("tables", {
             timeout: 1000,
-          }).containText("tables"),
+          }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -333,7 +355,7 @@ test.describe("Web Questions", () => {
 
     expect(
       await actor.asks(
-        Element.of("h3").not.containText(/[0-9]/), // RegExp that does not exist
+        Element.of(page.locator("h3")).not.containText(/[0-9]/), // RegExp that does not exist
       ),
     ).toBe(true);
 
@@ -341,7 +363,9 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of("h3", { timeout: 1000 }).not.containText(["Data"]),
+          Element.of(page.locator("h3")).not.containText(["Data"], {
+            timeout: 1000,
+          }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -351,16 +375,20 @@ test.describe("Web Questions", () => {
   });
 
   test("Element.haveValue", async ({ actor }) => {
+    const page: Page = BrowseTheWeb.as(actor).getPage();
+
     await actor.attemptsTo(
       Navigate.to("https://the-internet.herokuapp.com/login"),
       Wait.forLoadState("networkidle"),
     );
 
     // fill username field with string
-    await actor.attemptsTo(Fill.in('[id="username"]', "test"));
+    await actor.attemptsTo(Fill.in(page.locator('[id="username"]'), "test"));
     // toBe.value test: expect the value of the username field to be the string 'test'
     expect(
-      await actor.asks(Element.of('[id="username"]').haveValue("test")),
+      await actor.asks(
+        Element.of(page.locator('[id="username"]')).haveValue("test"),
+      ),
     ).toBe(true);
 
     // toBe.value test: expect the question to fail if the expected string is not correct
@@ -368,9 +396,10 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of('[id="username"]', {
-            timeout: 1000,
-          }).haveValue("this value is wrong"),
+          Element.of(page.locator('[id="username"]')).haveValue(
+            "this value is wrong",
+            { timeout: 1000 },
+          ),
         ),
       ).toBe(true);
     } catch (error) {
@@ -380,7 +409,9 @@ test.describe("Web Questions", () => {
 
     expect(
       await actor.asks(
-        Element.of('[id="username"]').not.haveValue("this value is wrong"),
+        Element.of(page.locator('[id="username"]')).not.haveValue(
+          "this value is wrong",
+        ),
       ),
     ).toBe(true);
 
@@ -388,9 +419,9 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of('[id="username"]', { timeout: 1000 }).not.haveValue(
-            /test/,
-          ), // RegExp for the string 'test'
+          Element.of(page.locator('[id="username"]')).not.haveValue(/test/, {
+            timeout: 1000,
+          }), // RegExp for the string 'test'
         ),
       ).toBe(true);
     } catch (error) {
@@ -400,22 +431,26 @@ test.describe("Web Questions", () => {
   });
 
   test("Element.haveCSS", async ({ actor }) => {
+    const page: Page = BrowseTheWeb.as(actor).getPage();
+
     await actor.attemptsTo(
       Navigate.to("https://the-internet.herokuapp.com/"),
       Wait.forLoadState("networkidle"),
     );
 
-    expect(await actor.asks(Element.of("h1").haveCSS("display", "block"))).toBe(
-      true,
-    );
+    expect(
+      await actor.asks(
+        Element.of(page.locator("h1")).haveCSS("display", "block"),
+      ),
+    ).toBe(true);
 
     let styleRes = false;
     try {
       expect(
         await actor.asks(
-          Element.of("h1", {
+          Element.of(page.locator("h1")).haveCSS("display", "inline", {
             timeout: 1000,
-          }).haveCSS("display", "inline"),
+          }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -424,14 +459,18 @@ test.describe("Web Questions", () => {
     expect(styleRes).toBeTruthy();
 
     expect(
-      await actor.asks(Element.of("h1").not.haveCSS("display", "inline")),
+      await actor.asks(
+        Element.of(page.locator("h1")).not.haveCSS("display", "inline"),
+      ),
     ).toBe(true);
 
     let notStyleRes = false;
     try {
       expect(
         await actor.asks(
-          Element.of("h1", { timeout: 1000 }).not.haveCSS("display", "block"),
+          Element.of(page.locator("h1")).not.haveCSS("display", "block", {
+            timeout: 1000,
+          }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -441,7 +480,7 @@ test.describe("Web Questions", () => {
   });
 
   test("Element.haveCount", async ({ actor }) => {
-    const page: Page = actor.states("page");
+    const page: Page = BrowseTheWeb.as(actor).getPage();
     await actor.attemptsTo(
       Navigate.to("https://the-internet.herokuapp.com/status_codes"),
       Wait.forLoadState("networkidle"),
@@ -454,9 +493,9 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of(page.getByRole("listitem"), {
+          Element.of(page.getByRole("listitem")).haveCount(5, {
             timeout: 1000,
-          }).haveCount(5),
+          }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -472,9 +511,9 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of(page.getByRole("listitem"), {
+          Element.of(page.getByRole("listitem")).not.haveCount(4, {
             timeout: 1000,
-          }).not.haveCount(4),
+          }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -484,7 +523,7 @@ test.describe("Web Questions", () => {
   });
 
   test("Element.haveScreenshot", async ({ actor }) => {
-    const page: Page = actor.states("page");
+    const page: Page = BrowseTheWeb.as(actor).getPage();
     await actor.attemptsTo(
       Navigate.to("https://the-internet.herokuapp.com/shifting_content/image"),
       Wait.forLoadState("networkidle"),
@@ -502,9 +541,12 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of(page.locator("#content").getByRole("img"), {
-            timeout: 1000,
-          }).haveScreenshot("element-negative.png"),
+          Element.of(page.locator("#content").getByRole("img")).haveScreenshot(
+            "element-negative.png",
+            {
+              timeout: 1000,
+            },
+          ),
         ),
       ).toBe(true);
     } catch (error) {
@@ -524,9 +566,11 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of(page.locator("#content").getByRole("img"), {
+          Element.of(
+            page.locator("#content").getByRole("img"),
+          ).not.haveScreenshot("element-positive.png", {
             timeout: 1000,
-          }).not.haveScreenshot("element-positive.png"),
+          }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -575,16 +619,14 @@ test.describe("Web Questions", () => {
   test("Screen.haveTitle", async ({ actor }) => {
     await actor.attemptsTo(Navigate.to("https://google.com"));
 
-    expect(
-      await actor.asks(Screen.of(actor.states("page")).haveTitle("Google")),
-    ).toBe(true);
+    expect(await actor.asks(Screen.does.haveTitle("Google"))).toBe(true);
 
     // toHave.title test: expect the question to fail if the expected title is not correct
     let titleRes = false;
     try {
       expect(
         await actor.asks(
-          Screen.of(actor.states("page")).haveTitle("GIKYOKU", {
+          Screen.does.haveTitle("GIKYOKU", {
             timeout: 1000,
           }),
         ),
@@ -594,17 +636,13 @@ test.describe("Web Questions", () => {
     }
     expect(titleRes).toBeTruthy();
 
-    expect(
-      await actor.asks(
-        Screen.of(actor.states("page")).not.haveTitle("GIKYOKU"),
-      ),
-    ).toBe(true);
+    expect(await actor.asks(Screen.does.not.haveTitle("GIKYOKU"))).toBe(true);
 
     let notTitleRes = false;
     try {
       expect(
         await actor.asks(
-          Screen.of(actor.states("page")).not.haveTitle("Google", {
+          Screen.does.not.haveTitle("Google", {
             timeout: 1000,
           }),
         ),
@@ -616,7 +654,7 @@ test.describe("Web Questions", () => {
   });
 
   test("Screen.haveScreenshot", async ({ actor }) => {
-    const page: Page = actor.states("page");
+    const page: Page = BrowseTheWeb.as(actor).getPage();
     await actor.attemptsTo(Navigate.to("https://example.com/"));
 
     expect(

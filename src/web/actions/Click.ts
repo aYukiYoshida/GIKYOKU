@@ -1,52 +1,54 @@
+import { Locator } from "@playwright/test";
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { Selector, SelectorOptions, ClickActionOptions } from "../types";
+import { ClickActionOptions } from "../types";
 
 /**
- * @group Actions
+ * Click on an element specified by a locator string.
  *
- * Click on an element specified by a selector string.
+ * @group Actions
  */
 export class Click extends Action {
   private constructor(
-    private selector: Selector,
-    private options?: SelectorOptions & ClickActionOptions,
+    private locator: Locator,
+    private options?: ClickActionOptions,
   ) {
     super();
   }
 
   /**
-   * find the specified selector and click on it.
+   * find the specified locator and click on it.
    *
    * @param {Actor} actor Actor performing this action
    * @return {void} Returns after clicking the element
    */
   public async performAs(actor: Actor): Promise<void> {
-    await BrowseTheWeb.as(actor).click(this.selector, this.options);
+    await BrowseTheWeb.as(actor).click(this.locator, this.options);
   }
 
   /**
    * specify which element should be clicked on
    *
-   * @param {Selector} selector the string representing the selector.
-   * @param {SelectorOptions & ClickActionOptions} options (optional): advanced selector lookup options.
+   * @param {Locator} locator the string representing the locator.
+   * @param {ClickActionOptions} options (optional) options for the click action.
    * @return {Click} new Click instance
    * @example
-   * // simple call with just selector
-   * Click.on('mySelector');
-   * // or with options
+   * simple call with just locator
+   * ```typescript
    * Click.on(
-   *   'mySelector', {
-   *     hasText: 'myText',
-   *     subSelector: ['mySubSelector', { hasText: 'anotherText' } ]
-   *   }
+   *   page.locator('myLocator')
    * );
+   * ```
+   * with options
+   * ```typescript
+   * Click.on(
+   *   page.locator('myLocator'),
+   *   { timeout: 3000 }
+   * );
+   * ```
    */
-  public static on(
-    selector: Selector,
-    options?: SelectorOptions & ClickActionOptions,
-  ): Click {
-    return new Click(selector, options);
+  public static on(locator: Locator, options?: ClickActionOptions): Click {
+    return new Click(locator, options);
   }
 }

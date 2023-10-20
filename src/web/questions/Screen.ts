@@ -3,7 +3,6 @@ import { Page } from "playwright";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 import {
-  ScreenOptions,
   ScreenQuestionMode,
   UrlPayload,
   isUrlPayload,
@@ -27,7 +26,7 @@ export class Screen extends Question<boolean> {
   private payload: UrlPayload | TitlePayload | ScreenshotPayload = "";
 
   // options.
-  private options?: ScreenOptions;
+  private options?: { timeout?: number };
 
   /**
    * @param {Page} page the playwright page object to verify.
@@ -50,6 +49,7 @@ export class Screen extends Question<boolean> {
             this.positive,
             this.payload,
             this.options,
+            this.page,
           ),
         ); // if the ability method is not the expected result there will be an exception
       } else {
@@ -63,6 +63,7 @@ export class Screen extends Question<boolean> {
             this.positive,
             this.payload,
             this.options,
+            this.page,
           ),
         ); // if the ability method is not the expected result there will be an exception
       } else {
@@ -116,15 +117,25 @@ export class Screen extends Question<boolean> {
    * Verifies if the page has URL.
    *
    * @param {TitlePayload} url the expected URL.
-   * @param {ScreenOptions} options the timeout in milliseconds.
+   * @param options the timeout in milliseconds.
    * @return {Screen} this Screen instance
    * @example
-   * // simple call with just selector
+   * simple call with just locator
+   * ```typescript
    * Screen.toHaveTitle('Title');
-   * // or with options
-   * Screen.not.toHaveTitle('Title', { timeout: 1000 });
+   * ```
+   * with options
+   * ```typescript
+   * Screen.not.toHaveTitle(
+   *   'Title',
+   *   { timeout: 1000 }
+   * );
+   * ```
    */
-  public haveTitle(title: TitlePayload, options?: ScreenOptions): Screen {
+  public haveTitle(
+    title: TitlePayload,
+    options?: { timeout?: number },
+  ): Screen {
     this.mode = "haveTitle";
     this.payload = title;
     this.options = options;
@@ -136,15 +147,19 @@ export class Screen extends Question<boolean> {
    * Verifies if the page has URL.
    *
    * @param {UrlPayload} url the expected URL.
-   * @param {ScreenOptions} options the timeout in milliseconds.
+   * @param options the timeout in milliseconds.
    * @return {Screen} this Screen instance
    * @example
-   * // simple call with just selector
+   * simple call with just locator
+   * ```typescript
    * Screen.toHaveUrl('https://www.example.com');
-   * // or with options
+   * ```
+   * with options
+   * ```typescript
    * Screen.not.toHaveUrl('https://www.example.com', { timeout: 1000 });
+   * ```
    */
-  public haveUrl(url: UrlPayload, options?: ScreenOptions): Screen {
+  public haveUrl(url: UrlPayload, options?: { timeout?: number }): Screen {
     this.mode = "haveUrl";
     this.payload = url;
     this.options = options;
@@ -156,17 +171,24 @@ export class Screen extends Question<boolean> {
    * Verifies if the page has URL.
    *
    * @param {ScreenshotPayload} name the screenshot name.
-   * @param {ScreenOptions} options the timeout in milliseconds.
+   * @param options the timeout in milliseconds.
    * @return {Screen} this Screen instance
    * @example
-   * // simple call with just selector
+   * simple call with just locator
+   * ```typescript
    * Screen.toHaveScreenshot('example.png');
-   * // or with options
-   * Screen.not.toHaveScreenshot('example.png', { timeout: 1000 });
+   * ```
+   * with options
+   * ```typescript
+   * Screen.not.toHaveScreenshot(
+   *   'example.png',
+   *   { timeout: 1000 }
+   * );
+   * ```
    */
   public haveScreenshot(
     name: ScreenshotPayload,
-    options?: ScreenOptions,
+    options?: { timeout?: number },
   ): Screen {
     this.mode = "haveScreenshot";
     this.payload = name;
@@ -179,7 +201,7 @@ export class Screen extends Question<boolean> {
    * Prompt a question to verify the page.
    *
    * @param {page} page the page object of the Playwright
-   * @return {Screen} Screen instance
+   * @return {Screen} new Screen instance
    */
   public static of(page?: Page): Screen {
     return new Screen(page);
