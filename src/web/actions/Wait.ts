@@ -1,12 +1,22 @@
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { Selector, SelectorOptions, WaitActionOptions } from "../types";
+import {
+  Selector,
+  SelectorOptions,
+  WaitForLoadStateActionOptions,
+  WaitForUrlActionOptions,
+} from "../types";
 
+type Mode = "selector" | "loadState" | "url";
 type Payload = {
   state?: "load" | "domcontentloaded" | "networkidle";
+  url?: string | RegExp | ((url: URL) => boolean);
   selector?: Selector;
-  options?: SelectorOptions;
+  options?:
+    | SelectorOptions
+    | WaitForLoadStateActionOptions
+    | WaitForUrlActionOptions;
 };
 /**
  * @group Actions
@@ -16,17 +26,11 @@ type Payload = {
 export class Wait extends Action {
   // the object that determines what to wait for (loading state, selector or selector == expected).
   // only 1 property is active at all times.
-  private action: {
-    mode: "selector" | "loadState";
-    payload: Payload;
-  };
-
-  private constructor(action: {
-    mode: "selector" | "loadState";
-    payload: Payload;
-  }) {
+  private constructor(
+    private mode: Mode,
+    private payload: Payload,
+  ) {
     super();
-    this.action = action;
   }
 
   /**
@@ -36,17 +40,28 @@ export class Wait extends Action {
    * @return {any} Returns when the required load state has been reached.
    */
   public performAs(actor: Actor): Promise<any> {
-    if (this.action.mode === "loadState") {
-      if (!this.action.payload.state)
-        throw new Error("Error: no state specified for Wait.performAs()");
-      return BrowseTheWeb.as(actor).waitForLoadState(this.action.payload.state);
+    if (this.mode === "loadState") {
+      if (!this.payload.state)
+        throw new Error("Error: no state specified for Wait.forLoadState()");
+      return BrowseTheWeb.as(actor).waitForLoadState(
+        this.payload.state,
+        this.payload.options,
+      );
     }
-    if (this.action.mode === "selector") {
-      if (!this.action.payload.selector)
-        throw new Error("Error: no selector specified for Wait.performAs()");
+    if (this.mode === "url") {
+      if (!this.payload.url)
+        throw new Error("Error: no url specified for Wait.forUrl()");
+      return BrowseTheWeb.as(actor).waitForUrl(
+        this.payload.url,
+        this.payload.options,
+      );
+    }
+    if (this.mode === "selector") {
+      if (!this.payload.selector)
+        throw new Error("Error: no selector specified for Wait.forSelector()");
       return BrowseTheWeb.as(actor).waitForSelector(
-        this.action.payload.selector,
-        this.action.payload.options,
+        this.payload.selector,
+        this.payload.options,
       );
     }
     throw new Error("Error: no match for Wait.performAs()!");
@@ -56,16 +71,32 @@ export class Wait extends Action {
    * Wait for a specific status of the page.
    *
    * @param {string} state either 'load', 'domcontentloaded' or 'networkidle'
-   * @param {WaitActionOptions} options
+   * @param {WaitForLoadStateActionOptions} options
    * @return {Wait} new Wait instance
    * @example
    * Wait.forLoadState('networkidle');
    */
   public static forLoadState(
     state: "load" | "domcontentloaded" | "networkidle",
-    options?: WaitActionOptions,
+    options?: WaitForLoadStateActionOptions,
   ): Wait {
-    return new Wait({ mode: "loadState", payload: { state, options } });
+    return new Wait("loadState", { state, options });
+  }
+
+  /**
+   * Wait for the page specified url.
+   *
+   * @param {string} url url to wait for
+   * @param {WaitForUrlActionOptions} options
+   * @return {Wait} new Wait instance
+   * @example
+   * Wait.forLoadState('networkidle');
+   */
+  public static forUrl(
+    url: string | RegExp | ((url: URL) => boolean),
+    options?: WaitForUrlActionOptions,
+  ): Wait {
+    return new Wait("url", { url, options });
   }
 
   /**
@@ -89,6 +120,6 @@ export class Wait extends Action {
     selector: Selector,
     options?: SelectorOptions,
   ): Wait {
-    return new Wait({ mode: "selector", payload: { selector, options } });
+    return new Wait("selector", { selector, options });
   }
 }

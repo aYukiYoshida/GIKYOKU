@@ -16,7 +16,8 @@ import {
   PressActionOptions,
   SelectActionOptions,
   TypeActionOptions,
-  WaitActionOptions,
+  WaitForLoadStateActionOptions,
+  WaitForUrlActionOptions,
   TextPayload,
   ValuePayload,
   StylePayload,
@@ -103,16 +104,32 @@ export class BrowseTheWeb extends Ability {
    * Wait for the specified loading state.
    *
    * @param {string} status the status to wait for. Allowed: "load" | "domcontentloaded" | "networkidle".
-   * @param {WaitActionOptions} options
+   * @param {WaitForLoadStateActionOptions} options
    * @return {void} Returns when the required load state has been reached.
    * @example
    * BrowseTheWeb.as(actor).waitForLoadState('networkidle');
    */
   public async waitForLoadState(
     status: "load" | "domcontentloaded" | "networkidle",
-    options?: WaitActionOptions,
+    options?: WaitForLoadStateActionOptions,
   ): Promise<void> {
     return this.page.waitForLoadState(status, options);
+  }
+
+  /**
+   * Wait for the specified URL.
+   *
+   * @param {string} url the url to wait for.
+   * @param options
+   * @return {void} Returns when the page specified url has been reached.
+   * @example
+   * BrowseTheWeb.as(actor).waitForLoadState('networkidle');
+   */
+  public async waitForUrl(
+    url: string | RegExp | ((url: URL) => boolean),
+    options?: WaitForUrlActionOptions,
+  ): Promise<void> {
+    return this.page.waitForURL(url, options);
   }
 
   /**
