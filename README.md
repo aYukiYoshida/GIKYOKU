@@ -35,9 +35,9 @@ export class Login extends Task {
     public async performAs(actor: Actor): Promise<void> {
         return actor.attemptsTo(
             Navigate.to('https://www.my-fancy-url.com'),
-            Fill.with('#username', actor.states('username') || ''),
-            Fill.with('#password', actor.states('password') || ''),
-            Click.on('#login-button'),
+            Fill.with(page.locator('#username'), actor.states('username') || ''),
+            Fill.with(page.locator('#password'), actor.states('password') || ''),
+            Click.on(page.locator()'#login-button')),
             Get.from('https://www.my-fancy-url.com')
         );
     }
@@ -88,7 +88,11 @@ test.describe('My Test', () => {
     await actor.attemptsTo(Login.toApp());
 
     // Check if the login was successful - use the status question from the web package
-    await actor.asks(Element.toBe.visible('#logged-in-indicator'));
+    await actor.asks(
+      Element.of(
+        page.locator('#logged-in-indicator')
+      ).visible()
+    );
   });
 });
 ```
