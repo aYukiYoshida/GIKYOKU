@@ -18,7 +18,7 @@
     "lint": "eslint ./ --fix",
     "format": "prettier ./src/**/*.ts --write",
     "clean": "rimraf dist && rimraf report && rimraf result",
-    "postversion": "git push && git push --tags",
+    "postversion": "git push origin --tags",
     "package": "node scripts/package.js",
     "prerelease": "npm run build && npm run package",
     "release": "npm publish --access=public ./dist"
