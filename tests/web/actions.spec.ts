@@ -1,5 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 
+import fs from "fs";
+
 import {
   BrowseTheWeb,
   Add,
@@ -16,6 +18,7 @@ import {
   Navigate,
   Press,
   Remove,
+  Save,
   Select,
   Set,
   Type,
@@ -445,5 +448,47 @@ test.describe("Web Actions", () => {
       Get.sessionStorageItem("sessionKey"),
     );
     expect(sessionDeleted).toBeUndefined();
+  });
+
+  test("Save", async ({ actor }, testInfo) => {
+    const page: Page = BrowseTheWeb.as(actor).getPage();
+    const context: BrowserContext = page.context();
+
+    expect(await context.cookies()).toStrictEqual([]);
+
+    const cookies: Cookie[] = [
+      {
+        name: "cookie1",
+        value: "someValue",
+        domain: ".google.com",
+        path: "/",
+        expires: 1700269944,
+        httpOnly: true,
+        secure: true,
+        sameSite: "Lax",
+      },
+      {
+        name: "cookie2",
+        value: "val",
+        domain: ".google.com",
+        path: "/",
+        expires: 1700269944,
+        httpOnly: true,
+        secure: true,
+        sameSite: "Lax",
+      },
+    ];
+    await actor.attemptsTo(Add.cookies(cookies));
+    expect(await context.cookies()).toStrictEqual(cookies);
+
+    await actor.attemptsTo(
+      Save.storageState(testInfo.outputPath("storage-state.json")),
+    );
+    const savedStorageState = JSON.parse(
+      fs.readFileSync(testInfo.outputPath("storage-state.json"), "utf8"),
+    );
+
+    // assert that storage state is saved successfully
+    expect(await context.storageState()).toStrictEqual(savedStorageState);
   });
 });
