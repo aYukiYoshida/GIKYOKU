@@ -13,6 +13,7 @@ export { Navigate } from "./Navigate";
 export { Press } from "./Press";
 export { Reload } from "./Reload";
 export { Remove } from "./Remove";
+export { Save } from "./Save";
 export { Select } from "./Select";
 export { Set } from "./Set";
 export { Type } from "./Type";

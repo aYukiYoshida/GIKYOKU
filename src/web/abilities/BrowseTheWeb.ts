@@ -1230,4 +1230,18 @@ export class BrowseTheWeb extends Ability {
       return Promise.resolve();
     }, key);
   }
+
+  /**
+   * Save storage state for this browser context, contains current cookies and local storage snapshot.
+   *
+   * @param {string} path The file path to save the storage state to.
+   * @return {Object} Returns storage state.
+   * @example
+   * ```ts
+   * await BrowseTheWeb.as(actor).removeSessionStorageItem('some key');
+   * ```
+   */
+  public async saveStorageState(path: string): Promise<Object> {
+    return this.page.context().storageState({ path });
+  }
 }
