@@ -1,30 +1,4 @@
-import { Locator } from "@playwright/test";
 import z from "zod";
-
-export type Selector = string | Locator;
-
-export type SelectorOptionsState =
-  | "visible"
-  | "hidden"
-  | "attached"
-  | "detached";
-
-export type SubSelector = [
-  Selector,
-  {
-    hasText?: string;
-    timeout?: number;
-    subSelector?: SubSelector;
-    state?: SelectorOptionsState;
-  }?,
-];
-
-export type SelectorOptions = {
-  hasText?: string | RegExp | undefined;
-  subSelector?: SubSelector;
-  timeout?: number;
-  state?: SelectorOptionsState;
-};
 
 export type Point = {
   x: number;
@@ -454,7 +428,7 @@ export type ElementQuestionMode =
   | "containText";
 
 // for Element.haveText and Element.containText
-const textPayloadSchema = z.union([
+export const textPayloadSchema = z.union([
   z.string(),
   z.instanceof(RegExp),
   z.array(z.union([z.string(), z.instanceof(RegExp)])),
@@ -466,7 +440,7 @@ export const isTextPayload = (value: unknown): value is TextPayload => {
 };
 
 // for Element.haveValue
-const valuePayloadSchema = z.union([z.string(), z.instanceof(RegExp)]);
+export const valuePayloadSchema = z.union([z.string(), z.instanceof(RegExp)]);
 
 export type ValuePayload = z.infer<typeof valuePayloadSchema>;
 export const isValuePayload = (value: unknown): value is ValuePayload => {
@@ -474,14 +448,14 @@ export const isValuePayload = (value: unknown): value is ValuePayload => {
 };
 
 // for Element.haveCount
-const countPayloadSchema = z.number();
+export const countPayloadSchema = z.number();
 export type CountPayload = z.infer<typeof countPayloadSchema>;
 export const isCountPayload = (value: unknown): value is CountPayload => {
   return countPayloadSchema.safeParse(value).success;
 };
 
 // for Element.haveCSS
-const stylePayloadSchema = z.object({
+export const stylePayloadSchema = z.object({
   name: z.string(),
   value: z.union([z.string(), z.instanceof(RegExp)]),
 });
@@ -492,7 +466,10 @@ export const isStylePayload = (value: unknown): value is StylePayload => {
 };
 
 // for Element.haveScreenshot and Screen.haveScreenshot
-const screenshotPayloadSchema = z.union([z.string(), z.array(z.string())]);
+export const screenshotPayloadSchema = z.union([
+  z.string(),
+  z.array(z.string()),
+]);
 
 export type ScreenshotPayload = z.infer<typeof screenshotPayloadSchema>;
 export const isScreenshotPayload = (
