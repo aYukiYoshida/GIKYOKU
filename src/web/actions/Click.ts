@@ -8,6 +8,7 @@ import { ClickActionOptions } from "../types";
  * Click on an element specified by a locator string.
  *
  * @group Actions
+ * @category to interact
  */
 export class Click extends Action {
   private constructor(
@@ -22,6 +23,7 @@ export class Click extends Action {
    *
    * @param {Actor} actor Actor performing this action
    * @return {void} Returns after clicking the element
+   * @category called internally
    */
   public async performAs(actor: Actor): Promise<void> {
     await BrowseTheWeb.as(actor).click(this.locator, this.options);
@@ -47,6 +49,7 @@ export class Click extends Action {
    *   { timeout: 3000 }
    * );
    * ```
+   * @category Factory
    */
   public static on(locator: Locator, options?: ClickActionOptions): Click {
     return new Click(locator, options);

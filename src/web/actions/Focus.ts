@@ -4,9 +4,10 @@ import { Locator } from "playwright";
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 
 /**
- * @group Actions
- *
  * Focus on an element specified by a locator string.
+ *
+ * @group Actions
+ * @category to interact
  */
 export class Focus extends Action {
   private constructor(
@@ -21,6 +22,7 @@ export class Focus extends Action {
    *
    * @param {Actor} actor Actor performing this action
    * @return {void} Returns after focusing the element
+   * @category called internally
    */
   public async performAs(actor: Actor): Promise<void> {
     await BrowseTheWeb.as(actor).focus(this.locator, this.options);
@@ -46,6 +48,7 @@ export class Focus extends Action {
    *   { timeout: 3000 }
    * );
    * ```
+   * @category Factory
    */
   public static on(locator: Locator, options?: { timeout?: number }): Focus {
     return new Focus(locator, options);

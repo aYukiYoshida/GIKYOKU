@@ -2,11 +2,10 @@
     "$schema": "https://typedoc.org/schema.json",
     "tsconfig": "tsconfig.json",
     "entryPoints": [
-        "./src",
-        "./src/shared/actions",
-        "./src/web/*/index.ts",
+        "./src/shared",
+        "./src/web",
         "./src/web/types.ts",
-        "./src/api/*/index.ts",
+        "./src/api/",
         "./src/api/constants.ts",
         "./src/api/types.ts",
     ],
@@ -15,6 +14,7 @@
     "name": "GIKYOKU API Docs",
     "readme": "./README.md",
     "excludePrivate": true,
+    "excludeReferences": true,
     "githubPages": true,
     "theme": "default",
     "categorizeByGroup": true

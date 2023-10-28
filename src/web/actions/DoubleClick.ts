@@ -5,9 +5,10 @@ import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 import { DblclickActionOptions } from "../types";
 
 /**
- * @group Actions
- *
  * Click on an element specified by a locator string.
+ *
+ * @group Actions
+ * @category to interact
  */
 export class DoubleClick extends Action {
   private constructor(
@@ -22,6 +23,7 @@ export class DoubleClick extends Action {
    *
    * @param {Actor} actor Actor performing this action
    * @return {void} Returns after double clicking the element
+   * @category called internally
    */
   public async performAs(actor: Actor): Promise<void> {
     await BrowseTheWeb.as(actor).dblclick(this.locator, this.options);
@@ -47,6 +49,7 @@ export class DoubleClick extends Action {
    *  { timeout: 3000 }
    * );
    * ```
+   * @category Factory
    */
   public static on(
     locator: Locator,

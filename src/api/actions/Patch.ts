@@ -7,9 +7,9 @@ import { Headers, Response, ResponseBodyFormat } from "../types";
 import { ARequest } from "./ARequest";
 
 /**
- * @group Actions
- *
  * Send a HTTP PATCH Request.
+ *
+ * @group Actions
  */
 export class Patch extends ARequest {
   private data?: any;
@@ -25,6 +25,7 @@ export class Patch extends ARequest {
    *
    * @param {Actor} actor the actor executes the request
    * @return {Response} the response
+   * @category called internally
    */
   public async performAs(actor: Actor): Promise<Response> {
     return UseAPI.as(actor).sendRequest(
@@ -43,9 +44,12 @@ export class Patch extends ARequest {
    * @param {string} url the URL of the target.
    * @return {Patch} the new instance
    * @example
-   * // simple request
+   * simple request
+   * ```typescript
    * Patch.to('https://my-fancy-url.com');
-   * // with chained definitions
+   * ```
+   * with chained definitions
+   * ```typescript
    * Patch.to('https://my-fancy-url.com')
    *     // add headers
    *     .withHeaders({
@@ -57,6 +61,8 @@ export class Patch extends ARequest {
    *     })
    *     // define expected response format
    *     .withResponseFormat('text');
+   * ```
+   * @category Factory
    */
   public static to(url: string): Patch {
     return new Patch(url);

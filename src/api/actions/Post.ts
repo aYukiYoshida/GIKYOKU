@@ -7,9 +7,9 @@ import { Headers, Response, ResponseBodyFormat } from "../types";
 import { ARequest } from "./ARequest";
 
 /**
- * @group Actions
- *
  * Send a HTTP POST Request.
+ *
+ * @group Actions
  */
 export class Post extends ARequest {
   private data?: any;
@@ -25,6 +25,7 @@ export class Post extends ARequest {
    *
    * @param {Actor} actor the used actor
    * @return {Response} the returned response
+   * @category called internally
    */
   public async performAs(actor: Actor): Promise<Response> {
     return UseAPI.as(actor).sendRequest(
@@ -43,9 +44,12 @@ export class Post extends ARequest {
    * @param {string} url the URL of the target.
    * @return {Post} a new Post instance
    * @example
-   * // simple request
+   * simple request
+   * ```typescript
    * Post.to('https://my-fancy-url.com');
-   * // with chained definitions
+   * ```
+   * with chained definitions
+   * ```typescript
    * Post.to('https://my-fancy-url.com')
    *     // add headers
    *     .withHeaders({
@@ -57,6 +61,8 @@ export class Post extends ARequest {
    *     })
    *     // define expected response format
    *     .withResponseFormat('text');
+   * ```
+   * @category Factory
    */
   public static to(url: string): Post {
     return new Post(url);

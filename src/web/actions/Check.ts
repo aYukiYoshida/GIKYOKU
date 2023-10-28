@@ -8,6 +8,7 @@ import { CheckActionOptions } from "../types";
  * Check a checkbox specified with locator.
  *
  * @group Actions
+ * @category to interact
  */
 export class Check extends Action {
   private constructor(
@@ -22,6 +23,7 @@ export class Check extends Action {
    *
    * @param {Actor} actor Actor performing this action
    * @return {void} Returns after checking the element
+   * @category called internally
    */
   public async performAs(actor: Actor): Promise<void> {
     await BrowseTheWeb.as(actor).checkBox(this.locator, this.options);
@@ -47,6 +49,7 @@ export class Check extends Action {
    *   { timeout: 3000 }
    * );
    * ```
+   * @category Factory
    */
   public static element(locator: Locator, options?: CheckActionOptions): Check {
     return new Check(locator, options);

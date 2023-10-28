@@ -6,8 +6,9 @@ import { TypeActionOptions } from "../types";
 
 /**
  * Type specified input into an element specified by a locator.
- *
+ * @deprecated In most cases, you should use {@link Fill.in} instead. You only need to press keys one by one if there is special keyboard handling on the page - in this case use {@link Press.characters}.
  * @group Actions
+ * @category to interact
  */
 export class Type extends Action {
   private constructor(
@@ -20,9 +21,9 @@ export class Type extends Action {
 
   /**
    * find the specified locator and fill it.
-   *
    * @param {Actor} actor the actor which is used
    * @return {void} Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
+   * @category called internally
    */
   public async performAs(actor: Actor): Promise<void> {
     return BrowseTheWeb.as(actor).type(this.locator, this.input, this.options);
@@ -42,6 +43,7 @@ export class Type extends Action {
    *   page.locator('myLocator'),
    *   'myInput'
    * );
+   * ```
    * with options
    * ```typescript
    * Type.in(
@@ -50,6 +52,7 @@ export class Type extends Action {
    *   { timeout: 3000 }
    * );
    * ```
+   * @category Factory
    */
   public static in(
     locator: Locator,

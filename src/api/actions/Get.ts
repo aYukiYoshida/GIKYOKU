@@ -7,9 +7,9 @@ import { Headers, Response, ResponseBodyFormat } from "../types";
 import { ARequest } from "./ARequest";
 
 /**
- * @group Actions
- *
  * Send a HTTP GET Request.
+ *
+ * @group Actions
  */
 export class Get extends ARequest {
   private responseBodyFormat: ResponseBodyFormat = "json";
@@ -23,6 +23,7 @@ export class Get extends ARequest {
    *
    * @param {Actor} actor the actor object
    * @return {Response} the response
+   * @category called internally
    */
   public async performAs(actor: Actor): Promise<Response> {
     return UseAPI.as(actor).sendRequest(
@@ -40,9 +41,12 @@ export class Get extends ARequest {
    * @param {string} url the URL of the target.
    * @return {Get} create a new instance
    * @example
-   * // simple request
+   * simple request
+   * ```typescript
    * Get.from('https://my-fancy-url.com');
-   * // with chained definitions
+   * ```
+   * with chained definitions
+   * ```typescript
    * Get.from('https://my-fancy-url.com')
    *     // add headers
    *     .withHeaders({
@@ -50,6 +54,8 @@ export class Get extends ARequest {
    *     })
    *     // define expected response format
    *     .withResponseFormat('text');
+   * ```
+   * @category Factory
    */
   public static from(url: string): Get {
     return new Get(url);

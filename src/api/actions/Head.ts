@@ -7,9 +7,9 @@ import { Headers, Response } from "../types";
 import { ARequest } from "./ARequest";
 
 /**
- * @group Actions
- *
  * Send a HTTP HEAD Request.
+ *
+ * @group Actions
  */
 export class Head extends ARequest {
   private constructor(private url: string) {
@@ -22,17 +22,7 @@ export class Head extends ARequest {
    *
    * @param {Actor} actor the actor
    * @return {Response} the response
-   * @example
-   * // simple request
-   * Head.from('https://my-fancy-url.com');
-   * // with chained definitions
-   * Head.from('https://my-fancy-url.com')
-   *     // add headers
-   *     .withHeaders({
-   *         key: value,
-   *     })
-   *     // define expected response format
-   *     .withResponseFormat('text');
+   * @category called internally
    */
   public async performAs(actor: Actor): Promise<Response> {
     return UseAPI.as(actor).sendRequest(
@@ -58,6 +48,22 @@ export class Head extends ARequest {
    *
    * @param {Headers} headers the headers.
    * @return {Head} this instance
+   * @example
+   * simple request
+   * ```typescript
+   * Head.from('https://my-fancy-url.com');
+   * ```
+   * with chained definitions
+   * ```typescript
+   * Head.from('https://my-fancy-url.com')
+   *     // add headers
+   *     .withHeaders({
+   *         key: value,
+   *     })
+   *     // define expected response format
+   *     .withResponseFormat('text');
+   * ```
+   * @category Factory
    */
   public withHeaders(headers: Headers): Head {
     this.headers = headers;

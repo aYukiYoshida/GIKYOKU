@@ -13,10 +13,10 @@ import {
 } from "../types";
 
 /**
- * @category Questions
- *
  * Get a specified state for page.
  * A mode operator must be prepended.
+ *
+ * @group Questions
  */
 export class Screen extends Question<boolean> {
   private positive = true;
@@ -40,6 +40,7 @@ export class Screen extends Question<boolean> {
    *
    * @param {Actor} actor the actor
    * @return {Promise<boolean>} true if the element has the specified state, false otherwise.
+   * @category called internally
    */
   public async answeredBy(actor: Actor): Promise<boolean> {
     if (this.mode === "haveUrl") {
@@ -112,8 +113,6 @@ export class Screen extends Question<boolean> {
   }
 
   /**
-   * @category mode operators
-   *
    * Verifies if the page has URL.
    *
    * @param {TitlePayload} url the expected URL.
@@ -131,6 +130,7 @@ export class Screen extends Question<boolean> {
    *   { timeout: 1000 }
    * );
    * ```
+   * @category mode operators
    */
   public haveTitle(
     title: TitlePayload,
@@ -158,6 +158,7 @@ export class Screen extends Question<boolean> {
    * ```typescript
    * Screen.not.toHaveUrl('https://www.example.com', { timeout: 1000 });
    * ```
+   * @category mode operators
    */
   public haveUrl(url: UrlPayload, options?: { timeout?: number }): Screen {
     this.mode = "haveUrl";
@@ -185,6 +186,7 @@ export class Screen extends Question<boolean> {
    *   { timeout: 1000 }
    * );
    * ```
+   * @category mode operators
    */
   public haveScreenshot(
     name: ScreenshotPayload,
@@ -202,6 +204,7 @@ export class Screen extends Question<boolean> {
    *
    * @param {page} page the page object of the Playwright
    * @return {Screen} new Screen instance
+   * @category Factory
    */
   public static of(page?: Page): Screen {
     return new Screen(page);

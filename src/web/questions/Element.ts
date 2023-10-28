@@ -53,6 +53,7 @@ export class Element extends Question<boolean> {
    *
    * @param {Actor} actor the actor
    * @return {Promise<boolean>} true if the element has the specified state, false otherwise.
+   * @category called internally
    */
   public async answeredBy(actor: Actor): Promise<boolean> {
     if (this.mode === "visible") {
@@ -594,6 +595,7 @@ export class Element extends Question<boolean> {
    *
    * @param {Locator} locator the locator of the element to check.
    * @return {Element} new Element instance
+   * @category Factory
    */
   public static of(locator: Locator) {
     return new Element(locator);

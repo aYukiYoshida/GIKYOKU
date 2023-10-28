@@ -8,6 +8,7 @@ import { PressActionOptions } from "../types";
  * Press the specified key on the keyboard.
  *
  * @group Actions
+ * @category to interact
  */
 export class Press extends Action {
   private constructor(
@@ -26,6 +27,7 @@ export class Press extends Action {
    *
    * @param {Actor} actor Actor performing this action
    * @return {void} Returns when the `key` can specify the intended value or a single character to generate the text for.
+   * @category called internally
    */
   public async performAs(actor: Actor): Promise<void> {
     if (this.action.sequential) {
@@ -56,6 +58,7 @@ export class Press extends Action {
    * ```typescript
    * Press.key('Control+A')
    * ```
+   * @category Factory
    */
   public static key(keys: string, options?: PressActionOptions): Press {
     return new Press(keys, { options, sequential: false });
@@ -69,8 +72,11 @@ export class Press extends Action {
    * @param {PressActionOptions} options (optional) options for the press action.
    * @return {Press} new Press instance
    * @example
-   * // keys of characters
+   * keys of characters
+   * ```typescript
    * Press.characters('abcdefghijklmnopqrstuvwxyz');
+   * ```
+   * @category Factory
    */
   public static characters(
     locator: Locator,

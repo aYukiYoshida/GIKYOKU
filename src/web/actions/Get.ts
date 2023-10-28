@@ -6,6 +6,8 @@ import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
  * Get either Cookies, Session Storage Items or Local Storage Items from the Browser.
  *
  * @group Actions
+ * @category related to cookies
+ * @category related to storage
  */
 export class Get extends Action {
   private constructor(
@@ -20,6 +22,7 @@ export class Get extends Action {
    *
    * @param {Actor} actor Actor performing this action
    * @return {any} Returns cookies, session storage items or local storage items
+   * @category called internally
    */
   public performAs(actor: Actor): Promise<any> {
     if (this.mode === "cookies") {
@@ -52,6 +55,7 @@ export class Get extends Action {
    * ```typescript
    * Get.cookies(['https://www.myapp.com', 'https://www.another-app.com']);
    * ```
+   * @category Factory
    */
   public static cookies(urls?: string | string[] | undefined): Get {
     return new Get("cookies", urls);
@@ -66,6 +70,7 @@ export class Get extends Action {
    * ```typescript
    * Get.sessionStorageItem('some key');
    * ```
+   * @category Factory
    */
   public static sessionStorageItem(key: string): Get {
     return new Get("sessionStorage", key);
@@ -80,6 +85,7 @@ export class Get extends Action {
    * ```typescript
    * Get.localStorageItem('some key');
    * ```
+   * @category Factory
    */
   public static localStorageItem(key: string): Get {
     return new Get("localStorage", key);

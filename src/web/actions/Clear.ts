@@ -6,6 +6,7 @@ import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
  * Remove from the Browser.
  *
  * @group Actions
+ * @category related to cookies
  */
 export class Clear extends Action {
   /**
@@ -13,6 +14,7 @@ export class Clear extends Action {
    *
    * @param {Actor} actor Actor performing this action
    * @return {any} Clears context cookies
+   * @category called internally
    */
   // eslint-disable-next-line class-methods-use-this
   public performAs(actor: Actor): Promise<any> {
@@ -26,6 +28,7 @@ export class Clear extends Action {
    * ```typescript
    * Clear.cookies();
    * ```
+   * @category Factory
    */
   public static cookies(): Clear {
     return new Clear();
