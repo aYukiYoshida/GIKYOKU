@@ -6,6 +6,7 @@ import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
  * Set either Session Storage Items or Local Storage Items on the Browser.
  *
  * @group Actions
+ * @category related to storage
  */
 export class Set extends Action {
   private constructor(
@@ -20,6 +21,7 @@ export class Set extends Action {
    *
    * @param {Actor} actor Actor performing this action
    * @return {any} Returns the value of the `pageFunction` invocation.
+   * @category called internally
    */
   public performAs(actor: Actor): Promise<any> {
     if (this.mode === "sessionStorage") {
@@ -47,6 +49,7 @@ export class Set extends Action {
    * ```typescript
    * Set.sessionStorageItem('some key', 'some value');
    * ```
+   * @category Factory
    */
   public static sessionStorageItem(key: string, value: any): Set {
     return new Set("sessionStorage", { key, value });
@@ -62,6 +65,7 @@ export class Set extends Action {
    * ```typescript
    * Set.localStorageItem('some key', 'some value');
    * ```
+   * @category Factory
    */
   public static localStorageItem(key: string, value: any): Set {
     return new Set("localStorage", { key, value });

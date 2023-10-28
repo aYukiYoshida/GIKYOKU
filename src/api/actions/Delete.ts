@@ -7,8 +7,9 @@ import { Headers, Response, ResponseBodyFormat } from "../types";
 import { ARequest } from "./ARequest";
 
 /**
- * @group Actions
  * Action Class. Send a HTTP DELETE Request.
+ *
+ * @group Actions
  */
 export class Delete extends ARequest {
   private responseBodyFormat: ResponseBodyFormat = "json";
@@ -22,6 +23,7 @@ export class Delete extends ARequest {
    *
    * @param {Actor} actor the used actor
    * @return {Response} the response
+   * @category called internally
    */
   public async performAs(actor: Actor): Promise<Response> {
     return UseAPI.as(actor).sendRequest(
@@ -39,9 +41,12 @@ export class Delete extends ARequest {
    * @param {string} url the URL of the target.
    * @return {Delete} new instance
    * @example
-   * // simple request
+   * simple request
+   * ```typescript
    * Delete.from('https://my-fancy-url.com');
-   * // with chained definitions
+   * ```
+   * with chained definitions
+   * ```typescript
    * Delete.from('https://my-fancy-url.com')
    *     // add headers
    *     .withHeaders({
@@ -53,6 +58,8 @@ export class Delete extends ARequest {
    *     })
    *     // define expected response format
    *     .withResponseFormat('text');
+   * ```
+   * @category Factory
    */
   public static from(url: string): Delete {
     return new Delete(url);

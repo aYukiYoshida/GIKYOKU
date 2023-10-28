@@ -8,6 +8,7 @@ import { SelectActionOptions } from "../types";
  * Set the value of a Locator of type select to the given option.
  *
  * @group Actions
+ * @category to interact
  */
 export class Select extends Action {
   private constructor(
@@ -57,6 +58,7 @@ export class Select extends Action {
    *
    * @param {Actor} actor Actor performing this action
    * @return {any} This method checks, waits until all specified options are present in the `<select>` element and selects these options.
+   * @category called internally
    */
   public async performAs(actor: Actor): Promise<any> {
     await BrowseTheWeb.as(actor).selectOption(
@@ -80,6 +82,7 @@ export class Select extends Action {
    *   page.locator('myLocator'),
    *   'myOptionLabel'
    * );
+   * ```
    * with options for select
    * ```typescript
    * Select.option(
@@ -88,6 +91,7 @@ export class Select extends Action {
    *   { timeout: 3000 }
    * );
    * ```
+   * @category Factory
    */
   public static option(
     locator: Locator,

@@ -24,10 +24,10 @@ import {
 } from "../types";
 
 /**
- * @group Abilities
- *
  * This class represents the actor's ability to use a Browser.
  * This ability enables the actor to interact with the browser and browse web user interfaces.
+ *
+ * @group Abilities
  */
 export class BrowseTheWeb extends Ability {
   /**
@@ -35,6 +35,7 @@ export class BrowseTheWeb extends Ability {
    *
    * @param {Page} page the Playwright Page that will be used to browse.
    * @return {BrowseTheWeb} Returns the ability to use a browser
+   * @category Factory
    */
   public static using(page: Page): BrowseTheWeb {
     return new BrowseTheWeb(page);
@@ -46,6 +47,7 @@ export class BrowseTheWeb extends Ability {
    *
    * @param {Actor} actor Actor is using this ability
    * @return {BrowseTheWeb} Returns the ability to use a browser
+   * @category called internally
    */
   public static as(actor: Actor): BrowseTheWeb {
     return actor.withAbilityTo(this) as BrowseTheWeb;
@@ -63,7 +65,8 @@ export class BrowseTheWeb extends Ability {
   /**
    * Get the page object
    *
-   * @returns {Page} the page object
+   * @returns {Page} the playwright page object
+   * @category getter
    */
   public getPage(): Page {
     return this.page;
@@ -79,6 +82,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).goto('myURL');
    * ```
+   * @category to interact
    */
   public async goto(
     url: string,
@@ -96,6 +100,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).reload();
    * ```
+   * @category to interact
    */
   public async reload(options?: ReloadActionOptions): Promise<Response | null> {
     return this.page.reload(options);
@@ -109,6 +114,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).bringToFront(page);
    * ```
+   * @category to interact
    */
   public async bringToFront(page: Page): Promise<void> {
     this.page = page;
@@ -125,6 +131,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).waitForLoadState('networkidle');
    * ```
+   * @category to interact
    */
   public async waitForLoadState(
     status: "load" | "domcontentloaded" | "networkidle",
@@ -143,6 +150,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).waitForUrl('example.com');
    * ```
+   * @category to interact
    */
   public async waitForUrl(
     url: string | RegExp | ((url: URL) => boolean),
@@ -168,6 +176,7 @@ export class BrowseTheWeb extends Ability {
    *     modifiers: ['Alt', 'Shift']
    * });
    * ```
+   * @category to interact
    */
   public async hover(
     locator: Locator,
@@ -191,6 +200,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).press('Control+A');
    * ```
+   * @category to interact
    */
   public async press(
     input: string,
@@ -213,6 +223,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).pressSequentially('ABC');
    * ```
+   * @category to interact
    */
   public async pressSequentially(
     locator: Locator,
@@ -241,6 +252,7 @@ export class BrowseTheWeb extends Ability {
    *     { timeout: 1000 }
    *   );
    * ```
+   * @category to interact
    */
   public async checkBox(
     locator: Locator,
@@ -269,6 +281,7 @@ export class BrowseTheWeb extends Ability {
    *   { state: "visible" }
    * );
    * ```
+   * @category to interact
    */
   public async waitForLocator(
     locator: Locator,
@@ -300,6 +313,7 @@ export class BrowseTheWeb extends Ability {
    *   { timeout: 1000 }
    * );
    * ```
+   * @category to interact
    */
   public async dragAndDrop(
     sourceLocator: Locator,
@@ -332,6 +346,7 @@ export class BrowseTheWeb extends Ability {
    *   { timeout: 1000 }
    * );
    * ```
+   * @category to interact
    */
   public async fill(
     locator: Locator,
@@ -343,7 +358,7 @@ export class BrowseTheWeb extends Ability {
 
   /**
    * Type the given input into the element specified by the locator.
-   * @deprecated Use {@link fill} instead.
+   * @deprecated In most cases, you should use {@link fill} instead. You only need to press keys one by one if there is special keyboard handling on the page - in this case use {@link pressSequentially}.
    * @param {Locator} locator the locator of the source element.
    * @param {string} input the input to type into the element.
    * @param {TypeActionOptions} options (optional) options for interaction.
@@ -364,6 +379,7 @@ export class BrowseTheWeb extends Ability {
    *   { timeout: 1000 }
    * );
    * ```
+   * @category to interact
    */
   public async type(
     locator: Locator,
@@ -397,6 +413,7 @@ export class BrowseTheWeb extends Ability {
    *   { timeout: 1000 }
    * );
    * ```
+   * @category to interact
    */
   public async click(
     locator: Locator,
@@ -425,6 +442,7 @@ export class BrowseTheWeb extends Ability {
    *   { timeout: 1000 }
    * );
    * ```
+   * @category to interact
    */
   public async dblclick(
     locator: Locator,
@@ -445,7 +463,7 @@ export class BrowseTheWeb extends Ability {
    * await BrowseTheWeb.as(actor).focus(
    *   page.locator('myLocator')
    * );
-   * @example
+   * ```
    * with options
    * ```ts
    * await BrowseTheWeb.as(actor).focus(
@@ -453,6 +471,7 @@ export class BrowseTheWeb extends Ability {
    *   { timeout: 1000 }
    * );
    * ```
+   * @category to interact
    */
   public async focus(
     locator: Locator,
@@ -484,6 +503,7 @@ export class BrowseTheWeb extends Ability {
    *   { timeout: 1000 }
    * );
    * ```
+   * @category to interact
    */
   public async selectOption(
     locator: Locator,
@@ -535,7 +555,7 @@ export class BrowseTheWeb extends Ability {
    * @param options (optional) options for assertion.
    * @param page (optional) the playwright page object to verify.
    * @returns {boolean} Promise<boolean> true if the page has URL as expected, false if the timeout was reached.
-   * @category method to ensure
+   * @category to ensure
    */
   public async checkPageUrl(
     positive: boolean,
@@ -560,7 +580,7 @@ export class BrowseTheWeb extends Ability {
    * @param options (optional) options for assertion.
    * @param page (optional) the playwright page object to verify.
    * @returns {boolean} Promise<boolean> true if the page has title as expected, false if the timeout was reached.
-   * @category method to ensure
+   * @category to ensure
    */
   public async checkPageTitle(
     positive: boolean,
@@ -585,7 +605,7 @@ export class BrowseTheWeb extends Ability {
    * @param options (optional) options for assertion.
    * @param page (optional) the playwright page object to verify.
    * @returns {boolean} Promise<boolean> true if the page has title as expected, false if the timeout was reached.
-   * @category method to ensure
+   * @category to ensure
    */
   public async checkPageScreenshot(
     positive: boolean,
@@ -625,7 +645,7 @@ export class BrowseTheWeb extends Ability {
    *   { timeout: 1000 }
    * );
    * ```
-   * @category method to ensure
+   * @category to ensure
    */
   public async checkVisibilityState(
     locator: Locator,
@@ -670,7 +690,7 @@ export class BrowseTheWeb extends Ability {
    *   { timeout: 1000 }
    * );
    * ```
-   * @category method to ensure
+   * @category to ensure
    */
   public async checkEnabledState(
     locator: Locator,
@@ -706,6 +726,7 @@ export class BrowseTheWeb extends Ability {
    *   page.locator('myLocator'),
    *   true
    * );
+   * ```
    * with options
    * ```ts
    * await BrowseTheWeb.as(actor).checkEditableState(
@@ -714,7 +735,7 @@ export class BrowseTheWeb extends Ability {
    *   { timeout: 1000 }
    * );
    * ```
-   * @category method to ensure
+   * @category to ensure
    */
   public async checkEditableState(
     locator: Locator,
@@ -750,6 +771,7 @@ export class BrowseTheWeb extends Ability {
    *   page.locator('myLocator'),
    *   true
    * );
+   * ```
    * with options
    * ```ts
    * await BrowseTheWeb.as(actor).checkFocusedState(
@@ -758,7 +780,7 @@ export class BrowseTheWeb extends Ability {
    *   { timeout: 1000 }
    * );
    * ```
-   * @category method to ensure
+   * @category to ensure
    */
   public async checkFocusedState(
     locator: Locator,
@@ -785,7 +807,7 @@ export class BrowseTheWeb extends Ability {
    * @param {boolean} positive whether to check the property of the locator positive or not.
    * @param options
    * @returns {boolean} true if the element is checked/not as expected, false if the timeout was reached.
-   * @category method to ensure
+   * @category to ensure
    */
   public async checkCheckedState(
     locator: Locator,
@@ -815,7 +837,7 @@ export class BrowseTheWeb extends Ability {
    * @param {boolean} positive whether to check the property of the locator positive or not.
    * @param options options for assertion.
    * @returns {boolean} true if the element has text/not as expected, false if the timeout was reached.
-   * @category method to ensure
+   * @category to ensure
    */
   public async checkLocatorHasText(
     locator: Locator,
@@ -854,7 +876,7 @@ export class BrowseTheWeb extends Ability {
    * @param {TextPayload} text the text to check.
    * @param {boolean} positive whether to check the property of the locator positive or not.
    * @param options (optional) options for assertion.
-   * @category method to ensure
+   * @category to ensure
    */
   public async checkLocatorContainsText(
     locator: Locator,
@@ -894,7 +916,7 @@ export class BrowseTheWeb extends Ability {
    * @param {boolean} positive whether to check the property of the locator positive or not.
    * @param options (optional) options for assertion.
    * @returns {boolean} true if the element has value/not as expected, false if the timeout was reached.
-   * @category method to ensure
+   * @category to ensure
    */
   public async checkLocatorHasValue(
     locator: Locator,
@@ -923,7 +945,7 @@ export class BrowseTheWeb extends Ability {
    * @param {boolean} positive whether to check the property of the locator positive or not.
    * @param options (optional) options for assertion.
    * @returns {boolean} true if the element has exact number of DOM node, false if the timeout was reached.
-   * @category method to ensure
+   * @category to ensure
    */
   public async checkLocatorHasCount(
     locator: Locator,
@@ -952,7 +974,7 @@ export class BrowseTheWeb extends Ability {
    * @param {boolean} positive whether to check the property of the locator positive or not.
    * @param options (optional) options for assertion.
    * @returns {boolean} true if the element has CSS/not as expected, false if the timeout was reached.
-   * @category method to ensure
+   * @category to ensure
    */
   public async checkLocatorHasCSS(
     locator: Locator,
@@ -981,7 +1003,7 @@ export class BrowseTheWeb extends Ability {
    * @param {boolean} positive whether to check the property of the locator positive or not.
    * @param options (optional) options for assertion.
    * @returns {boolean} true if the element has screenshot/not as expected, false if the timeout was reached.
-   * @category method to ensure
+   * @category to ensure
    */
   public async checkLocatorHasScreenshot(
     locator: Locator,
@@ -1081,6 +1103,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).getCookies(['https://example.com', 'https://www.com']);
    * ```
+   * @category related to cookies
    */
   public async getCookies(urls?: string | string[]): Promise<Cookie[]> {
     return this.page.context().cookies(urls);
@@ -1098,6 +1121,7 @@ export class BrowseTheWeb extends Ability {
    *   url: 'http://www.myapp.com',
    * }]);
    * ```
+   * @category related to cookies
    */
   public async addCookies(cookies: Cookie[]): Promise<void> {
     return this.page.context().addCookies(cookies);
@@ -1110,6 +1134,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).clearCookies();
    * ```
+   * @category related to cookies
    */
   public async clearCookies(): Promise<void> {
     return this.page.context().clearCookies();
@@ -1124,6 +1149,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).getLocalStorageItem('some key');
    * ```
+   * @category related to storage
    */
   public async getLocalStorageItem(key: string): Promise<any> {
     return this.page.evaluate((k) => {
@@ -1145,6 +1171,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).setLocalStorageItem('some key', 'some value');
    * ```
+   * @category related to storage
    */
   public async setLocalStorageItem(key: string, value: any): Promise<void> {
     return this.page.evaluate(
@@ -1165,6 +1192,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).removeLocalStorageItem('some key');
    * ```
+   * @category related to storage
    */
   public async removeLocalStorageItem(key: string): Promise<void> {
     return this.page.evaluate((k) => {
@@ -1182,6 +1210,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).getSessionStorageItem('some key');
    * ```
+   * @category related to storage
    */
   public async getSessionStorageItem(key: string): Promise<any> {
     return this.page.evaluate((k) => {
@@ -1203,6 +1232,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).setSessionStorageItem('some key', 'some value');
    * ```
+   * @category related to storage
    */
   public async setSessionStorageItem(key: string, value: any): Promise<void> {
     return this.page.evaluate(
@@ -1223,6 +1253,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).removeSessionStorageItem('some key');
    * ```
+   * @category related to storage
    */
   public async removeSessionStorageItem(key: string): Promise<void> {
     return this.page.evaluate((k) => {
@@ -1240,6 +1271,7 @@ export class BrowseTheWeb extends Ability {
    * ```ts
    * await BrowseTheWeb.as(actor).removeSessionStorageItem('some key');
    * ```
+   * @category related to storage
    */
   public async saveStorageState(path: string): Promise<Object> {
     return this.page.context().storageState({ path });

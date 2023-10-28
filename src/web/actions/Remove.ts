@@ -6,6 +6,7 @@ import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
  * Remove either Session Storage Items or Local Storage Items from the Browser.
  *
  * @group Actions
+ * @category related to cookies
  */
 export class Remove extends Action {
   private constructor(
@@ -20,6 +21,7 @@ export class Remove extends Action {
    *
    * @param {Actor} actor Actor performing this action
    * @return {any} Returns the value of the `pageFunction` invocation.
+   * @category called internally
    */
   public performAs(actor: Actor): Promise<any> {
     if (this.mode === "sessionStorage") {
@@ -40,6 +42,7 @@ export class Remove extends Action {
    * ```typescript
    * Remove.sessionStorageItem('some key');
    * ```
+   * @category Factory
    */
   public static sessionStorageItem(key: string): Remove {
     return new Remove("sessionStorage", key);
@@ -54,6 +57,7 @@ export class Remove extends Action {
    * ```typescript
    * Remove.localStorageItem('some key');
    * ```
+   * @category Factory
    */
   public static localStorageItem(key: string): Remove {
     return new Remove("localStorage", key);

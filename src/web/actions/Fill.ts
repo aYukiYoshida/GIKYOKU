@@ -8,6 +8,7 @@ import { FillActionOptions } from "../types";
  * Fill an element specified by a locator string with the specified input.
  *
  * @group Actions
+ * @category to interact
  */
 export class Fill extends Action {
   private constructor(
@@ -23,6 +24,7 @@ export class Fill extends Action {
    *
    * @param {Actor} actor Actor performing this action
    * @return {void} Returns after checks, focuses the element, fills it and triggers an `input` event after filling.
+   * @category called internally
    */
   public async performAs(actor: Actor): Promise<void> {
     return BrowseTheWeb.as(actor).fill(this.locator, this.input, this.options);
@@ -51,6 +53,7 @@ export class Fill extends Action {
    *   { timeout: 3000 }
    * );
    * ```
+   * @category Factory
    */
   public static in(
     locator: Locator,

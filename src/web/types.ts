@@ -1,12 +1,21 @@
 import z from "zod";
 
+/**
+ * @category properties of options
+ */
 export type Point = {
   x: number;
   y: number;
 };
 
+/**
+ * @category properties of options
+ */
 export type Modifiers = Array<"Alt" | "Control" | "Meta" | "Shift">;
 
+/**
+ * @category options of Actions
+ */
 export type CheckActionOptions = {
   /**
    * Whether to bypass the [actionability](https://playwright.dev/docs/actionability) checks. Defaults to `false`.
@@ -41,6 +50,9 @@ export type CheckActionOptions = {
   trial?: boolean;
 };
 
+/**
+ * @category options of Actions
+ */
 export type ClickActionOptions = {
   /**
    * Defaults to `left`.
@@ -96,6 +108,9 @@ export type ClickActionOptions = {
   trial?: boolean;
 };
 
+/**
+ * @category options of Actions
+ */
 export type DblclickActionOptions = {
   /**
    * Defaults to `left`.
@@ -146,6 +161,9 @@ export type DblclickActionOptions = {
   trial?: boolean;
 };
 
+/**
+ * @category options of Actions
+ */
 export type DragAndDropActionOptions = {
   /**
    * Whether to bypass the [actionability](https://playwright.dev/docs/actionability) checks. Defaults to `false`.
@@ -186,6 +204,9 @@ export type DragAndDropActionOptions = {
   trial?: boolean;
 };
 
+/**
+ * @category options of Actions
+ */
 export type FillActionOptions = {
   /**
    * Whether to bypass the [actionability](https://playwright.dev/docs/actionability) checks. Defaults to `false`.
@@ -208,6 +229,9 @@ export type FillActionOptions = {
   timeout?: number;
 };
 
+/**
+ * @category options of Actions
+ */
 export type HoverActionOptions = {
   /**
    * Whether to bypass the [actionability](https://playwright.dev/docs/actionability) checks. Defaults to `false`.
@@ -248,6 +272,9 @@ export type HoverActionOptions = {
   trial?: boolean;
 };
 
+/**
+ * @category options of Actions
+ */
 export type NavigateActionOptions = {
   /**
    * Referer header value. If provided it will take preference over the referer header value set by
@@ -267,6 +294,9 @@ export type NavigateActionOptions = {
   waitUntil?: "load" | "domcontentloaded" | "networkidle" | "commit";
 };
 
+/**
+ * @category options of Actions
+ */
 export type ReloadActionOptions = {
   /**
    * Maximum operation time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via
@@ -290,6 +320,9 @@ export type ReloadActionOptions = {
   waitUntil?: "load" | "domcontentloaded" | "networkidle" | "commit";
 };
 
+/**
+ * @category options of Actions
+ */
 export type PressActionOptions = {
   /**
    * Time to wait between `keydown` and `keyup` in milliseconds. Defaults to 0.
@@ -312,6 +345,9 @@ export type PressActionOptions = {
   timeout?: number;
 };
 
+/**
+ * @category options of Actions
+ */
 export type SelectActionOptions = {
   /**
    * Whether to bypass the [actionability](https://playwright.dev/docs/actionability) checks. Defaults to `false`.
@@ -334,6 +370,9 @@ export type SelectActionOptions = {
   timeout?: number;
 };
 
+/**
+ * @category options of Actions
+ */
 export type TypeActionOptions = {
   /**
    * Time to wait between key presses in milliseconds. Defaults to 0.
@@ -356,6 +395,9 @@ export type TypeActionOptions = {
   timeout?: number;
 };
 
+/**
+ * @category options of Actions
+ */
 export type WaitForLoadStateActionOptions = {
   /**
    * Maximum operation time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via
@@ -368,6 +410,9 @@ export type WaitForLoadStateActionOptions = {
   timeout?: number;
 };
 
+/**
+ * @category options of Actions
+ */
 export type WaitForUrlActionOptions = {
   /**
    * Maximum operation time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via
@@ -391,6 +436,9 @@ export type WaitForUrlActionOptions = {
   waitUntil?: "load" | "domcontentloaded" | "networkidle" | "commit";
 };
 
+/**
+ * @category options of Actions
+ */
 export type WaitForLocatorActionOptions = {
   /**
    * Defaults to `'visible'`. Can be either:
@@ -412,8 +460,14 @@ export type WaitForLocatorActionOptions = {
   timeout?: number;
 };
 
+/**
+ * @category modes of Questions
+ */
 export type ScreenQuestionMode = "haveUrl" | "haveTitle" | "haveScreenshot";
 
+/**
+ * @category modes of Questions
+ */
 export type ElementQuestionMode =
   | "visible"
   | "enabled"
@@ -428,50 +482,101 @@ export type ElementQuestionMode =
   | "containText";
 
 // for Element.haveText and Element.containText
+/**
+ * @category payload schemas
+ */
 export const textPayloadSchema = z.union([
   z.string(),
   z.instanceof(RegExp),
   z.array(z.union([z.string(), z.instanceof(RegExp)])),
 ]);
 
+/**
+ * @category payload
+ */
 export type TextPayload = z.infer<typeof textPayloadSchema>;
+
+/**
+ * @category type guards for payload
+ */
 export const isTextPayload = (value: unknown): value is TextPayload => {
   return textPayloadSchema.safeParse(value).success;
 };
 
 // for Element.haveValue
+/**
+ * @category payload schemas
+ */
 export const valuePayloadSchema = z.union([z.string(), z.instanceof(RegExp)]);
 
+/**
+ * @category payload
+ */
 export type ValuePayload = z.infer<typeof valuePayloadSchema>;
+
+/**
+ * @category type guards for payload
+ */
 export const isValuePayload = (value: unknown): value is ValuePayload => {
   return valuePayloadSchema.safeParse(value).success;
 };
 
 // for Element.haveCount
+/**
+ * @category payload schemas
+ */
 export const countPayloadSchema = z.number();
+
+/**
+ * @category payload
+ */
 export type CountPayload = z.infer<typeof countPayloadSchema>;
+
+/**
+ * @category type guards for payload
+ */
 export const isCountPayload = (value: unknown): value is CountPayload => {
   return countPayloadSchema.safeParse(value).success;
 };
 
 // for Element.haveCSS
+/**
+ * @category payload schemas
+ */
 export const stylePayloadSchema = z.object({
   name: z.string(),
   value: z.union([z.string(), z.instanceof(RegExp)]),
 });
 
+/**
+ * @category payload
+ */
 export type StylePayload = z.infer<typeof stylePayloadSchema>;
+
+/**
+ * @category type guards for payload
+ */
 export const isStylePayload = (value: unknown): value is StylePayload => {
   return stylePayloadSchema.safeParse(value).success;
 };
 
 // for Element.haveScreenshot and Screen.haveScreenshot
+/**
+ * @category payload schemas
+ */
 export const screenshotPayloadSchema = z.union([
   z.string(),
   z.array(z.string()),
 ]);
 
+/**
+ * @category payload
+ */
 export type ScreenshotPayload = z.infer<typeof screenshotPayloadSchema>;
+
+/**
+ * @category type guards for payload
+ */
 export const isScreenshotPayload = (
   value: unknown,
 ): value is ScreenshotPayload => {
@@ -479,13 +584,27 @@ export const isScreenshotPayload = (
 };
 
 // for Screen.haveUrl
+/**
+ * @category payload
+ */
 export type UrlPayload = z.infer<typeof valuePayloadSchema>;
+
+/**
+ * @category type guards for payload
+ */
 export const isUrlPayload = (value: unknown): value is UrlPayload => {
   return valuePayloadSchema.safeParse(value).success;
 };
 
 // for Screen.haveTitle
+/**
+ * @category payload
+ */
 export type TitlePayload = z.infer<typeof valuePayloadSchema>;
+
+/**
+ * @category type guards for payload
+ */
 export const isTitlePayload = (value: unknown): value is TitlePayload => {
   return valuePayloadSchema.safeParse(value).success;
 };

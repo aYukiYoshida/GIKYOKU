@@ -4,10 +4,10 @@ import { UseAPI } from "../abilities/UseAPI";
 import { Headers, Response as ResponseType, ResponseBodyType } from "../types";
 
 /**
- * @group Questions
- *
  * Verify certain aspects of an API Response.
  * A mode operator must be prepended.
+ *
+ * @group Questions
  */
 export class Response extends Question<boolean> {
   // the response to check.
@@ -33,6 +33,7 @@ export class Response extends Question<boolean> {
    *
    * @param {Actor} actor the actor which is used
    * @return {Promise<boolean>} true if the element has the specified state, false otherwise.
+   * @category called internally
    */
   public async answeredBy(actor: Actor): Promise<boolean> {
     if (this.action.mode === "status") {

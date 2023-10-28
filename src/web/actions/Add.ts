@@ -7,6 +7,7 @@ import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
  * Add Cookies to the Browser.
  *
  * @group Actions
+ * @category related to cookies
  */
 export class Add extends Action {
   private constructor(private cookies: Cookie[]) {
@@ -18,6 +19,7 @@ export class Add extends Action {
    *
    * @param {Actor} actor Actor performing this action
    * @return {any} Adds cookies into this browser context.
+   * @category called internally
    */
   public performAs(actor: Actor): Promise<any> {
     return BrowseTheWeb.as(actor).addCookies(this.cookies);
@@ -36,6 +38,7 @@ export class Add extends Action {
    *   url: 'http://www.myapp.com',
    * }]);
    * ```
+   * @category Factory
    */
   public static cookies(cookies: Cookie[]): Add {
     return new Add(cookies);

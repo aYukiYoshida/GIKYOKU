@@ -8,6 +8,7 @@ import { HoverActionOptions } from "../types";
  * Hover over an element specified by a locator.
  *
  * @group Actions
+ * @category to interact
  */
 export class Hover extends Action {
   private constructor(
@@ -22,6 +23,7 @@ export class Hover extends Action {
    *
    * @param {Actor} actor Actor performing this action
    * @return {void} Returns when hovered over the element
+   * @category called internally
    */
   public performAs(actor: Actor): Promise<void> {
     return BrowseTheWeb.as(actor).hover(this.locator, this.options);
@@ -46,6 +48,7 @@ export class Hover extends Action {
    *   { timeout: 3000 }
    * );
    * ```
+   * @category Factory
    */
   public static over(locator: Locator, options?: HoverActionOptions): Hover {
     return new Hover(locator, options);

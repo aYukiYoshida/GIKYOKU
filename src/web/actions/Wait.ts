@@ -22,6 +22,7 @@ type Payload = {
  * Wait for loading state or a locator or url.
  *
  * @group Actions
+ * @category to interact
  */
 export class Wait extends Action {
   // only 1 property is active at all times.
@@ -37,6 +38,7 @@ export class Wait extends Action {
    *
    * @param {Actor} actor the actor object
    * @return {any} Returns when the required load state has been reached.
+   * @category called internally
    */
   public performAs(actor: Actor): Promise<any> {
     if (this.mode === "loadState") {
@@ -73,7 +75,10 @@ export class Wait extends Action {
    * @param {WaitForLoadStateActionOptions} options
    * @return {Wait} new Wait instance
    * @example
+   * ```typescript
    * Wait.forLoadState('networkidle');
+   * ```
+   * @category Factory
    */
   public static forLoadState(
     state: "load" | "domcontentloaded" | "networkidle",
@@ -89,7 +94,10 @@ export class Wait extends Action {
    * @param {WaitForUrlActionOptions} options
    * @return {Wait} new Wait instance
    * @example
-   * Wait.forLoadState('networkidle');
+   * ```typescript
+   * Wait.forUrl('networkidle');
+   * ```
+   * @category Factory
    */
   public static forUrl(
     url: string | RegExp | ((url: URL) => boolean),
@@ -105,15 +113,20 @@ export class Wait extends Action {
    * @param {WaitForLocatorActionOptions} options (optional) advanced locator lookup options.
    * @return {Wait} new Wait instance
    * @example
-   * // simple call with just locator
+   * simple call with just locator
+   * ```typescript
    * Wait.forLocator('myLocator');
-   * // or with options
+   * ```
+   * with options
+   * ```typescript
    * Wait.forLocator(
    *   'myLocator', {
    *     hasText: 'myText',
    *     subLocator: ['mySubLocator', { hasText: 'anotherText' } ]
    *   }
    * );
+   * ```
+   * @category Factory
    */
   public static forLocator(
     locator: Locator,

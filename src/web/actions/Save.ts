@@ -6,6 +6,7 @@ import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
  * Save Cookies and local storage snapshot.
  *
  * @group Actions
+ * @category related to storage
  */
 export class Save extends Action {
   private constructor(private path: string) {
@@ -17,6 +18,7 @@ export class Save extends Action {
    *
    * @param {Actor} actor Actor performing this action
    * @return {any} cookies and local storage snapshot.
+   * @category called internally
    */
   public performAs(actor: Actor): Promise<any> {
     return BrowseTheWeb.as(actor).saveStorageState(this.path);
@@ -33,6 +35,7 @@ export class Save extends Action {
    *   Save.storageState('/tmp/storage.json')
    * );
    * ```
+   * @category Factory
    */
   public static storageState(path: string): Save {
     return new Save(path);
