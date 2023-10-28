@@ -137,3 +137,6 @@ Footer
 
 # nodenv
 .node-version
+
+# github pages
+/docs/
