@@ -135,8 +135,9 @@ dist
 .pnp.*
 Footer
 
-# nodenv
+# package manager
 .node-version
+.mise.toml
 
 # github pages
 /docs/
