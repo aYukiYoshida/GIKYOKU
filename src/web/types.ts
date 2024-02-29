@@ -1,3 +1,15 @@
+import {
+  ConsoleMessage,
+  Download,
+  Dialog,
+  FileChooser,
+  Frame,
+  Page,
+  Request,
+  Response,
+  WebSocket,
+  Worker,
+} from "playwright";
 import z from "zod";
 
 /**
@@ -12,6 +24,24 @@ export type Point = {
  * @category properties of options
  */
 export type Modifiers = Array<"Alt" | "Control" | "Meta" | "Shift">;
+
+/**
+ * @category properties of options
+ */
+export type EventPredicate = (
+  arg:
+    | ConsoleMessage
+    | Dialog
+    | Download
+    | Error
+    | FileChooser
+    | Frame
+    | Page
+    | Request
+    | Response
+    | WebSocket
+    | Worker,
+) => boolean | Promise<boolean>;
 
 /**
  * @category options of Actions
@@ -450,6 +480,24 @@ export type WaitForLocatorActionOptions = {
    *   `visibility:hidden`. This is opposite to the `'visible'` option.
    */
   state?: "attached" | "detached" | "visible" | "hidden";
+
+  /**
+   * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
+   * option in the config, or by using the
+   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
+   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+   */
+  timeout?: number;
+};
+
+/**
+ * @category options of Actions
+ */
+export type WaitForEventActionOptions = {
+  /**
+   * Receives the event data and resolves to truthy value when the waiting should resolve.
+   */
+  predicate?: EventPredicate;
 
   /**
    * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`
