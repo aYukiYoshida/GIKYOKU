@@ -6,17 +6,20 @@ import {
   WaitForLocatorActionOptions,
   WaitForLoadStateActionOptions,
   WaitForUrlActionOptions,
+  WaitForEventActionOptions,
 } from "../types";
 
-type Mode = "locator" | "loadState" | "url";
+type Mode = "locator" | "loadState" | "url" | "event";
 type Payload = {
   state?: "load" | "domcontentloaded" | "networkidle";
   url?: string | RegExp | ((url: URL) => boolean);
   locator?: Locator;
+  event?: string;
   options?:
     | WaitForLocatorActionOptions
     | WaitForLoadStateActionOptions
-    | WaitForUrlActionOptions;
+    | WaitForUrlActionOptions
+    | WaitForEventActionOptions;
 };
 /**
  * Wait for loading state or a locator or url.
@@ -64,6 +67,14 @@ export class Wait extends Action {
         this.payload.locator,
         this.payload.options,
       );
+    }
+    if (this.mode === "event") {
+      if (this.payload.event !== undefined) {
+        return BrowseTheWeb.as(actor).waitForEvent(
+          this.payload.event,
+          this.payload.options,
+        );
+      }
     }
     throw new Error("Error: no match for Wait.performAs()!");
   }
@@ -133,5 +144,25 @@ export class Wait extends Action {
     options?: WaitForLocatorActionOptions,
   ): Wait {
     return new Wait("locator", { locator, options });
+  }
+
+  /**
+   * Wait for a specific event.
+   *
+   * @param {string} event the event to wait for.
+   * @param {WaitForEventActionOptions} options
+   * @return {Wait} new Wait instance
+   * @example
+   * simple call
+   * ```typescript
+   * Wait.forEvent('download');
+   * ```
+   * @category Factory
+   */
+  public static forEvent(
+    event: string,
+    options?: WaitForEventActionOptions,
+  ): Wait {
+    return new Wait("event", { event, options });
   }
 }
