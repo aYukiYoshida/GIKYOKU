@@ -1,5 +1,6 @@
 import {
   expect,
+  BrowserContext,
   ConsoleMessage,
   Cookie,
   Dialog,
@@ -10,6 +11,7 @@ import {
   Page,
   Request,
   Response,
+  WebError,
   WebSocket,
   Worker,
 } from "@playwright/test";
@@ -172,6 +174,90 @@ export class BrowseTheWeb extends Ability {
     options?: WaitForUrlActionOptions,
   ): Promise<void> {
     return this.page.waitForURL(url, options);
+  }
+
+  /**
+   * Wait for the specified event in browser.
+   *
+   * @param {string} event the event in browser to wait for.
+   * @param {WaitForEventActionOptions<BrowserContext | ConsoleMessage| Dialog | Page | Request | Response | WebError | Worker>} options (optional) options for interaction.
+   * @return {Promise<BrowserContext | ConsoleMessage| Dialog | Page | Request | Response | WebError | Worker>} Returns the event data value.
+   * @example
+   * ```ts
+   * await BrowseTheWeb.as(actor).waitForEvent('page');
+   * ```
+   * @category to interact
+   */
+  public async waitForEvent(
+    event: string,
+    options?: WaitForEventActionOptions<
+      | BrowserContext
+      | ConsoleMessage
+      | Dialog
+      | Page
+      | Request
+      | Response
+      | WebError
+      | Worker
+    >,
+  ): Promise<
+    | BrowserContext
+    | ConsoleMessage
+    | Dialog
+    | Page
+    | Request
+    | Response
+    | WebError
+    | Worker
+  > {
+    switch (event) {
+      case "backgroundpage":
+        return this.page
+          .context()
+          .waitForEvent(event, options) as Promise<Page>;
+      case "close":
+        return this.page
+          .context()
+          .waitForEvent(event, options) as Promise<BrowserContext>;
+      case "console":
+        return this.page
+          .context()
+          .waitForEvent(event, options) as Promise<ConsoleMessage>;
+      case "dialog":
+        return this.page
+          .context()
+          .waitForEvent(event, options) as Promise<Dialog>;
+      case "page":
+        return this.page
+          .context()
+          .waitForEvent(event, options) as Promise<Page>;
+      case "request":
+        return this.page
+          .context()
+          .waitForEvent(event, options) as Promise<Request>;
+      case "requestfailed":
+        return this.page
+          .context()
+          .waitForEvent(event, options) as Promise<Request>;
+      case "requestfinished":
+        return this.page
+          .context()
+          .waitForEvent(event, options) as Promise<Request>;
+      case "response":
+        return this.page
+          .context()
+          .waitForEvent(event, options) as Promise<Response>;
+      case "serviceworker":
+        return this.page
+          .context()
+          .waitForEvent(event, options) as Promise<Worker>;
+      case "weberror":
+        return this.page
+          .context()
+          .waitForEvent(event, options) as Promise<WebError>;
+      default:
+        throw new Error(`Error: event of ${event} is not supported.`);
+    }
   }
 
   /**
