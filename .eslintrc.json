@@ -7,6 +7,7 @@
     "docs/"
   ],
   "extends": [
+    "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:import/typescript",
     "prettier"
@@ -17,62 +18,10 @@
   ],
   "parserOptions": {
     "project": "tsconfig.json",
-    "ecmaVersion": 2018,
+    "ecmaVersion": "latest",
     "sourceType": "module"
   },
   "rules": {
-    "semi": [2, "always"],
-    "import/extensions": [
-      "error",
-      {
-        "extensions": [
-          ".js",
-          ".ts"
-        ]
-      }
-    ],
-    "indent": [
-      "error",
-      2,
-      {
-        "SwitchCase": 1
-      }
-    ],
-    "@typescript-eslint/indent": [
-      "error",
-      2,
-      {
-        "SwitchCase": 1
-      }
-    ],
-    "linebreak-style": "off",
-    "max-len": "off",
-    "import/prefer-default-export": "off",
-    "import/no-named-as-default": "off",
-    "import/no-named-as-default-member": "off",
-    "react/require-default-props": "off",
-    "@typescript-eslint/ban-types": "off",
-    "no-use-before-define": "off",
-    "no-nested-ternary": "off",
-    "no-shadow": "off",
-    "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-use-before-define": [
-      "error"
-    ],
-    "@typescript-eslint/no-floating-promises": ["error"],
-    "import/order": [
-      "error",
-      {
-        "groups": ["builtin", "external", "internal", "parent", "sibling", "index", "object", "type"],
-        "newlines-between": "always",
-        "pathGroupsExcludedImportTypes": ["builtin"],
-        "alphabetize": { "order": "asc", "caseInsensitive": true },
-        "pathGroups": [
-          { "pattern": "src/web/**", "group": "internal", "position": "before" },
-          { "pattern": "src/api/**", "group": "internal", "position": "before" }
-        ]
-      }
-    ]
+    "semi": [2, "always"]
   } 
 }
