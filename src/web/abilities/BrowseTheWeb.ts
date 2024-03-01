@@ -1,4 +1,18 @@
-import { Cookie, expect, Locator, Page, Response } from "@playwright/test";
+import {
+  expect,
+  ConsoleMessage,
+  Cookie,
+  Dialog,
+  Download,
+  FileChooser,
+  Frame,
+  Locator,
+  Page,
+  Request,
+  Response,
+  WebSocket,
+  Worker,
+} from "@playwright/test";
 import { Ability, Actor } from "@testla/screenplay";
 
 import {
@@ -16,6 +30,7 @@ import {
   WaitForLoadStateActionOptions,
   WaitForUrlActionOptions,
   WaitForLocatorActionOptions,
+  WaitForEventActionOptions,
   TextPayload,
   ValuePayload,
   StylePayload,
@@ -49,8 +64,8 @@ export class BrowseTheWeb extends Ability {
    * @return {BrowseTheWeb} Returns the ability to use a browser
    * @category called internally
    */
-  public static as(actor: Actor): BrowseTheWeb {
-    return actor.withAbilityTo(this) as BrowseTheWeb;
+  public static as(actor: Actor, alias?: string): BrowseTheWeb {
+    return actor.withAbilityTo(this, alias) as BrowseTheWeb;
   }
 
   /**
@@ -157,6 +172,93 @@ export class BrowseTheWeb extends Ability {
     options?: WaitForUrlActionOptions,
   ): Promise<void> {
     return this.page.waitForURL(url, options);
+  }
+
+  /**
+   * Wait for the specified event.
+   *
+   * @param {string} event the event to wait for.
+   * @param {WaitForEventActionOptions<ConsoleMessage|Dialog|Download|Error|FileChooser|Frame|Page|Request|Response|WebSocket|Worker>} options (optional) options for interaction.
+   * @return {Promise<ConsoleMessage|Dialog|Download|Error|FileChooser|Frame|Page|Request|Response|WebSocket|Worker>} Returns the event data value.
+   * @example
+   * ```ts
+   * await BrowseTheWeb.as(actor).waitForUrl('example.com');
+   * ```
+   * @category to interact
+   */
+  public async waitForEvent(
+    event: string,
+    options?: WaitForEventActionOptions<
+      | ConsoleMessage
+      | Dialog
+      | Download
+      | Error
+      | FileChooser
+      | Frame
+      | Page
+      | Request
+      | Response
+      | WebSocket
+      | Worker
+    >,
+  ): Promise<
+    | ConsoleMessage
+    | Dialog
+    | Download
+    | Error
+    | FileChooser
+    | Frame
+    | Page
+    | Request
+    | Response
+    | WebSocket
+    | Worker
+  > {
+    switch (event) {
+      case "close":
+        return this.page.waitForEvent(event, options) as Promise<Page>;
+      case "console":
+        return this.page.waitForEvent(
+          event,
+          options,
+        ) as Promise<ConsoleMessage>;
+      case "crash":
+        return this.page.waitForEvent(event, options) as Promise<Page>;
+      case "dialog":
+        return this.page.waitForEvent(event, options) as Promise<Dialog>;
+      case "domcontentloaded":
+        return this.page.waitForEvent(event, options) as Promise<Page>;
+      case "download":
+        return this.page.waitForEvent(event, options) as Promise<Download>;
+      case "filechooser":
+        return this.page.waitForEvent(event, options) as Promise<FileChooser>;
+      case "frameattached":
+        return this.page.waitForEvent(event, options) as Promise<Frame>;
+      case "framedetached":
+        return this.page.waitForEvent(event, options) as Promise<Frame>;
+      case "framenavigated":
+        return this.page.waitForEvent(event, options) as Promise<Frame>;
+      case "load":
+        return this.page.waitForEvent(event, options) as Promise<Page>;
+      case "pageerror":
+        return this.page.waitForEvent(event, options) as Promise<Error>;
+      case "popup":
+        return this.page.waitForEvent(event, options) as Promise<Page>;
+      case "request":
+        return this.page.waitForEvent(event, options) as Promise<Request>;
+      case "requestfailed":
+        return this.page.waitForEvent(event, options) as Promise<Request>;
+      case "requestfinished":
+        return this.page.waitForEvent(event, options) as Promise<Request>;
+      case "response":
+        return this.page.waitForEvent(event, options) as Promise<Response>;
+      case "websocket":
+        return this.page.waitForEvent(event, options) as Promise<WebSocket>;
+      case "worker":
+        return this.page.waitForEvent(event, options) as Promise<Worker>;
+      default:
+        throw new Error("Error: HTTP method not supported.");
+    }
   }
 
   /**
