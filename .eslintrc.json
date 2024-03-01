@@ -7,6 +7,7 @@
     "docs/"
   ],
   "extends": [
+    "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:import/typescript",
     "prettier"
@@ -17,7 +18,7 @@
   ],
   "parserOptions": {
     "project": "tsconfig.json",
-    "ecmaVersion": 2018,
+    "ecmaVersion": "latest",
     "sourceType": "module"
   },
   "rules": {
