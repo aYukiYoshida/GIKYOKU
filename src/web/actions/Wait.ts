@@ -21,7 +21,7 @@ import {
   WaitForEventActionOptions,
 } from "../types";
 
-type Mode = "locator" | "loadState" | "url" | "event";
+type Mode = "locator" | "loadState" | "url" | "eventOnPage";
 type Payload = {
   state?: "load" | "domcontentloaded" | "networkidle";
   url?: string | RegExp | ((url: URL) => boolean);
@@ -92,9 +92,9 @@ export class Wait extends Action {
         this.payload.options,
       );
     }
-    if (this.mode === "event") {
+    if (this.mode === "eventOnPage") {
       if (this.payload.event !== undefined) {
-        return BrowseTheWeb.as(actor).waitForEvent(
+        return BrowseTheWeb.as(actor).waitForEventOnPage(
           this.payload.event,
           this.payload.options,
         );
@@ -187,6 +187,6 @@ export class Wait extends Action {
     event: string,
     options?: WaitForEventActionOptions<T>,
   ): Wait {
-    return new Wait("event", { event, options });
+    return new Wait("eventOnPage", { event, options });
   }
 }

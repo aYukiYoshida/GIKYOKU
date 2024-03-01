@@ -26,14 +26,7 @@ import {
   Reload,
   Screen,
 } from "@g5u/web";
-import {
-  BrowserContext,
-  Cookie,
-  Page,
-  expect,
-  test as base,
-  Download,
-} from "@playwright/test";
+import { Cookie, Page, expect, test as base, Download } from "@playwright/test";
 import { Actor } from "@testla/screenplay";
 
 type MyActors = {

@@ -175,18 +175,18 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
-   * Wait for the specified event.
+   * Wait for the specified event on page.
    *
-   * @param {string} event the event to wait for.
+   * @param {string} event the event on page to wait for.
    * @param {WaitForEventActionOptions<ConsoleMessage|Dialog|Download|Error|FileChooser|Frame|Page|Request|Response|WebSocket|Worker>} options (optional) options for interaction.
    * @return {Promise<ConsoleMessage|Dialog|Download|Error|FileChooser|Frame|Page|Request|Response|WebSocket|Worker>} Returns the event data value.
    * @example
    * ```ts
-   * await BrowseTheWeb.as(actor).waitForUrl('example.com');
+   * await BrowseTheWeb.as(actor).waitForEventOnPage('console');
    * ```
    * @category to interact
    */
-  public async waitForEvent(
+  public async waitForEventOnPage(
     event: string,
     options?: WaitForEventActionOptions<
       | ConsoleMessage
@@ -257,7 +257,7 @@ export class BrowseTheWeb extends Ability {
       case "worker":
         return this.page.waitForEvent(event, options) as Promise<Worker>;
       default:
-        throw new Error("Error: HTTP method not supported.");
+        throw new Error(`Error: event of ${event} is not supported.`);
     }
   }
 
