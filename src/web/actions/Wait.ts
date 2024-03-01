@@ -1,4 +1,5 @@
 import {
+  BrowserContext,
   ConsoleMessage,
   Dialog,
   Download,
@@ -8,6 +9,7 @@ import {
   Page,
   Request,
   Response,
+  WebError,
   WebSocket,
   Worker,
 } from "@playwright/test";
@@ -21,7 +23,7 @@ import {
   WaitForEventActionOptions,
 } from "../types";
 
-type Mode = "locator" | "loadState" | "url" | "event";
+type Mode = "locator" | "loadState" | "url" | "eventOnPage" | "event";
 type Payload = {
   state?: "load" | "domcontentloaded" | "networkidle";
   url?: string | RegExp | ((url: URL) => boolean);
@@ -32,6 +34,7 @@ type Payload = {
     | WaitForLoadStateActionOptions
     | WaitForUrlActionOptions
     | WaitForEventActionOptions<
+        | BrowserContext
         | ConsoleMessage
         | Dialog
         | Download
@@ -41,6 +44,7 @@ type Payload = {
         | Page
         | Request
         | Response
+        | WebError
         | WebSocket
         | Worker
       >;
@@ -91,6 +95,14 @@ export class Wait extends Action {
         this.payload.locator,
         this.payload.options,
       );
+    }
+    if (this.mode === "eventOnPage") {
+      if (this.payload.event !== undefined) {
+        return BrowseTheWeb.as(actor).waitForEventOnPage(
+          this.payload.event,
+          this.payload.options,
+        );
+      }
     }
     if (this.mode === "event") {
       if (this.payload.event !== undefined) {
@@ -171,15 +183,35 @@ export class Wait extends Action {
   }
 
   /**
-   * Wait for a specific event.
+   * Wait for a specific event on page.
    *
-   * @param {string} event the event to wait for.
+   * @param {string} event the event on page to wait for.
    * @param {WaitForEventActionOptions} options
    * @return {Wait} new Wait instance
    * @example
    * simple call
    * ```typescript
-   * Wait.forEvent<Download>('download');
+   * Wait.forEventOnPage<Download>('download');
+   * ```
+   * @category Factory
+   */
+  public static forEventOnPage<T>(
+    event: string,
+    options?: WaitForEventActionOptions<T>,
+  ): Wait {
+    return new Wait("eventOnPage", { event, options });
+  }
+
+  /**
+   * Wait for a specific event on page.
+   *
+   * @param {string} event the event on browser to wait for.
+   * @param {WaitForEventActionOptions} options
+   * @return {Wait} new Wait instance
+   * @example
+   * simple call
+   * ```typescript
+   * Wait.forEvent<Page>('page');
    * ```
    * @category Factory
    */

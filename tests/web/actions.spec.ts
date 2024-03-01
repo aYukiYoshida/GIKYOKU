@@ -26,14 +26,7 @@ import {
   Reload,
   Screen,
 } from "@g5u/web";
-import {
-  BrowserContext,
-  Cookie,
-  Page,
-  expect,
-  test as base,
-  Download,
-} from "@playwright/test";
+import { Cookie, Page, expect, test as base, Download } from "@playwright/test";
 import { Actor } from "@testla/screenplay";
 
 type MyActors = {
@@ -81,7 +74,6 @@ test.describe("Web Actions", () => {
   test("Bring", async ({ actor }) => {
     // To get access of the page object
     const page: Page = BrowseTheWeb.as(actor).getPage();
-    const newPagePromise: Promise<Page> = page.context().waitForEvent("page");
 
     await actor.attemptsTo(
       Navigate.to("https://the-internet.herokuapp.com/windows"),
@@ -91,12 +83,15 @@ test.describe("Web Actions", () => {
       Screen.does.haveUrl("https://the-internet.herokuapp.com/windows"),
     );
 
+    const [newPage] = await Promise.all([
+      actor.attemptsTo(Wait.forEvent<Page>("page")),
+      actor.attemptsTo(
+        Click.on(page.getByRole("link", { name: "Click Here" })),
+      ),
+    ]);
+
     await actor.attemptsTo(
-      Click.on(page.getByRole("link", { name: "Click Here" })),
-    );
-    const newPage: Page = await newPagePromise;
-    await actor.attemptsTo(
-      Bring.toFront(newPage),
+      Bring.toFront(newPage as Page),
       Wait.forLoadState("networkidle"),
     );
     await actor.asks(
@@ -362,7 +357,7 @@ test.describe("Web Actions", () => {
         Wait.forLoadState("networkidle"),
       );
       const [download] = await Promise.all([
-        actor.attemptsTo(Wait.forEvent<Download>("download")),
+        actor.attemptsTo(Wait.forEventOnPage<Download>("download")),
         actor.attemptsTo(
           Click.on(page.getByRole("link", { name: "some-file.txt" })),
         ),
