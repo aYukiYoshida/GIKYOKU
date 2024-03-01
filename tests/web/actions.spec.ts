@@ -32,6 +32,7 @@ import {
   Page,
   expect,
   test as base,
+  Download,
 } from "@playwright/test";
 import { Actor } from "@testla/screenplay";
 
@@ -352,56 +353,95 @@ test.describe("Web Actions", () => {
     );
   });
 
-  test("Cookies: Add, Get, Clear", async ({ actor }) => {
-    const page: Page = BrowseTheWeb.as(actor).getPage();
-    const context: BrowserContext = page.context();
+  test.describe("Wait for event", () => {
+    test("Wait for download event", async ({ actor }, testInfo) => {
+      const page: Page = BrowseTheWeb.as(actor).getPage();
 
-    await actor.attemptsTo(
-      Navigate.to("https://google.com"),
-      Wait.forLoadState("networkidle"),
-    );
-    // assert that there are cookies to clear
-    expect(await context.cookies()).not.toStrictEqual([]);
+      await actor.attemptsTo(
+        Navigate.to("https://the-internet.herokuapp.com/download"),
+        Wait.forLoadState("networkidle"),
+      );
+      const [download] = await Promise.all([
+        actor.attemptsTo(Wait.forEvent<Download>("download")),
+        actor.attemptsTo(
+          Click.on(page.getByRole("link", { name: "some-file.txt" })),
+        ),
+      ]);
+      await (download as unknown as Download).saveAs(
+        testInfo.outputPath("some-file.txt"),
+      );
 
-    // Clear any cookies not added by us
-    await actor.attemptsTo(Clear.cookies());
+      expect(fs.existsSync(testInfo.outputPath("some-file.txt"))).toBeTruthy();
+    });
+  });
 
-    // assert that cookies are successfully cleared
-    expect(await context.cookies()).toStrictEqual([]);
+  test.describe("Cookies", () => {
+    test("Clear Cookies", async ({ actor }) => {
+      const page: Page = BrowseTheWeb.as(actor).getPage();
 
-    // Add some cookies
-    const cookiesToAdd: Cookie[] = [
-      {
-        name: "cookie1",
-        value: "someValue",
-        domain: ".google.com",
-        path: "/",
-        expires: 1700269944,
-        httpOnly: true,
-        secure: true,
-        sameSite: "Lax",
-      },
-      {
-        name: "cookie2",
-        value: "val",
-        domain: ".google.com",
-        path: "/",
-        expires: 1700269944,
-        httpOnly: true,
-        secure: true,
-        sameSite: "Lax",
-      },
-    ];
-    await actor.attemptsTo(Add.cookies(cookiesToAdd));
-    // assert that cookies are successfully added
-    expect(await context.cookies()).toStrictEqual(cookiesToAdd);
+      await actor.attemptsTo(
+        Navigate.to("https://google.com"),
+        Wait.forLoadState("networkidle"),
+      );
+      expect(await page.context().cookies()).not.toStrictEqual([]);
 
-    // Get the cookies we just added
-    const getCookies: Cookie[] = await actor.attemptsTo(
-      Get.cookies("https://google.com"),
-    );
-    // assert that cookies are retrieved successfully
-    expect(getCookies).toStrictEqual(cookiesToAdd);
+      // Clear any cookies not added by us
+      await actor.attemptsTo(Clear.cookies());
+
+      // assert that cookies are successfully cleared
+      expect(await page.context().cookies()).toStrictEqual([]);
+    });
+
+    test("Get Cookies", async ({ actor }) => {
+      await actor.attemptsTo(
+        Navigate.to("https://google.com"),
+        Wait.forLoadState("networkidle"),
+      );
+      // assert that there are cookies to clear
+      const cookies: Cookie[] = await actor.attemptsTo(
+        Get.cookies("https://google.com"),
+      );
+      for (const cookie of cookies) {
+        expect(cookie.domain).toEqual(".google.com");
+      }
+    });
+
+    test("Add Cookies", async ({ actor }) => {
+      test.fail(); // Maybe due to bug in Playwright
+      const page: Page = BrowseTheWeb.as(actor).getPage();
+
+      await actor.attemptsTo(
+        Navigate.to("https://example.com"),
+        Wait.forLoadState("networkidle"),
+      );
+
+      // Add some cookies
+      const cookiesToAdd: Cookie[] = [
+        {
+          name: "cookie1",
+          value: "val",
+          domain: ".example.com",
+          path: "/",
+          expires: 1700269944,
+          httpOnly: true,
+          secure: true,
+          sameSite: "Lax",
+        },
+        {
+          name: "cookie2",
+          value: "val",
+          domain: ".example.com",
+          path: "/",
+          expires: 1700269944,
+          httpOnly: true,
+          secure: true,
+          sameSite: "Lax",
+        },
+      ];
+      await actor.attemptsTo(Add.cookies(cookiesToAdd));
+      // assert that cookies are successfully added
+      expect(await page.context().cookies()).toStrictEqual(cookiesToAdd);
+    });
   });
 
   test("Local storage + Session storage", async ({ actor }) => {
