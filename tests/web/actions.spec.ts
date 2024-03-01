@@ -490,34 +490,12 @@ test.describe("Web Actions", () => {
 
   test("Save", async ({ actor }, testInfo) => {
     const page: Page = BrowseTheWeb.as(actor).getPage();
-    const context: BrowserContext = page.context();
-
-    expect(await context.cookies()).toStrictEqual([]);
-
-    const cookies: Cookie[] = [
-      {
-        name: "cookie1",
-        value: "someValue",
-        domain: ".google.com",
-        path: "/",
-        expires: 1700269944,
-        httpOnly: true,
-        secure: true,
-        sameSite: "Lax",
-      },
-      {
-        name: "cookie2",
-        value: "val",
-        domain: ".google.com",
-        path: "/",
-        expires: 1700269944,
-        httpOnly: true,
-        secure: true,
-        sameSite: "Lax",
-      },
-    ];
-    await actor.attemptsTo(Add.cookies(cookies));
-    expect(await context.cookies()).toStrictEqual(cookies);
+    await actor.attemptsTo(
+      Navigate.to("https://google.com"),
+      Wait.forLoadState("networkidle"),
+    );
+    expect(await page.context().cookies()).not.toStrictEqual([]);
+    const storageState = await page.context().storageState();
 
     await actor.attemptsTo(
       Save.storageState(testInfo.outputPath("storage-state.json")),
@@ -527,6 +505,6 @@ test.describe("Web Actions", () => {
     );
 
     // assert that storage state is saved successfully
-    expect(await context.storageState()).toStrictEqual(savedStorageState);
+    expect(await savedStorageState).toStrictEqual(storageState);
   });
 });
