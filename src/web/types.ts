@@ -1,15 +1,3 @@
-import {
-  ConsoleMessage,
-  Download,
-  Dialog,
-  FileChooser,
-  Frame,
-  Page,
-  Request,
-  Response,
-  WebSocket,
-  Worker,
-} from "playwright";
 import z from "zod";
 
 /**
@@ -28,20 +16,7 @@ export type Modifiers = Array<"Alt" | "Control" | "Meta" | "Shift">;
 /**
  * @category properties of options
  */
-export type EventPredicate = (
-  arg:
-    | ConsoleMessage
-    | Dialog
-    | Download
-    | Error
-    | FileChooser
-    | Frame
-    | Page
-    | Request
-    | Response
-    | WebSocket
-    | Worker,
-) => boolean | Promise<boolean>;
+export type EventPredicate<T> = (arg: T) => boolean | Promise<boolean>;
 
 /**
  * @category options of Actions
@@ -493,11 +468,11 @@ export type WaitForLocatorActionOptions = {
 /**
  * @category options of Actions
  */
-export type WaitForEventActionOptions = {
+export type WaitForEventActionOptions<T> = {
   /**
    * Receives the event data and resolves to truthy value when the waiting should resolve.
    */
-  predicate?: EventPredicate;
+  predicate?: EventPredicate<T>;
 
   /**
    * Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout`

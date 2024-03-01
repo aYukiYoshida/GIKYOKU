@@ -178,7 +178,7 @@ export class BrowseTheWeb extends Ability {
    * Wait for the specified event.
    *
    * @param {string} event the event to wait for.
-   * @param {WaitForEventActionOptions} options (optional) options for interaction.
+   * @param {WaitForEventActionOptions<ConsoleMessage|Dialog|Download|Error|FileChooser|Frame|Page|Request|Response|WebSocket|Worker>} options (optional) options for interaction.
    * @return {Promise<ConsoleMessage|Dialog|Download|Error|FileChooser|Frame|Page|Request|Response|WebSocket|Worker>} Returns the event data value.
    * @example
    * ```ts
@@ -188,7 +188,19 @@ export class BrowseTheWeb extends Ability {
    */
   public async waitForEvent(
     event: string,
-    options?: WaitForEventActionOptions,
+    options?: WaitForEventActionOptions<
+      | ConsoleMessage
+      | Dialog
+      | Download
+      | Error
+      | FileChooser
+      | Frame
+      | Page
+      | Request
+      | Response
+      | WebSocket
+      | Worker
+    >,
   ): Promise<
     | ConsoleMessage
     | Dialog

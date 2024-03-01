@@ -1,4 +1,16 @@
-import { Locator } from "@playwright/test";
+import {
+  ConsoleMessage,
+  Dialog,
+  Download,
+  FileChooser,
+  Frame,
+  Locator,
+  Page,
+  Request,
+  Response,
+  WebSocket,
+  Worker,
+} from "@playwright/test";
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
@@ -19,7 +31,19 @@ type Payload = {
     | WaitForLocatorActionOptions
     | WaitForLoadStateActionOptions
     | WaitForUrlActionOptions
-    | WaitForEventActionOptions;
+    | WaitForEventActionOptions<
+        | ConsoleMessage
+        | Dialog
+        | Download
+        | Error
+        | FileChooser
+        | Frame
+        | Page
+        | Request
+        | Response
+        | WebSocket
+        | Worker
+      >;
 };
 /**
  * Wait for loading state or a locator or url.
@@ -155,13 +179,13 @@ export class Wait extends Action {
    * @example
    * simple call
    * ```typescript
-   * Wait.forEvent('download');
+   * Wait.forEvent<Download>('download');
    * ```
    * @category Factory
    */
-  public static forEvent(
+  public static forEvent<T>(
     event: string,
-    options?: WaitForEventActionOptions,
+    options?: WaitForEventActionOptions<T>,
   ): Wait {
     return new Wait("event", { event, options });
   }
