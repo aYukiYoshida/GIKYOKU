@@ -219,6 +219,6 @@ export class Wait extends Action {
     event: string,
     options?: WaitForEventActionOptions<T>,
   ): Wait {
-    return new Wait("eventOnPage", { event, options });
+    return new Wait("event", { event, options });
   }
 }
