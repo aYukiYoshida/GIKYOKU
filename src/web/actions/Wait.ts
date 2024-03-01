@@ -171,7 +171,7 @@ export class Wait extends Action {
   }
 
   /**
-   * Wait for a specific event.
+   * Wait for a specific event on page.
    *
    * @param {string} event the event to wait for.
    * @param {WaitForEventActionOptions} options
@@ -179,11 +179,11 @@ export class Wait extends Action {
    * @example
    * simple call
    * ```typescript
-   * Wait.forEvent<Download>('download');
+   * Wait.forEventOnPage<Download>('download');
    * ```
    * @category Factory
    */
-  public static forEvent<T>(
+  public static forEventOnPage<T>(
     event: string,
     options?: WaitForEventActionOptions<T>,
   ): Wait {
