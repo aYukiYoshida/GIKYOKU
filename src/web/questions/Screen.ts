@@ -139,6 +139,10 @@ export class Screen extends Question<boolean> {
     this.mode = "haveTitle";
     this.payload = title;
     this.options = options;
+    this.addToCallStack({
+      caller: "haveTitle",
+      calledWith: { title, options },
+    });
 
     return this;
   }
@@ -164,6 +168,7 @@ export class Screen extends Question<boolean> {
     this.mode = "haveUrl";
     this.payload = url;
     this.options = options;
+    this.addToCallStack({ caller: "haveUrl", calledWith: { url, options } });
 
     return this;
   }
@@ -195,6 +200,10 @@ export class Screen extends Question<boolean> {
     this.mode = "haveScreenshot";
     this.payload = name;
     this.options = options;
+    this.addToCallStack({
+      caller: "haveScreenshot",
+      calledWith: { name, options },
+    });
 
     return this;
   }

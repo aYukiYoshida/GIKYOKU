@@ -41,6 +41,8 @@ export class Navigate extends Action {
    * @category Factory
    */
   public static to(url: string, options?: NavigateActionOptions): Navigate {
-    return new Navigate(url, options);
+    const instance = new Navigate(url, options);
+    instance.setCallStackInitializeCalledWith({ url, options });
+    return instance;
   }
 }

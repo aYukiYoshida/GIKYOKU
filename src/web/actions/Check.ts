@@ -52,6 +52,8 @@ export class Check extends Action {
    * @category Factory
    */
   public static element(locator: Locator, options?: CheckActionOptions): Check {
-    return new Check(locator, options);
+    const instance = new Check(locator, options);
+    instance.setCallStackInitializeCalledWith({ locator, options });
+    return instance;
   }
 }

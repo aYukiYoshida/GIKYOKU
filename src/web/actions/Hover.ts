@@ -51,6 +51,8 @@ export class Hover extends Action {
    * @category Factory
    */
   public static over(locator: Locator, options?: HoverActionOptions): Hover {
-    return new Hover(locator, options);
+    const instance = new Hover(locator, options);
+    instance.setCallStackInitializeCalledWith({ locator, options });
+    return instance;
   }
 }

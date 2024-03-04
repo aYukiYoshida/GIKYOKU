@@ -60,6 +60,8 @@ export class Fill extends Action {
     input: string,
     options?: FillActionOptions,
   ): Fill {
-    return new Fill(locator, input, options);
+    const instance = new Fill(locator, input, options);
+    instance.setCallStackInitializeCalledWith({ locator, input, options });
+    return instance;
   }
 }

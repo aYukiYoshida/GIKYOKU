@@ -63,6 +63,12 @@ export class DragAndDrop extends Action {
     targetLocator: Locator,
     options?: DragAndDropActionOptions,
   ): DragAndDrop {
-    return new DragAndDrop(sourceLocator, targetLocator, options);
+    const instance = new DragAndDrop(sourceLocator, targetLocator, options);
+    instance.setCallStackInitializeCalledWith({
+      sourceLocator,
+      targetLocator,
+      options,
+    });
+    return instance;
   }
 }

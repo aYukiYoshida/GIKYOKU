@@ -31,6 +31,8 @@ export class Clear extends Action {
    * @category Factory
    */
   public static cookies(): Clear {
-    return new Clear();
+    const instance = new Clear();
+    instance.setCallStackInitializeCalledWith({});
+    return instance;
   }
 }

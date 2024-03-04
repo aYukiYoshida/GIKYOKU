@@ -59,6 +59,8 @@ export class Type extends Action {
     input: string,
     options?: TypeActionOptions,
   ): Type {
-    return new Type(locator, input, options);
+    const instance = new Type(locator, input, options);
+    instance.setCallStackInitializeCalledWith({ locator, input, options });
+    return instance;
   }
 }

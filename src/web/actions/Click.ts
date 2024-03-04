@@ -52,6 +52,8 @@ export class Click extends Action {
    * @category Factory
    */
   public static on(locator: Locator, options?: ClickActionOptions): Click {
-    return new Click(locator, options);
+    const instance = new Click(locator, options);
+    instance.setCallStackInitializeCalledWith({ locator, options });
+    return instance;
   }
 }

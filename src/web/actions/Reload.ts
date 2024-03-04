@@ -25,6 +25,8 @@ export class Reload extends Action {
    * @category Factory
    */
   public static page(): Reload {
-    return new Reload();
+    const instance = new Reload();
+    instance.setCallStackInitializeCalledWith({});
+    return instance;
   }
 }

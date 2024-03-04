@@ -132,6 +132,8 @@ export class Select extends Action {
         }>,
     options?: SelectActionOptions,
   ): Select {
-    return new Select(locator, values, options);
+    const instance = new Select(locator, values, options);
+    instance.setCallStackInitializeCalledWith({ locator, values, options });
+    return instance;
   }
 }
