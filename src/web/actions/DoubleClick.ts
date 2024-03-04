@@ -55,6 +55,8 @@ export class DoubleClick extends Action {
     locator: Locator,
     options?: DblclickActionOptions,
   ): DoubleClick {
-    return new DoubleClick(locator, options);
+    const instance = new DoubleClick(locator, options);
+    instance.setCallStackInitializeCalledWith({ locator, options });
+    return instance;
   }
 }

@@ -226,6 +226,7 @@ export class Element extends Question<boolean> {
   }): Element {
     this.mode = "visible";
     this.options = options;
+    this.addToCallStack({ caller: "visible", calledWith: { options } });
 
     return this;
   }
@@ -258,6 +259,7 @@ export class Element extends Question<boolean> {
   }): Element {
     this.mode = "enabled";
     this.options = options;
+    this.addToCallStack({ caller: "enabled", calledWith: { options } });
 
     return this;
   }
@@ -292,6 +294,7 @@ export class Element extends Question<boolean> {
   }): Element {
     this.mode = "editable";
     this.options = options;
+    this.addToCallStack({ caller: "editable", calledWith: { options } });
 
     return this;
   }
@@ -326,6 +329,7 @@ export class Element extends Question<boolean> {
   }): Element {
     this.mode = "checked";
     this.options = options;
+    this.addToCallStack({ caller: "checked", calledWith: { options } });
 
     return this;
   }
@@ -358,6 +362,7 @@ export class Element extends Question<boolean> {
   }): Element {
     this.mode = "focused";
     this.options = options;
+    this.addToCallStack({ caller: "focused", calledWith: { options } });
 
     return this;
   }
@@ -393,6 +398,7 @@ export class Element extends Question<boolean> {
     this.mode = "haveText";
     this.payload = text;
     this.options = options;
+    this.addToCallStack({ caller: "haveText", calledWith: { text, options } });
 
     return this;
   }
@@ -428,6 +434,10 @@ export class Element extends Question<boolean> {
     this.mode = "containText";
     this.payload = text;
     this.options = options;
+    this.addToCallStack({
+      caller: "containText",
+      calledWith: { text, options },
+    });
 
     return this;
   }
@@ -452,6 +462,10 @@ export class Element extends Question<boolean> {
     this.mode = "haveValue";
     this.payload = value;
     this.options = options;
+    this.addToCallStack({
+      caller: "haveValue",
+      calledWith: { value, options },
+    });
 
     return this;
   }
@@ -476,6 +490,10 @@ export class Element extends Question<boolean> {
     this.mode = "haveCount";
     this.payload = count;
     this.options = options;
+    this.addToCallStack({
+      caller: "haveCount",
+      calledWith: { count, options },
+    });
 
     return this;
   }
@@ -502,6 +520,10 @@ export class Element extends Question<boolean> {
     this.mode = "haveCSS";
     this.payload = { name, value };
     this.options = options;
+    this.addToCallStack({
+      caller: "haveCSS",
+      calledWith: { name, value, options },
+    });
 
     return this;
   }
@@ -586,6 +608,10 @@ export class Element extends Question<boolean> {
     this.mode = "haveScreenshot";
     this.payload = name;
     this.options = options;
+    this.addToCallStack({
+      caller: "haveScreenshot",
+      calledWith: { name, options },
+    });
 
     return this;
   }

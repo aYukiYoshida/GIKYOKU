@@ -61,7 +61,13 @@ export class Press extends Action {
    * @category Factory
    */
   public static key(keys: string, options?: PressActionOptions): Press {
-    return new Press(keys, { options, sequential: false });
+    const instance = new Press(keys, { options, sequential: false });
+    instance.setCallStackInitializeCalledWith({
+      keys,
+      options,
+      sequential: false,
+    });
+    return instance;
   }
 
   /**
@@ -83,6 +89,13 @@ export class Press extends Action {
     input: string,
     options?: PressActionOptions,
   ): Press {
-    return new Press(input, { locator, options, sequential: true });
+    const instance = new Press(input, { locator, options, sequential: true });
+    instance.setCallStackInitializeCalledWith({
+      locator,
+      input,
+      options,
+      sequential: true,
+    });
+    return instance;
   }
 }

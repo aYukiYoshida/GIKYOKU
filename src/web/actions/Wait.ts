@@ -131,7 +131,9 @@ export class Wait extends Action {
     state: "load" | "domcontentloaded" | "networkidle",
     options?: WaitForLoadStateActionOptions,
   ): Wait {
-    return new Wait("loadState", { state, options });
+    const instance = new Wait("loadState", { state, options });
+    instance.setCallStackInitializeCalledWith({ state, options });
+    return instance;
   }
 
   /**
@@ -150,7 +152,9 @@ export class Wait extends Action {
     url: string | RegExp | ((url: URL) => boolean),
     options?: WaitForUrlActionOptions,
   ): Wait {
-    return new Wait("url", { url, options });
+    const instance = new Wait("url", { url, options });
+    instance.setCallStackInitializeCalledWith({ url, options });
+    return instance;
   }
 
   /**
@@ -179,7 +183,9 @@ export class Wait extends Action {
     locator: Locator,
     options?: WaitForLocatorActionOptions,
   ): Wait {
-    return new Wait("locator", { locator, options });
+    const instance = new Wait("locator", { locator, options });
+    instance.setCallStackInitializeCalledWith({ locator, options });
+    return instance;
   }
 
   /**
@@ -199,7 +205,9 @@ export class Wait extends Action {
     event: string,
     options?: WaitForEventActionOptions<T>,
   ): Wait {
-    return new Wait("eventOnPage", { event, options });
+    const instance = new Wait("eventOnPage", { event, options });
+    instance.setCallStackInitializeCalledWith({ event, options });
+    return instance;
   }
 
   /**
@@ -219,6 +227,8 @@ export class Wait extends Action {
     event: string,
     options?: WaitForEventActionOptions<T>,
   ): Wait {
-    return new Wait("event", { event, options });
+    const instance = new Wait("event", { event, options });
+    instance.setCallStackInitializeCalledWith({ event, options });
+    return instance;
   }
 }

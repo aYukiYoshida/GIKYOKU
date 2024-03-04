@@ -32,6 +32,8 @@ export class Sleep extends Action {
    * @category Factory
    */
   public static for(ms: number): Sleep {
-    return new Sleep(ms);
+    const instance = new Sleep(ms);
+    instance.setCallStackInitializeCalledWith({ ms });
+    return instance;
   }
 }

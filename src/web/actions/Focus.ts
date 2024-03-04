@@ -51,6 +51,8 @@ export class Focus extends Action {
    * @category Factory
    */
   public static on(locator: Locator, options?: { timeout?: number }): Focus {
-    return new Focus(locator, options);
+    const instance = new Focus(locator, options);
+    instance.setCallStackInitializeCalledWith({ locator, options });
+    return instance;
   }
 }

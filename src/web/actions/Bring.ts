@@ -29,6 +29,8 @@ export class Bring extends Action {
    * @category Factory
    */
   public static toFront(page: Page): Bring {
-    return new Bring(page);
+    const instance = new Bring(page);
+    instance.setCallStackInitializeCalledWith({ page });
+    return instance;
   }
 }

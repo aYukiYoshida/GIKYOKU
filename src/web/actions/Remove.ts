@@ -45,7 +45,9 @@ export class Remove extends Action {
    * @category Factory
    */
   public static sessionStorageItem(key: string): Remove {
-    return new Remove("sessionStorage", key);
+    const instance = new Remove("sessionStorage", key);
+    instance.setCallStackInitializeCalledWith({ key });
+    return instance;
   }
 
   /**
@@ -60,6 +62,8 @@ export class Remove extends Action {
    * @category Factory
    */
   public static localStorageItem(key: string): Remove {
-    return new Remove("localStorage", key);
+    const instance = new Remove("localStorage", key);
+    instance.setCallStackInitializeCalledWith({ key });
+    return instance;
   }
 }

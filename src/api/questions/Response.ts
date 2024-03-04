@@ -110,6 +110,10 @@ export class Response extends Question<boolean> {
    */
   public statusCode(response: ResponseType, statusCode: number): Response {
     this.response = response;
+    this.addToCallStack({
+      caller: "statusCode",
+      calledWith: { response, statusCode },
+    });
     this.action = { mode: "status", payload: { statusCode } };
 
     return this;
@@ -138,6 +142,7 @@ export class Response extends Question<boolean> {
    */
   public body(response: ResponseType, body: ResponseBodyType): Response {
     this.response = response;
+    this.addToCallStack({ caller: "body", calledWith: { response, body } });
     this.action = { mode: "body", payload: { body } };
 
     return this;
@@ -165,6 +170,10 @@ export class Response extends Question<boolean> {
    */
   public headers(response: ResponseType, headers: Headers): Response {
     this.response = response;
+    this.addToCallStack({
+      caller: "headers",
+      calledWith: { response, headers },
+    });
     this.action = { mode: "header", payload: { headers } };
 
     return this;
@@ -192,6 +201,10 @@ export class Response extends Question<boolean> {
     duration: number,
   ): Response {
     this.response = response;
+    this.addToCallStack({
+      caller: "beenReceivedWithin",
+      calledWith: { response, duration },
+    });
     this.action = { mode: "duration", payload: { duration } };
 
     return this;

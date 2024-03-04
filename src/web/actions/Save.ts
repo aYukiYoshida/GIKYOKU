@@ -38,6 +38,8 @@ export class Save extends Action {
    * @category Factory
    */
   public static storageState(path: string): Save {
-    return new Save(path);
+    const instance = new Save(path);
+    instance.setCallStackInitializeCalledWith({ path });
+    return instance;
   }
 }

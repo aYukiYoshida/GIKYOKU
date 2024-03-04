@@ -52,7 +52,9 @@ export class Set extends Action {
    * @category Factory
    */
   public static sessionStorageItem(key: string, value: any): Set {
-    return new Set("sessionStorage", { key, value });
+    const instance = new Set("sessionStorage", { key, value });
+    instance.setCallStackInitializeCalledWith({ key, value });
+    return instance;
   }
 
   /**
@@ -68,6 +70,8 @@ export class Set extends Action {
    * @category Factory
    */
   public static localStorageItem(key: string, value: any): Set {
-    return new Set("localStorage", { key, value });
+    const instance = new Set("localStorage", { key, value });
+    instance.setCallStackInitializeCalledWith({ key, value });
+    return instance;
   }
 }
