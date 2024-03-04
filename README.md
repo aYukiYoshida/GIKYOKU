@@ -101,6 +101,18 @@ Besides the existing actions, abilities and questions it is of course possible t
 
 Since tasks, actions and questions return promises, we advise to make use of the [require-await](https://eslint.org/docs/rules/require-await) rule in case of using eslint. This will help to prevent unexpected behavior when forgetting to await tasks/actions or questions.
 
+### Logging
+
+> This feature is currently in experimental stage and might see bigger changes.
+
+Testla comes with logging which helps you to debug your test code. When logging is enabled all activities an actor triggers are logged in a comprehensive way to stdout. To enable logging set the DEBUG environment variable as follows:
+
+```typescript
+DEBUG=testla:sp
+```
+
+To understand how to enable logging in custom Actions and Questions please refer to the [logging guide](https://github.com/testla-project/testla-screenplay-core-js/blob/main/doc/logging.md) of Testla Screenplay Core.
+
 ### API Specification
 
 See [API Specification](https://ayukiyoshida.github.io/GIKYOKU/index.html).
