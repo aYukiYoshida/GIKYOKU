@@ -65,7 +65,9 @@ export class Put extends ARequest {
    * @category Factory
    */
   public static to(url: string): Put {
-    return new Put(url);
+    const instance = new Put(url);
+    instance.setCallStackInitializeCalledWith({ url });
+    return instance;
   }
 
   /**
@@ -77,6 +79,7 @@ export class Put extends ARequest {
    */
   public withData(data: any): Put {
     this.data = data;
+    this.addToCallStack({ caller: "withData", calledWith: { data } });
     return this;
   }
 
@@ -88,6 +91,7 @@ export class Put extends ARequest {
    */
   public withHeaders(headers: Headers): Put {
     this.headers = headers;
+    this.addToCallStack({ caller: "withHeaders", calledWith: { headers } });
     return this;
   }
 
@@ -99,6 +103,10 @@ export class Put extends ARequest {
    */
   public withResponseBodyFormat(responseBodyFormat: ResponseBodyFormat): Put {
     this.responseBodyFormat = responseBodyFormat;
+    this.addToCallStack({
+      caller: "withResponseBodyFormat",
+      calledWith: { responseBodyFormat },
+    });
     return this;
   }
 }

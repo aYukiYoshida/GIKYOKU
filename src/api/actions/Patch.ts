@@ -65,7 +65,9 @@ export class Patch extends ARequest {
    * @category Factory
    */
   public static to(url: string): Patch {
-    return new Patch(url);
+    const instance = new Patch(url);
+    instance.setCallStackInitializeCalledWith({ url });
+    return instance;
   }
 
   /**
@@ -77,6 +79,7 @@ export class Patch extends ARequest {
    */
   public withData(data: any): Patch {
     this.data = data;
+    this.addToCallStack({ caller: "withData", calledWith: { data } });
     return this;
   }
 
@@ -88,6 +91,7 @@ export class Patch extends ARequest {
    */
   public withHeaders(headers: Headers): Patch {
     this.headers = headers;
+    this.addToCallStack({ caller: "withHeaders", calledWith: { headers } });
     return this;
   }
 
@@ -99,6 +103,10 @@ export class Patch extends ARequest {
    */
   public withResponseBodyFormat(responseBodyFormat: ResponseBodyFormat): Patch {
     this.responseBodyFormat = responseBodyFormat;
+    this.addToCallStack({
+      caller: "withResponseBodyFormat",
+      calledWith: { responseBodyFormat },
+    });
     return this;
   }
 }
