@@ -1,6 +1,6 @@
 {
   "name": "gikyoku",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Implement the screenplay pattern for Playwright.",
   "main": "index.js",
   "types": "index.d.ts",
