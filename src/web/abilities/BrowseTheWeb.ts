@@ -1018,7 +1018,7 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
-   * Verify if a locator on the page is displayed or not
+   * Verify if a locator points to an element that intersects viewport
    *
    * @param {Locator} locator the locator to search for.
    * @param {boolean} positive whether to check the visibility of the locator positive or not.
@@ -1042,34 +1042,26 @@ export class BrowseTheWeb extends Ability {
    * ```
    * @category to ensure
    */
-  public async checkDisplayState(
+  public async checkLocatorInViewportState(
     locator: Locator,
     positive: boolean,
     options?: {
+      /**
+       * The minimal ratio of the element to intersect viewport. If equals to `0`, then element should intersect viewport at any positive ratio. Defaults to `0`.
+       */
+      ratio?: number;
       /**
        * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
        */
       timeout?: number;
     },
   ): Promise<boolean> {
-    const displayed = await locator.evaluate(
-      (element) => {
-        if (!element) return false;
-        const rect = element.getBoundingClientRect();
-        return (
-          rect.top >= 0 &&
-          rect.left >= 0 &&
-          rect.bottom <= window.innerHeight &&
-          rect.right <= window.innerWidth
-        );
-      },
-      undefined,
-      options,
-    );
     if (positive) {
-      expect(displayed).toBeTruthy();
+      // Make sure at least some part of element intersects viewport.
+      await expect(locator).toBeInViewport(options);
     } else {
-      expect(displayed).toBeFalsy();
+      // Make sure element is fully outside of viewport.
+      await expect(locator).not.toBeInViewport(options);
     }
     return Promise.resolve(true);
   }
