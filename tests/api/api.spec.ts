@@ -213,16 +213,16 @@ test.describe("Testing g5u web module", () => {
     );
 
     const expectedBodyJSON = {
-      "post code": "90210",
       country: "United States",
       "country abbreviation": "US",
+      "post code": "90210",
       places: [
         {
           "place name": "Beverly Hills",
           longitude: "-118.4065",
+          latitude: "34.0901",
           state: "California",
           "state abbreviation": "CA",
-          latitude: "34.0901",
         },
       ],
     };
