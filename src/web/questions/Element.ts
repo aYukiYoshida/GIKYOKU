@@ -22,6 +22,7 @@ type Options =
   | { timeout?: number; enabled?: boolean }
   | { timeout?: number; editable?: boolean }
   | { timeout?: number; checked?: boolean }
+  | { timeout?: number; ratio?: number }
   | { timeout?: number; ignoreCase?: boolean; useInnerText?: boolean };
 
 /**
@@ -95,6 +96,15 @@ export class Element extends Question<boolean> {
     if (this.mode === "focused") {
       return Promise.resolve(
         await BrowseTheWeb.as(actor).checkFocusedState(
+          this.locator,
+          this.positive,
+          this.options,
+        ),
+      ); // if the ability method is not the expected result there will be an exception
+    }
+    if (this.mode === "inViewport") {
+      return Promise.resolve(
+        await BrowseTheWeb.as(actor).checkLocatorInViewportState(
           this.locator,
           this.positive,
           this.options,
@@ -363,6 +373,43 @@ export class Element extends Question<boolean> {
     this.mode = "focused";
     this.options = options;
     this.addToCallStack({ caller: "focused", calledWith: { options } });
+
+    return this;
+  }
+
+  /**
+   * Verify if an element is displayed in window.
+   *
+   * @param options (optional) options for assertions.
+   * @return {Element} this Element instance
+   * @example
+   * simple call with just locator or with options
+   * ```typescript
+   * Element.of(
+   *   page.locator('myLocator')
+   * ).displayed();
+   * ```
+   * with options
+   * ```
+   * Element.of(
+   *   page.locator('myLocator'),
+   * ).not.displayed({ timeout: 1000});
+   * ```
+   * @category mode operators
+   */
+  public inViewport(options?: {
+    /**
+     * The minimal ratio of the element to intersect viewport. If equals to `0`, then element should intersect viewport at any positive ratio. Defaults to `0`.
+     */
+    ratio?: number;
+    /**
+     * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+     */
+    timeout?: number;
+  }): Element {
+    this.mode = "inViewport";
+    this.options = options;
+    this.addToCallStack({ caller: "inViewport", calledWith: { options } });
 
     return this;
   }

@@ -1018,6 +1018,55 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
+   * Verify if a locator points to an element that intersects viewport
+   *
+   * @param {Locator} locator the locator to search for.
+   * @param {boolean} positive whether to check the visibility of the locator positive or not.
+   * @param options (optional) options for assertion.
+   * @returns {boolean} Promise<boolean> true if the element is displayed as expected, false if the timeout was reached.
+   * @example
+   * simple call with just locator
+   * ```ts
+   * await BrowseTheWeb.as(actor).checkDisplayState(
+   *   page.locator('myLocator'),
+   *   true
+   * );
+   * ```
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).checkDisplayState(
+   *   page.locator('myLocator'),
+   *   false,
+   *   { timeout: 1000 }
+   * );
+   * ```
+   * @category to ensure
+   */
+  public async checkLocatorInViewportState(
+    locator: Locator,
+    positive: boolean,
+    options?: {
+      /**
+       * The minimal ratio of the element to intersect viewport. If equals to `0`, then element should intersect viewport at any positive ratio. Defaults to `0`.
+       */
+      ratio?: number;
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
+  ): Promise<boolean> {
+    if (positive) {
+      // Make sure at least some part of element intersects viewport.
+      await expect(locator).toBeInViewport(options);
+    } else {
+      // Make sure element is fully outside of viewport.
+      await expect(locator).not.toBeInViewport(options);
+    }
+    return Promise.resolve(true);
+  }
+
+  /**
    * Verify if the given element has the given text or not.
    *
    * @param {Locator} locator the locator of the element to hover over.

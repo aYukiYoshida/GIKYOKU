@@ -497,6 +497,7 @@ export type ElementQuestionMode =
   | "editable"
   | "checked"
   | "focused"
+  | "inViewport"
   | "haveText"
   | "haveValue"
   | "haveCount"

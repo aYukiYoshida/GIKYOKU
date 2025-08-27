@@ -86,14 +86,15 @@ test.describe("Web Questions", () => {
     const page: Page = BrowseTheWeb.as(actor).getPage();
 
     await actor.attemptsTo(
-      Navigate.to("https://the-internet.herokuapp.com/tinymce"),
+      Navigate.to(
+        "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/disabled",
+      ),
       Wait.forLoadState("networkidle"),
-      Click.on(page.locator('[aria-label="Bold"]')),
     );
 
     expect(
       await actor.asks(
-        Element.of(page.locator('[aria-label="Undo"]')).enabled(),
+        Element.of(page.getByRole("button", { name: "Reset" })).enabled(),
       ),
     ).toBe(true);
 
@@ -101,7 +102,13 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of(page.locator('[aria-label="Redo"]')).enabled({
+          Element.of(
+            page
+              .getByRole("region", { name: "Try it" })
+              .locator('iframe[title="runner"]')
+              .contentFrame()
+              .getByLabel("Employed:"),
+          ).enabled({
             timeout: 1000,
           }),
         ),
@@ -113,7 +120,13 @@ test.describe("Web Questions", () => {
 
     expect(
       await actor.asks(
-        Element.of(page.locator('[aria-label="Redo"]')).not.enabled(),
+        Element.of(
+          page
+            .getByRole("region", { name: "Try it" })
+            .locator('iframe[title="runner"]')
+            .contentFrame()
+            .getByLabel("Employed:"),
+        ).not.enabled(),
       ),
     ).toBe(true);
 
@@ -121,7 +134,7 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of(page.locator('[aria-label="Undo"]')).not.enabled({
+          Element.of(page.getByRole("button", { name: "Reset" })).not.enabled({
             timeout: 1000,
           }),
         ),
@@ -278,6 +291,59 @@ test.describe("Web Questions", () => {
       notFocusedRes = true;
     }
     expect(notFocusedRes).toBeTruthy();
+  });
+
+  test("Element.inViewport", async ({ actor }) => {
+    const page: Page = BrowseTheWeb.as(actor).getPage();
+
+    await actor.attemptsTo(
+      Navigate.to("https://the-internet.herokuapp.com"),
+      Wait.forLoadState("networkidle"),
+    );
+
+    expect(
+      await actor.asks(
+        Element.of(page.getByText("Welcome to the-internet")).inViewport(),
+      ),
+    ).toBe(true);
+
+    let inViewportRes = false;
+    try {
+      expect(
+        await actor.asks(
+          Element.of(
+            page.getByText("Powered by Elemental Selenium"),
+          ).inViewport({
+            timeout: 1000,
+          }),
+        ),
+      ).toBe(true);
+    } catch (error) {
+      inViewportRes = true;
+    }
+    expect(inViewportRes).toBeTruthy();
+
+    expect(
+      await actor.asks(
+        Element.of(
+          page.getByText("Powered by Elemental Selenium"),
+        ).not.inViewport(),
+      ),
+    ).toBe(true);
+
+    let notInViewportRes = false;
+    try {
+      expect(
+        await actor.asks(
+          Element.of(page.getByText("Welcome to the-internet")).not.inViewport({
+            timeout: 1000,
+          }),
+        ),
+      ).toBe(true);
+    } catch (error) {
+      notInViewportRes = true;
+    }
+    expect(notInViewportRes).toBeTruthy();
   });
 
   test("Element.haveText", async ({ actor }) => {
@@ -580,18 +646,18 @@ test.describe("Web Questions", () => {
   });
 
   test("Screen.haveUrl", async ({ actor }) => {
-    await actor.attemptsTo(Navigate.to("https://google.com"));
+    await actor.attemptsTo(Navigate.to("https://example.com"));
 
-    expect(
-      await actor.asks(Screen.does.haveUrl("https://www.google.com/")),
-    ).toBe(true);
+    expect(await actor.asks(Screen.does.haveUrl("https://example.com"))).toBe(
+      true,
+    );
 
     // toHave.url test: expect the question to fail if the expected url is not correct
     let urlRes = false;
     try {
       expect(
         await actor.asks(
-          Screen.does.haveUrl("https://www.google.co.jp/", { timeout: 1000 }),
+          Screen.does.haveUrl("https://example.co.jp", { timeout: 1000 }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -600,14 +666,14 @@ test.describe("Web Questions", () => {
     expect(urlRes).toBeTruthy();
 
     expect(
-      await actor.asks(Screen.does.not.haveUrl("https://www.google.co.jp/")),
+      await actor.asks(Screen.does.not.haveUrl("https://example.co.jp")),
     ).toBe(true);
 
     let notTextRes = false;
     try {
       expect(
         await actor.asks(
-          Screen.does.not.haveUrl("https://www.google.com/", { timeout: 1000 }),
+          Screen.does.not.haveUrl("https://example.com", { timeout: 1000 }),
         ),
       ).toBe(true);
     } catch (error) {
