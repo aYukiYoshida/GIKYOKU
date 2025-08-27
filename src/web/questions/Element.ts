@@ -378,7 +378,7 @@ export class Element extends Question<boolean> {
   }
 
   /**
-   * Verify if an element is displayed in window.
+   * Verify if an element intersects viewport.
    *
    * @param options (optional) options for assertions.
    * @return {Element} this Element instance
@@ -387,13 +387,13 @@ export class Element extends Question<boolean> {
    * ```typescript
    * Element.of(
    *   page.locator('myLocator')
-   * ).displayed();
+   * ).inViewport();
    * ```
    * with options
    * ```
    * Element.of(
    *   page.locator('myLocator'),
-   * ).not.displayed({ timeout: 1000});
+   * ).not.inViewport({ timeout: 1000});
    * ```
    * @category mode operators
    */
