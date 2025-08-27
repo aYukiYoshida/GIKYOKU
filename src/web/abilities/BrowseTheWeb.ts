@@ -1018,6 +1018,63 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
+   * Verify if a locator on the page is displayed or not
+   *
+   * @param {Locator} locator the locator to search for.
+   * @param {boolean} positive whether to check the visibility of the locator positive or not.
+   * @param options (optional) options for assertion.
+   * @returns {boolean} Promise<boolean> true if the element is displayed as expected, false if the timeout was reached.
+   * @example
+   * simple call with just locator
+   * ```ts
+   * await BrowseTheWeb.as(actor).checkDisplayState(
+   *   page.locator('myLocator'),
+   *   true
+   * );
+   * ```
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).checkDisplayState(
+   *   page.locator('myLocator'),
+   *   false,
+   *   { timeout: 1000 }
+   * );
+   * ```
+   * @category to ensure
+   */
+  public async checkDisplayState(
+    locator: Locator,
+    positive: boolean,
+    options?: {
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
+  ): Promise<boolean> {
+    const displayed = await locator.evaluate(
+      (element) => {
+        if (!element) return false;
+        const rect = element.getBoundingClientRect();
+        return (
+          rect.top >= 0 &&
+          rect.left >= 0 &&
+          rect.bottom <= window.innerHeight &&
+          rect.right <= window.innerWidth
+        );
+      },
+      undefined,
+      options,
+    );
+    if (positive) {
+      expect(displayed).toBeTruthy();
+    } else {
+      expect(displayed).toBeFalsy();
+    }
+    return Promise.resolve(true);
+  }
+
+  /**
    * Verify if the given element has the given text or not.
    *
    * @param {Locator} locator the locator of the element to hover over.
