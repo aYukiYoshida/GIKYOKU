@@ -280,6 +280,59 @@ test.describe("Web Questions", () => {
     expect(notFocusedRes).toBeTruthy();
   });
 
+  test("Element.inViewport", async ({ actor }) => {
+    const page: Page = BrowseTheWeb.as(actor).getPage();
+
+    await actor.attemptsTo(
+      Navigate.to("https://the-internet.herokuapp.com"),
+      Wait.forLoadState("networkidle"),
+    );
+
+    expect(
+      await actor.asks(
+        Element.of(page.getByText("Welcome to the-internet")).inViewport(),
+      ),
+    ).toBe(true);
+
+    let inViewportRes = false;
+    try {
+      expect(
+        await actor.asks(
+          Element.of(
+            page.getByText("Powered by Elemental Selenium"),
+          ).inViewport({
+            timeout: 1000,
+          }),
+        ),
+      ).toBe(true);
+    } catch (error) {
+      inViewportRes = true;
+    }
+    expect(inViewportRes).toBeTruthy();
+
+    expect(
+      await actor.asks(
+        Element.of(
+          page.getByText("Powered by Elemental Selenium"),
+        ).not.inViewport(),
+      ),
+    ).toBe(true);
+
+    let notInViewportRes = false;
+    try {
+      expect(
+        await actor.asks(
+          Element.of(page.getByText("Welcome to the-internet")).not.inViewport({
+            timeout: 1000,
+          }),
+        ),
+      ).toBe(true);
+    } catch (error) {
+      notInViewportRes = true;
+    }
+    expect(notInViewportRes).toBeTruthy();
+  });
+
   test("Element.haveText", async ({ actor }) => {
     const page: Page = BrowseTheWeb.as(actor).getPage();
 
