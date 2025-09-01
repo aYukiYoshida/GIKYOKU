@@ -26,7 +26,15 @@ import {
   Reload,
   Screen,
 } from "@g5u/web";
-import { Cookie, Page, expect, test as base, Download } from "@playwright/test";
+import {
+  Cookie,
+  Page,
+  expect,
+  test as base,
+  Download,
+  Request,
+  Response,
+} from "@playwright/test";
 import { Actor } from "@testla/screenplay";
 
 type MyActors = {
@@ -346,6 +354,50 @@ test.describe("Web Actions", () => {
     await expect(page).toHaveURL(
       "https://the-internet.herokuapp.com/status_codes",
     );
+  });
+
+  test("Wait for Request", async ({ actor }) => {
+    const [request] = await Promise.all([
+      actor.attemptsTo(
+        Wait.forRequest(
+          (request) =>
+            request
+              .url()
+              .includes(
+                "https://the-internet.herokuapp.com/img/avatar-blank.jpg",
+              ) && request.method() === "GET",
+        ),
+      ),
+      actor.attemptsTo(
+        Navigate.to("https://the-internet.herokuapp.com/broken_images"),
+      ),
+    ]);
+    expect((request as Request).url()).toBe(
+      "https://the-internet.herokuapp.com/img/avatar-blank.jpg",
+    );
+    expect((request as Request).method()).toBe("GET");
+  });
+
+  test("Wait for Response", async ({ actor }) => {
+    const [response] = await Promise.all([
+      actor.attemptsTo(
+        Wait.forResponse(
+          (response) =>
+            response
+              .url()
+              .includes(
+                "https://the-internet.herokuapp.com/img/avatar-blank.jpg",
+              ) && response.status() === 200,
+        ),
+      ),
+      actor.attemptsTo(
+        Navigate.to("https://the-internet.herokuapp.com/broken_images"),
+      ),
+    ]);
+    expect((response as Response).url()).toBe(
+      "https://the-internet.herokuapp.com/img/avatar-blank.jpg",
+    );
+    expect((response as Response).status()).toBe(200);
   });
 
   test.describe("Wait for event", () => {
