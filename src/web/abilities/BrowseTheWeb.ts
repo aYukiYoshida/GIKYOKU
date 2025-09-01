@@ -32,6 +32,8 @@ import {
   WaitForLoadStateActionOptions,
   WaitForUrlActionOptions,
   WaitForLocatorActionOptions,
+  WaitForRequestActionOptions,
+  WaitForResponseActionOptions,
   WaitForEventActionOptions,
   TextPayload,
   ValuePayload,
@@ -174,6 +176,50 @@ export class BrowseTheWeb extends Ability {
     options?: WaitForUrlActionOptions,
   ): Promise<void> {
     return this.page.waitForURL(url, options);
+  }
+
+  /**
+   * Wait for the specified Request.
+   *
+   * @param {string} urlOrPredicate Request URL string, regex or predicate receiving [Request](https://playwright.dev/docs/api/class-request) object.
+   * @param {WaitForRequestActionOptions} options (optional) options for interaction.
+   * @return {Promise<Request>} Returns the Response object once the response is received.
+   * @example
+   * ```ts
+   * await BrowseTheWeb.as(actor).waitForRequest('example.com');
+   * ```
+   * @category to interact
+   */
+  public async waitForRequest(
+    urlOrPredicate:
+      | string
+      | RegExp
+      | ((request: Request) => boolean | Promise<boolean>),
+    options?: WaitForRequestActionOptions,
+  ): Promise<Request> {
+    return this.page.waitForRequest(urlOrPredicate, options);
+  }
+
+  /**
+   * Wait for the specified Response.
+   *
+   * @param {string} urlOrPredicate Request URL string, regex or predicate receiving [Response](https://playwright.dev/docs/api/class-response) object. When a [baseURL](https://playwright.dev/docs/api/class-browser#browser-new-context-option-base-url) via the context options was provided and the passed URL is a path, it gets merged via the new URL() constructor.
+   * @param {WaitForResponseActionOptions} options (optional) options for interaction.
+   * @return {Promise<Response>} Returns the Response object once the response is received.
+   * @example
+   * ```ts
+   * await BrowseTheWeb.as(actor).waitForResponse('example.com');
+   * ```
+   * @category to interact
+   */
+  public async waitForResponse(
+    urlOrPredicate:
+      | string
+      | RegExp
+      | ((response: Response) => boolean | Promise<boolean>),
+    options?: WaitForResponseActionOptions,
+  ): Promise<Response> {
+    return this.page.waitForResponse(urlOrPredicate, options);
   }
 
   /**
