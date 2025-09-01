@@ -468,6 +468,32 @@ export type WaitForLocatorActionOptions = {
 /**
  * @category options of Actions
  */
+export type WaitForRequestActionOptions = {
+  /**
+   * Maximum wait time in milliseconds, defaults to 30 seconds, pass `0` to disable the timeout. The default value can
+   * be changed by using the
+   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
+   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+   */
+  timeout?: number;
+};
+
+/**
+ * @category options of Actions
+ */
+export type WaitForResponseActionOptions = {
+  /**
+   * Maximum wait time in milliseconds, defaults to 30 seconds, pass `0` to disable the timeout. The default value can
+   * be changed by using the
+   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
+   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+   */
+  timeout?: number;
+};
+
+/**
+ * @category options of Actions
+ */
 export type WaitForEventActionOptions<T> = {
   /**
    * Receives the event data and resolves to truthy value when the waiting should resolve.

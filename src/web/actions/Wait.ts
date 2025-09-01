@@ -20,19 +20,38 @@ import {
   WaitForLocatorActionOptions,
   WaitForLoadStateActionOptions,
   WaitForUrlActionOptions,
+  WaitForRequestActionOptions,
+  WaitForResponseActionOptions,
   WaitForEventActionOptions,
 } from "../types";
 
-type Mode = "locator" | "loadState" | "url" | "eventOnPage" | "event";
+type Mode =
+  | "locator"
+  | "loadState"
+  | "url"
+  | "request"
+  | "response"
+  | "eventOnPage"
+  | "event";
 type Payload = {
   state?: "load" | "domcontentloaded" | "networkidle";
   url?: string | RegExp | ((url: URL) => boolean);
+  requestUrlOrPredict?:
+    | string
+    | RegExp
+    | ((request: Request) => boolean | Promise<boolean>);
+  responseUrlOrPredict?:
+    | string
+    | RegExp
+    | ((request: Response) => boolean | Promise<boolean>);
   locator?: Locator;
   event?: string;
   options?:
     | WaitForLocatorActionOptions
     | WaitForLoadStateActionOptions
     | WaitForUrlActionOptions
+    | WaitForRequestActionOptions
+    | WaitForResponseActionOptions
     | WaitForEventActionOptions<
         | BrowserContext
         | ConsoleMessage
@@ -93,6 +112,26 @@ export class Wait extends Action {
         throw new Error("Error: no locator specified for Wait.forLocator()");
       return BrowseTheWeb.as(actor).waitForLocator(
         this.payload.locator,
+        this.payload.options,
+      );
+    }
+    if (this.mode === "request") {
+      if (!this.payload.requestUrlOrPredict)
+        throw new Error(
+          "Error: no urlOrPredict specified for Wait.forRequest()",
+        );
+      return BrowseTheWeb.as(actor).waitForRequest(
+        this.payload.requestUrlOrPredict,
+        this.payload.options,
+      );
+    }
+    if (this.mode === "response") {
+      if (!this.payload.responseUrlOrPredict)
+        throw new Error(
+          "Error: no urlOrPredict specified for Wait.forResponse()",
+        );
+      return BrowseTheWeb.as(actor).waitForResponse(
+        this.payload.responseUrlOrPredict,
         this.payload.options,
       );
     }
@@ -185,6 +224,60 @@ export class Wait extends Action {
   ): Wait {
     const instance = new Wait("locator", { locator, options });
     instance.setCallStackInitializeCalledWith({ locator, options });
+    return instance;
+  }
+
+  /**
+   * Wait for request matching the url or predicate.
+   *
+   * @param {string} urlOrPredicate url or predicate to wait for
+   * @param {WaitForRequestActionOptions} options
+   * @return {Wait} new Wait instance
+   * @example
+   * ```typescript
+   * Wait.forRequest('example.com');
+   * ```
+   * @category Factory
+   */
+  public static forRequest(
+    urlOrPredicate:
+      | string
+      | RegExp
+      | ((request: Request) => boolean | Promise<boolean>),
+    options?: WaitForRequestActionOptions,
+  ): Wait {
+    const instance = new Wait("request", {
+      requestUrlOrPredict: urlOrPredicate,
+      options,
+    });
+    instance.setCallStackInitializeCalledWith({ urlOrPredicate, options });
+    return instance;
+  }
+
+  /**
+   * Wait for response matching the url or predicate.
+   *
+   * @param {string} urlOrPredicate url or predicate to wait for
+   * @param {WaitForResponseActionOptions} options
+   * @return {Wait} new Wait instance
+   * @example
+   * ```typescript
+   * Wait.forRequest('example.com');
+   * ```
+   * @category Factory
+   */
+  public static forResponse(
+    urlOrPredicate:
+      | string
+      | RegExp
+      | ((response: Response) => boolean | Promise<boolean>),
+    options?: WaitForResponseActionOptions,
+  ): Wait {
+    const instance = new Wait("response", {
+      responseUrlOrPredict: urlOrPredicate,
+      options,
+    });
+    instance.setCallStackInitializeCalledWith({ urlOrPredicate, options });
     return instance;
   }
 
