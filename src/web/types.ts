@@ -527,6 +527,7 @@ export type ElementQuestionMode =
   | "haveText"
   | "haveValue"
   | "haveCount"
+  | "haveAttribute"
   | "haveCSS"
   | "haveScreenshot"
   | "containText";
@@ -608,6 +609,29 @@ export type StylePayload = z.infer<typeof stylePayloadSchema>;
  */
 export const isStylePayload = (value: unknown): value is StylePayload => {
   return stylePayloadSchema.safeParse(value).success;
+};
+
+// for Element.hasAttribute
+/**
+ * @category payload schemas
+ */
+export const attributePayloadSchema = z.object({
+  name: z.string(),
+  value: z.union([z.string(), z.instanceof(RegExp)]).optional(),
+});
+
+/**
+ * @category payload
+ */
+export type AttributePayload = z.infer<typeof attributePayloadSchema>;
+
+/**
+ * @category type guards for payload
+ */
+export const isAttributePayload = (
+  value: unknown,
+): value is AttributePayload => {
+  return attributePayloadSchema.safeParse(value).success;
 };
 
 // for Element.haveScreenshot and Screen.haveScreenshot

@@ -38,6 +38,7 @@ import {
   TextPayload,
   ValuePayload,
   StylePayload,
+  AttributePayload,
   CountPayload,
   ScreenshotPayload,
 } from "../types";
@@ -1245,6 +1246,58 @@ export class BrowseTheWeb extends Ability {
       await expect(locator).toHaveCount(count, options);
     } else {
       await expect(locator).not.toHaveCount(count, options);
+    }
+    return Promise.resolve(true);
+  }
+
+  /**
+   * Verify if the given element has the given attribute or not.
+   *
+   * @param {Locator} locator the locator of the element to verify.
+   * @param {AttributePayload} attribute the attribute name and value to check.
+   * @param {boolean} positive whether to check the property of the locator positive or not.
+   * @param options (optional) options for assertion.
+   * @returns {boolean} true if the element has attribute/not as expected, false if the timeout was reached.
+   * @category to ensure
+   */
+  public async checkLocatorHasAttribute(
+    locator: Locator,
+    attribute: AttributePayload,
+    positive: boolean,
+    options?: {
+      /**
+       * Whether to perform case-insensitive match.
+       * [`ignoreCase`](https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-have-attribute-option-ignore-case)
+       * option takes precedence over the corresponding regular expression flag if specified.
+       */
+      ignoreCase?: boolean;
+
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
+  ): Promise<boolean> {
+    if (positive) {
+      if (attribute.value) {
+        await expect(locator).toHaveAttribute(
+          attribute.name,
+          attribute.value,
+          options,
+        );
+      } else {
+        await expect(locator).toHaveAttribute(attribute.name, options);
+      }
+    } else {
+      if (attribute.value) {
+        await expect(locator).not.toHaveAttribute(
+          attribute.name,
+          attribute.value,
+          options,
+        );
+      } else {
+        await expect(locator).not.toHaveAttribute(attribute.name, options);
+      }
     }
     return Promise.resolve(true);
   }

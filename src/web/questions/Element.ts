@@ -10,6 +10,8 @@ import {
   isValuePayload,
   CountPayload,
   isCountPayload,
+  AttributePayload,
+  isAttributePayload,
   StylePayload,
   isStylePayload,
   ScreenshotPayload,
@@ -38,6 +40,7 @@ export class Element extends Question<boolean> {
     | TextPayload
     | ValuePayload
     | CountPayload
+    | AttributePayload
     | StylePayload
     | ScreenshotPayload = "";
   private options?: Options;
@@ -162,6 +165,19 @@ export class Element extends Question<boolean> {
         ); // if the ability method is not the expected result there will be an exception
       }
       throw new Error("Element.haveCount: incompatible payload.");
+    }
+    if (this.mode === "haveAttribute") {
+      if (isAttributePayload(this.payload)) {
+        return Promise.resolve(
+          await BrowseTheWeb.as(actor).checkLocatorHasAttribute(
+            this.locator,
+            this.payload,
+            this.positive,
+            this.options,
+          ),
+        ); // if the ability method is not the expected result there will be an exception
+      }
+      throw new Error("Element.haveAttribute: incompatible payload.");
     }
     if (this.mode === "haveCSS") {
       if (isStylePayload(this.payload)) {
@@ -541,6 +557,80 @@ export class Element extends Question<boolean> {
       caller: "haveCount",
       calledWith: { count, options },
     });
+
+    return this;
+  }
+
+  /**
+   * Verify if an element has the given attribute.
+   * @overload
+   * @param name the attribute name.
+   * @param options (optional) options for assertions.
+   * @returns {Element} this Element instance
+   * @category mode operators
+   */
+  public haveAttribute(
+    name: string,
+    options?: {
+      /**
+       * Whether to perform case-insensitive match.
+       * [`ignoreCase`](https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-have-attribute-option-ignore-case)
+       * option takes precedence over the corresponding regular expression flag if specified.
+       */
+      ignoreCase?: boolean;
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
+  ): Element;
+  /**
+   * Verify if an element has the given attribute with value.
+   *
+   * @overload
+   * @param name the attribute name.
+   * @param value the attribute value.
+   * @param options (optional) options for assertions.
+   * @returns {Element} this Element instance
+   * @category mode operators
+   */
+  public haveAttribute(
+    name: string,
+    value: string | RegExp,
+    options?: {
+      /**
+       * Whether to perform case-insensitive match.
+       * [`ignoreCase`](https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-have-attribute-option-ignore-case)
+       * option takes precedence over the corresponding regular expression flag if specified.
+       */
+      ignoreCase?: boolean;
+      /**
+       * Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+       */
+      timeout?: number;
+    },
+  ): Element;
+  public haveAttribute(
+    name: string,
+    value?: string | RegExp | { ignoreCase?: boolean; timeout?: number },
+    options?: { ignoreCase?: boolean; timeout?: number },
+  ): Element {
+    this.mode = "haveAttribute";
+    if (typeof value === "string" || value instanceof RegExp) {
+      this.payload = { name, value };
+      this.options = options;
+      this.addToCallStack({
+        caller: "haveAttribute",
+        calledWith: { name, value, options },
+      });
+    } else {
+      this.payload = { name };
+      this.options = value;
+      this.addToCallStack({
+        caller: "haveAttribute",
+        calledWith: { name, value },
+      });
+    }
 
     return this;
   }
