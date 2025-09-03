@@ -496,6 +496,103 @@ test.describe("Web Questions", () => {
     expect(notTextRes).toBeTruthy();
   });
 
+  test("Element.haveAttribute", async ({ actor }) => {
+    const page: Page = BrowseTheWeb.as(actor).getPage();
+
+    await actor.attemptsTo(
+      Navigate.to("https://the-internet.herokuapp.com/"),
+      Wait.forLoadState("networkidle"),
+    );
+
+    expect(
+      await actor.asks(
+        Element.of(
+          page.getByRole("link", { name: "Basic Auth" }),
+        ).haveAttribute("href"),
+      ),
+    ).toBe(true);
+
+    expect(
+      await actor.asks(
+        Element.of(
+          page.getByRole("link", { name: "Basic Auth" }),
+        ).haveAttribute("href", "/basic_auth"),
+      ),
+    ).toBe(true);
+
+    let attributeRes = false;
+    try {
+      expect(
+        await actor.asks(
+          Element.of(page.locator("h1")).haveAttribute("href", {
+            timeout: 1000,
+          }),
+        ),
+      ).toBe(true);
+    } catch (error) {
+      attributeRes = true;
+    }
+    expect(attributeRes).toBeTruthy();
+
+    let attributeWithValueRes = false;
+    try {
+      expect(
+        await actor.asks(
+          Element.of(page.locator("h1")).haveAttribute("href", "/header", {
+            timeout: 1000,
+          }),
+        ),
+      ).toBe(true);
+    } catch (error) {
+      attributeWithValueRes = true;
+    }
+    expect(attributeWithValueRes).toBeTruthy();
+
+    expect(
+      await actor.asks(
+        Element.of(page.locator("h1")).not.haveAttribute("href"),
+      ),
+    ).toBe(true);
+
+    expect(
+      await actor.asks(
+        Element.of(page.locator("h1")).not.haveAttribute("href", "/header"),
+      ),
+    ).toBe(true);
+
+    let notAttributeRes = false;
+    try {
+      expect(
+        await actor.asks(
+          Element.of(
+            page.getByRole("link", { name: "Basic Auth" }),
+          ).not.haveAttribute("href", {
+            timeout: 1000,
+          }),
+        ),
+      ).toBe(true);
+    } catch (error) {
+      notAttributeRes = true;
+    }
+    expect(notAttributeRes).toBeTruthy();
+
+    let notAttributeWithRes = false;
+    try {
+      expect(
+        await actor.asks(
+          Element.of(
+            page.getByRole("link", { name: "Basic Auth" }),
+          ).not.haveAttribute("href", "/basic_auth", {
+            timeout: 1000,
+          }),
+        ),
+      ).toBe(true);
+    } catch (error) {
+      notAttributeWithRes = true;
+    }
+    expect(notAttributeWithRes).toBeTruthy();
+  });
+
   test("Element.haveCSS", async ({ actor }) => {
     const page: Page = BrowseTheWeb.as(actor).getPage();
 
