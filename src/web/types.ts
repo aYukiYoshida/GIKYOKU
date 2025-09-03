@@ -527,6 +527,7 @@ export type ElementQuestionMode =
   | "haveText"
   | "haveValue"
   | "haveCount"
+  | "haveAttribute"
   | "haveCSS"
   | "haveScreenshot"
   | "containText";
