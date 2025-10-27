@@ -158,6 +158,20 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
+   * Emulates the context's network being offline or online.
+   * @param {boolean} offline Whether to emulate network being offline for the browser context.
+   * @returns {Promise<void>}
+   * @example
+   * ```js
+   * await BrowseTheWeb.as(actor).setOffline(true);
+   * ```
+   * @category related to context
+   */
+  public async setOffline(offline: boolean): Promise<void> {
+    return this.page.context().setOffline(offline);
+  }
+
+  /**
    * Wait for the specified loading state.
    *
    * @param {string} status the status to wait for. Allowed: "load" | "domcontentloaded" | "networkidle".
