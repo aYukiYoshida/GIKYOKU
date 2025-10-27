@@ -11,6 +11,24 @@ export type Point = {
 /**
  * @category properties of options
  */
+export type Geolocation = {
+  /**
+   * Latitude between -90 and 90.
+   */
+  latitude: number;
+  /**
+   * Longitude between -180 and 180.
+   */
+  longitude: number;
+  /**
+   * Non-negative accuracy value. Defaults to `0`.
+   */
+  accuracy?: number;
+};
+
+/**
+ * @category properties of options
+ */
 export type Modifiers = Array<"Alt" | "Control" | "Meta" | "Shift">;
 
 /**

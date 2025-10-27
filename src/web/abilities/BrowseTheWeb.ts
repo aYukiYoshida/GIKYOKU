@@ -18,6 +18,7 @@ import {
 import { Ability, Actor } from "@testla/screenplay";
 
 import {
+  Geolocation,
   CheckActionOptions,
   ClickActionOptions,
   DblclickActionOptions,
@@ -139,6 +140,35 @@ export class BrowseTheWeb extends Ability {
   public async bringToFront(page: Page): Promise<void> {
     this.page = page;
     return this.page.bringToFront();
+  }
+
+  /**
+   * Sets the context's geolocation. Passing `null` or `undefined` emulates position unavailable.
+   *
+   * @param {null|Geolocation} geolocation the geolocation.
+   * @returns {Promise<void>}
+   * @example
+   * ```js
+   * await BrowseTheWeb.as(actor).setGeolocation({ latitude: 59.95, longitude: 30.31667 });
+   * ```
+   * @category related to context
+   */
+  public async setGeolocation(geolocation: null | Geolocation): Promise<void> {
+    return this.page.context().setGeolocation(geolocation);
+  }
+
+  /**
+   * Emulates the context's network being offline or online.
+   * @param {boolean} offline Whether to emulate network being offline for the browser context.
+   * @returns {Promise<void>}
+   * @example
+   * ```js
+   * await BrowseTheWeb.as(actor).setOffline(true);
+   * ```
+   * @category related to context
+   */
+  public async setOffline(offline: boolean): Promise<void> {
+    return this.page.context().setOffline(offline);
   }
 
   /**

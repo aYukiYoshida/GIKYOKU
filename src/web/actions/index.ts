@@ -3,6 +3,7 @@ export { Bring } from "./Bring";
 export { Check } from "./Check";
 export { Clear } from "./Clear";
 export { Click } from "./Click";
+export { Configure } from "./Configure";
 export { DoubleClick } from "./DoubleClick";
 export { DragAndDrop } from "./DragAndDrop";
 export { Fill } from "./Fill";
