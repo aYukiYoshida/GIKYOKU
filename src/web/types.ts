@@ -1,3 +1,4 @@
+import { PageFunction, SmartHandle } from "playwright-core/types/structs";
 import z from "zod";
 
 /**
@@ -457,6 +458,28 @@ export type WaitForUrlActionOptions = {
    *   loading.
    */
   waitUntil?: "load" | "domcontentloaded" | "networkidle" | "commit";
+};
+
+/**
+ * @category options of Actions
+ */
+export type WaitForFunctionActionOptions = {
+  /**
+   * If [`polling`](https://playwright.dev/docs/api/class-page#page-wait-for-function-option-polling) is `'raf'`, then
+   * [`pageFunction`](https://playwright.dev/docs/api/class-page#page-wait-for-function-option-expression) is constantly
+   * executed in `requestAnimationFrame` callback. If
+   * [`polling`](https://playwright.dev/docs/api/class-page#page-wait-for-function-option-polling) is a number, then it
+   * is treated as an interval in milliseconds at which the function would be executed. Defaults to `raf`.
+   */
+  polling?: number | "raf";
+
+  /**
+   * Maximum time to wait for in milliseconds. Defaults to `0` - no timeout. The default value can be changed via
+   * `actionTimeout` option in the config, or by using the
+   * [browserContext.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-browsercontext#browser-context-set-default-timeout)
+   * or [page.setDefaultTimeout(timeout)](https://playwright.dev/docs/api/class-page#page-set-default-timeout) methods.
+   */
+  timeout?: number;
 };
 
 /**
