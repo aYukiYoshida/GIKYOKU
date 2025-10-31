@@ -16,6 +16,7 @@ import {
   Worker,
 } from "@playwright/test";
 import { Ability, Actor } from "@testla/screenplay";
+import { PageFunction, SmartHandle } from "playwright-core/types/structs";
 
 import {
   Geolocation,
@@ -32,6 +33,7 @@ import {
   TypeActionOptions,
   WaitForLoadStateActionOptions,
   WaitForUrlActionOptions,
+  WaitForFunctionActionOptions,
   WaitForLocatorActionOptions,
   WaitForRequestActionOptions,
   WaitForResponseActionOptions,
@@ -207,6 +209,59 @@ export class BrowseTheWeb extends Ability {
     options?: WaitForUrlActionOptions,
   ): Promise<void> {
     return this.page.waitForURL(url, options);
+  }
+
+  /**
+   * Wait until the
+   * [`pageFunction`](https://playwright.dev/docs/api/class-page#page-wait-for-function-option-expression) returns a
+   * truthy value. It resolves to a JSHandle of the truthy value.
+   * @overload
+   * @param pageFunction Function to be evaluated in the page context.
+   * @param argument Optional argument to pass to
+   * [`pageFunction`](https://playwright.dev/docs/api/class-page#page-wait-for-function-option-expression).
+   * @param options
+   * @example
+   * ```ts
+   * const selector = '.foo';
+   * await BrowseTheWeb.as(actor).waitForFunction(
+   *  () => window.innerWidth < 100)
+   * );
+   * ```
+   */
+  public async waitForFunction<R, Arg>(
+    pageFunction: PageFunction<Arg, R>,
+    argument: Arg,
+    options?: WaitForFunctionActionOptions,
+  ): Promise<SmartHandle<R>>;
+  /**
+   * Wait until the
+   * [`pageFunction`](https://playwright.dev/docs/api/class-page#page-wait-for-function-option-expression) returns a
+   * truthy value. It resolves to a JSHandle of the truthy value.
+   * @overload
+   * @param pageFunction Function to be evaluated in the page context.
+   * @param argument Optional argument to pass to
+   * [`pageFunction`](https://playwright.dev/docs/api/class-page#page-wait-for-function-option-expression).
+   * @param options
+   * @example
+   * ```ts
+   * const selector = '.foo';
+   * await BrowseTheWeb.as(actor).waitForFunction(
+   *  (selector) => !!document.querySelector(selector),
+   *  selector
+   * );
+   * ```
+   */
+  public async waitForFunction<R>(
+    pageFunction: PageFunction<void, R>,
+    argument?: any,
+    options?: WaitForFunctionActionOptions,
+  ): Promise<SmartHandle<R>>;
+  public async waitForFunction<R>(
+    pageFunction: PageFunction<any, R>,
+    argument?: any,
+    options?: WaitForFunctionActionOptions,
+  ): Promise<SmartHandle<R>> {
+    return this.page.waitForFunction(pageFunction, argument, options);
   }
 
   /**
