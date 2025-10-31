@@ -14,6 +14,7 @@ import {
   Worker,
 } from "@playwright/test";
 import { Action, Actor } from "@testla/screenplay";
+import { PageFunction, SmartHandle } from "playwright-core/types/structs";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 import {
@@ -23,12 +24,14 @@ import {
   WaitForRequestActionOptions,
   WaitForResponseActionOptions,
   WaitForEventActionOptions,
+  WaitForFunctionActionOptions,
 } from "../types";
 
 type Mode =
   | "locator"
   | "loadState"
   | "url"
+  | "function"
   | "request"
   | "response"
   | "eventOnPage"
@@ -46,12 +49,15 @@ type Payload = {
     | ((request: Response) => boolean | Promise<boolean>);
   locator?: Locator;
   event?: string;
+  pageFunction?: PageFunction<any, any>;
+  argument?: any;
   options?:
     | WaitForLocatorActionOptions
     | WaitForLoadStateActionOptions
     | WaitForUrlActionOptions
     | WaitForRequestActionOptions
     | WaitForResponseActionOptions
+    | WaitForFunctionActionOptions
     | WaitForEventActionOptions<
         | BrowserContext
         | ConsoleMessage
@@ -132,6 +138,17 @@ export class Wait extends Action {
         );
       return BrowseTheWeb.as(actor).waitForResponse(
         this.payload.responseUrlOrPredict,
+        this.payload.options,
+      );
+    }
+    if (this.mode === "function") {
+      if (!this.payload.pageFunction)
+        throw new Error(
+          "Error: no pageFunction specified for Wait.forFunction()",
+        );
+      return BrowseTheWeb.as(actor).waitForFunction(
+        this.payload.pageFunction,
+        this.payload.argument,
         this.payload.options,
       );
     }
@@ -278,6 +295,45 @@ export class Wait extends Action {
       options,
     });
     instance.setCallStackInitializeCalledWith({ urlOrPredicate, options });
+    return instance;
+  }
+
+  /**
+   * Wait until the
+   * [`pageFunction`](https://playwright.dev/docs/api/class-page#page-wait-for-function-option-expression) returns a
+   * truthy value. It resolves to a JSHandle of the truthy value.
+   * @param pageFunction Function to be evaluated in the page context.
+   * @param argument Optional argument to pass to
+   * [`pageFunction`](https://playwright.dev/docs/api/class-page#page-wait-for-function-option-expression).
+   * @param options
+   * @return {Wait} new Wait instance
+   * @example
+   * ```typescript
+   * const selector = '.foo';
+   * await actor.attemptsTo(
+   *   Wait.forFunction(
+   *     (selector) => !!document.querySelector(selector),
+   *     selector
+   *   );
+   * );
+   * ```
+   * @category Factory
+   */
+  public static forFunction<R, Arg>(
+    pageFunction: PageFunction<Arg, R>,
+    argument?: Arg,
+    options?: WaitForFunctionActionOptions,
+  ): Wait {
+    const instance = new Wait("function", {
+      pageFunction,
+      argument,
+      options,
+    });
+    instance.setCallStackInitializeCalledWith({
+      pageFunction,
+      argument,
+      options,
+    });
     return instance;
   }
 
