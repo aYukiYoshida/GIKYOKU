@@ -30,6 +30,7 @@ import {
   Cookie,
   Page,
   expect,
+  JSHandle,
   test as base,
   Download,
   Request,
@@ -356,8 +357,43 @@ test.describe("Web Actions", () => {
     );
   });
 
+  test("Wait for Function without Argument", async ({ actor }) => {
+    const [handle, response] = await Promise.all<
+      [Promise<JSHandle<{ document: Document }>>, Promise<Response>]
+    >([
+      actor.attemptsTo(
+        Wait.forFunction<{ document: Document }, void>(() => ({ document })),
+      ),
+      actor.attemptsTo(Navigate.to("https://example.com")),
+    ]);
+
+    expect(response.url()).toBe("https://example.com/");
+    expect(handle).toBeDefined();
+    const obj = await handle.evaluate((obj) => obj.document.title);
+    expect(obj).toBe("Example Domain");
+  });
+
+  test("Wait for Function with Argument", async ({ actor }) => {
+    const [handle, response] = await Promise.all<
+      [Promise<JSHandle<{ document: Document }>>, Promise<Response>]
+    >([
+      actor.attemptsTo(
+        Wait.forFunction<{ document: Document }, string>((title: string) => {
+          document.title = title;
+          return { document };
+        }, "Edited Example Domain"),
+      ),
+      actor.attemptsTo(Navigate.to("https://example.com")),
+    ]);
+
+    expect(response.url()).toBe("https://example.com/");
+    expect(handle).toBeDefined();
+    const obj = await handle.evaluate((obj) => obj.document.title);
+    expect(obj).toBe("Edited Example Domain");
+  });
+
   test("Wait for Request", async ({ actor }) => {
-    const [request] = await Promise.all([
+    const [request] = await Promise.all<Request>([
       actor.attemptsTo(
         Wait.forRequest(
           (request) =>
@@ -372,14 +408,14 @@ test.describe("Web Actions", () => {
         Navigate.to("https://the-internet.herokuapp.com/broken_images"),
       ),
     ]);
-    expect((request as Request).url()).toBe(
+    expect(request.url()).toBe(
       "https://the-internet.herokuapp.com/img/avatar-blank.jpg",
     );
-    expect((request as Request).method()).toBe("GET");
+    expect(request.method()).toBe("GET");
   });
 
   test("Wait for Response", async ({ actor }) => {
-    const [response] = await Promise.all([
+    const [response] = await Promise.all<Response>([
       actor.attemptsTo(
         Wait.forResponse(
           (response) =>
@@ -394,10 +430,10 @@ test.describe("Web Actions", () => {
         Navigate.to("https://the-internet.herokuapp.com/broken_images"),
       ),
     ]);
-    expect((response as Response).url()).toBe(
+    expect(response.url()).toBe(
       "https://the-internet.herokuapp.com/img/avatar-blank.jpg",
     );
-    expect((response as Response).status()).toBe(200);
+    expect(response.status()).toBe(200);
   });
 
   test.describe("Wait for event", () => {
