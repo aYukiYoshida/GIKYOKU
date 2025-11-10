@@ -27,9 +27,10 @@ export class Click extends Action {
    */
   public async performAs(actor: Actor): Promise<void> {
     if (isPoint(this.locator)) {
-      return BrowseTheWeb.as(actor).click(this.locator, this.options);
+      await BrowseTheWeb.as(actor).click(this.locator, this.options);
+    } else {
+      await BrowseTheWeb.as(actor).click(this.locator, this.options);
     }
-    await BrowseTheWeb.as(actor).click(this.locator, this.options);
   }
 
   /**
