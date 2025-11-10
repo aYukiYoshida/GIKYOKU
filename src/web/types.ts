@@ -2,11 +2,23 @@ import { PageFunction, SmartHandle } from "playwright-core/types/structs";
 import z from "zod";
 
 /**
+ * @category schemas
+ */
+const pointSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+});
+
+/**
  * @category properties of options
  */
-export type Point = {
-  x: number;
-  y: number;
+export type Point = z.infer<typeof pointSchema>;
+
+/**
+ * @category type guards of options
+ */
+export const isPoint = (value: unknown): value is Point => {
+  return pointSchema.safeParse(value).success;
 };
 
 /**
