@@ -2,7 +2,7 @@ import { Locator } from "@playwright/test";
 import { Action, Actor } from "@testla/screenplay";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
-import { ClickActionOptions } from "../types";
+import { ClickActionOptions, Point, isPoint } from "../types";
 
 /**
  * Click on an element specified by a locator string.
@@ -12,7 +12,7 @@ import { ClickActionOptions } from "../types";
  */
 export class Click extends Action {
   private constructor(
-    private locator: Locator,
+    private locator: Locator | Point,
     private options?: ClickActionOptions,
   ) {
     super();
@@ -26,6 +26,9 @@ export class Click extends Action {
    * @category called internally
    */
   public async performAs(actor: Actor): Promise<void> {
+    if (isPoint(this.locator)) {
+      return BrowseTheWeb.as(actor).click(this.locator, this.options);
+    }
     await BrowseTheWeb.as(actor).click(this.locator, this.options);
   }
 
@@ -54,6 +57,34 @@ export class Click extends Action {
   public static on(locator: Locator, options?: ClickActionOptions): Click {
     const instance = new Click(locator, options);
     instance.setCallStackInitializeCalledWith({ locator, options });
+    return instance;
+  }
+
+  /**
+   * specify which point should be clicked at
+   *
+   * @param {Point} point the point representing the coordinates.
+   * @param {ClickActionOptions} options (optional) options for the click action.
+   * @return {Click} new Click instance
+   * @example
+   * simple call with just point
+   * ```typescript
+   * Click.at(
+   *   { x: 100, y: 200 }
+   * );
+   * ```
+   * with options
+   * ```typescript
+   * Click.at(
+   *   { x: 100, y: 200 },
+   *   { timeout: 3000 }
+   * );
+   * ```
+   * @category Factory
+   */
+  public static at(point: Point, options?: ClickActionOptions): Click {
+    const instance = new Click(point, options);
+    instance.setCallStackInitializeCalledWith({ point, options });
     return instance;
   }
 }
