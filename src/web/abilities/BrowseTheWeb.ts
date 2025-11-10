@@ -19,6 +19,8 @@ import { Ability, Actor } from "@testla/screenplay";
 import { PageFunction, SmartHandle } from "playwright-core/types/structs";
 
 import {
+  Point,
+  isPoint,
   Geolocation,
   CheckActionOptions,
   ClickActionOptions,
@@ -716,6 +718,7 @@ export class BrowseTheWeb extends Ability {
   /**
    * Click the element specified by the locator.
    *
+   * @overload
    * @param {Locator} locator the locator of the element to click.
    * @param {ClickActionOptions} options (optional) options for interaction.
    * @return {void} Returns after clicking the element
@@ -738,7 +741,41 @@ export class BrowseTheWeb extends Ability {
   public async click(
     locator: Locator,
     options?: ClickActionOptions,
+  ): Promise<void>;
+  /**
+   * Click at the specified point.
+   *
+   * @overload
+   * @param {Point} point the point to click.
+   * @param {ClickActionOptions} options (optional) options for interaction.
+   * @return {void} Returns after clicking at the point
+   * @example
+   * simple call with just point
+   * ```ts
+   * await BrowseTheWeb.as(actor).click(
+   *   { x: 100,  y: 200 }
+   * );
+   * ```
+   * with options
+   * ```ts
+   * await BrowseTheWeb.as(actor).click(
+   *  { x: 100,  y: 200 },
+   *   { button: "right" }
+   * );
+   * ```
+   * @category to interact
+   */
+  public async click(
+    locator: Point,
+    options?: ClickActionOptions,
+  ): Promise<void>;
+  public async click(
+    locator: Locator | Point,
+    options?: ClickActionOptions,
   ): Promise<void> {
+    if (isPoint(locator)) {
+      return this.page.mouse.click(locator.x, locator.y, options);
+    }
     return locator.click(options);
   }
 
