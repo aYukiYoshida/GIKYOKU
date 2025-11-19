@@ -99,6 +99,16 @@ export class BrowseTheWeb extends Ability {
   }
 
   /**
+   * Get the page object
+   *
+   * @returns {Page[]} array of the playwright page object
+   * @category getter
+   */
+  public getPages(): Page[] {
+    return this.page.context().pages();
+  }
+
+  /**
    * Use the page to navigate to the specified URL.
    *
    * @param {string} url the url to access.
