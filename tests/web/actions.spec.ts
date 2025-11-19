@@ -9,6 +9,7 @@ import {
   Check,
   Clear,
   Click,
+  Close,
   DoubleClick,
   DragAndDrop,
   Fill,
@@ -35,6 +36,7 @@ import {
   Download,
   Request,
   Response,
+  BrowserContext,
 } from "@playwright/test";
 import { Actor } from "@testla/screenplay";
 
@@ -114,6 +116,44 @@ test.describe("Web Actions", () => {
     await actor.asks(
       Screen.does.haveUrl("https://the-internet.herokuapp.com/windows"),
     );
+  });
+
+  test("Close", async ({ actor }) => {
+    // To get access of the page object
+    const page: Page = BrowseTheWeb.as(actor).getPage();
+    const context = page.context();
+
+    await actor.attemptsTo(
+      Navigate.to("https://the-internet.herokuapp.com/windows"),
+      Wait.forLoadState("networkidle"),
+    );
+    await expect(page).toHaveURL("https://the-internet.herokuapp.com/windows");
+
+    const [newPage] = await Promise.all<Page>([
+      actor.attemptsTo(Wait.forEvent<Page>("page")),
+      actor.attemptsTo(
+        Click.on(page.getByRole("link", { name: "Click Here" })),
+      ),
+    ]);
+    await expect(newPage).toHaveURL(
+      "https://the-internet.herokuapp.com/windows/new",
+    );
+
+    const urlsBeforeClose = context.pages().map((page) => page.url());
+    expect(urlsBeforeClose).toStrictEqual([
+      "https://the-internet.herokuapp.com/windows",
+      "https://the-internet.herokuapp.com/windows/new",
+    ]);
+
+    await actor.attemptsTo(
+      Close.page(newPage),
+      Bring.toFront(page),
+      Wait.forLoadState("networkidle"),
+    );
+    const urlsAfterClose = context.pages().map((page) => page.url());
+    expect(urlsAfterClose).toStrictEqual([
+      "https://the-internet.herokuapp.com/windows",
+    ]);
   });
 
   test("DragAndDrop", async ({ actor }) => {

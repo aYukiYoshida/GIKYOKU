@@ -355,7 +355,21 @@ export type ReloadActionOptions = {
    */
   waitUntil?: "load" | "domcontentloaded" | "networkidle" | "commit";
 };
+/**
+ * @category options of Actions
+ */
+export type CloseActionOptions = {
+  /**
+   * The reason to be reported to the operations interrupted by the page closure.
+   */
+  reason?: string;
 
+  /**
+   * Defaults to `false`. Whether to run the
+   * [before unload](https://developer.mozilla.org/en-US/docs/Web/Events/beforeunload) page handlers.
+   */
+  runBeforeUnload?: boolean;
+};
 /**
  * @category options of Actions
  */

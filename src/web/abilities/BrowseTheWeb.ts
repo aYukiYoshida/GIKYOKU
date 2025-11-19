@@ -46,6 +46,7 @@ import {
   AttributePayload,
   CountPayload,
   ScreenshotPayload,
+  CloseActionOptions,
 } from "../types";
 
 /**
@@ -144,6 +145,13 @@ export class BrowseTheWeb extends Ability {
   public async bringToFront(page: Page): Promise<void> {
     this.page = page;
     return this.page.bringToFront();
+  }
+
+  /**
+   * Close specified page
+   */
+  public async close(page: Page, options?: CloseActionOptions): Promise<void> {
+    return page.close(options);
   }
 
   /**
