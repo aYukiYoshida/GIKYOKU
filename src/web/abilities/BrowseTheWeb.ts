@@ -91,10 +91,30 @@ export class BrowseTheWeb extends Ability {
   /**
    * Get the page object
    *
+   * @param options options to specify page
    * @returns {Page} the playwright page object
    * @category getter
    */
-  public getPage(): Page {
+  public getPage(
+    options: {
+      /**
+       * Optional URL to get specific page, if multiple pages are opened
+       */
+      url?: string | RegExp;
+    } = {},
+  ): Page {
+    if (options.url) {
+      const url = options.url;
+      const page = this.getPages().find((page) => {
+        if (typeof url === "string") {
+          return page.url() === options.url;
+        } else {
+          return url.test(page.url());
+        }
+      });
+      if (!page) throw new Error(`Page with URL ${url.toString()} not found.`);
+      return page;
+    }
     return this.page;
   }
 
