@@ -10,15 +10,31 @@ import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
  * @category to interact
  */
 export class Bring extends Action {
-  private constructor(private page: Page) {
+  private page: Page | undefined;
+  private url: string | RegExp | undefined;
+  private constructor(
+    private options: {
+      page?: Page;
+      url?: string | RegExp;
+    },
+  ) {
     super();
+    this.page = options.page;
+    this.url = options.url;
   }
 
   /**
    * @category called internally
    */
   public async performAs(actor: Actor): Promise<any> {
-    return BrowseTheWeb.as(actor).bringToFront(this.page);
+    if (this.url) {
+      const page = BrowseTheWeb.as(actor).getPage({ url: this.url });
+      return BrowseTheWeb.as(actor).bringToFront(page);
+    }
+    if (this.page) {
+      return BrowseTheWeb.as(actor).bringToFront(this.page);
+    }
+    throw new Error("Either 'page' or 'url' must be provided to Bring action");
   }
 
   /**
@@ -29,8 +45,14 @@ export class Bring extends Action {
    * @category Factory
    */
   public static toFront(page: Page): Bring {
-    const instance = new Bring(page);
+    const instance = new Bring({ page });
     instance.setCallStackInitializeCalledWith({ page });
+    return instance;
+  }
+
+  public static toFrontByUrl(url: string | RegExp): Bring {
+    const instance = new Bring({ url });
+    instance.setCallStackInitializeCalledWith({ url });
     return instance;
   }
 }

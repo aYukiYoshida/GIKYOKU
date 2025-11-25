@@ -82,40 +82,76 @@ test.describe("Web Actions", () => {
     await expect(page.locator('[class="added-manually"]')).toHaveCount(0);
   });
 
-  test("Bring", async ({ actor }) => {
-    // To get access of the page object
-    const page: Page = BrowseTheWeb.as(actor).getPage();
+  test.describe("Bring", () => {
+    test("by page", async ({ actor }) => {
+      // To get access of the page object
+      const page: Page = BrowseTheWeb.as(actor).getPage();
 
-    await actor.attemptsTo(
-      Navigate.to("https://the-internet.herokuapp.com/windows"),
-      Wait.forLoadState("networkidle"),
-    );
-    await actor.asks(
-      Screen.does.haveUrl("https://the-internet.herokuapp.com/windows"),
-    );
+      await actor.attemptsTo(
+        Navigate.to("https://the-internet.herokuapp.com/windows"),
+        Wait.forLoadState("networkidle"),
+      );
+      await actor.asks(
+        Screen.does.haveUrl("https://the-internet.herokuapp.com/windows"),
+      );
 
-    const [newPage] = await Promise.all([
-      actor.attemptsTo(Wait.forEvent<Page>("page")),
-      actor.attemptsTo(
-        Click.on(page.getByRole("link", { name: "Click Here" })),
-      ),
-    ]);
+      const [newPage] = await Promise.all([
+        actor.attemptsTo(Wait.forEvent<Page>("page")),
+        actor.attemptsTo(
+          Click.on(page.getByRole("link", { name: "Click Here" })),
+        ),
+      ]);
 
-    await actor.attemptsTo(
-      Bring.toFront(newPage as Page),
-      Wait.forLoadState("networkidle"),
-    );
-    await actor.asks(
-      Screen.does.haveUrl("https://the-internet.herokuapp.com/windows/new"),
-    );
+      await actor.attemptsTo(
+        Bring.toFront(newPage as Page),
+        Wait.forLoadState("networkidle"),
+      );
+      await actor.asks(
+        Screen.does.haveUrl("https://the-internet.herokuapp.com/windows/new"),
+      );
 
-    await actor.attemptsTo(
-      Bring.toFront(page),
-      Wait.forLoadState("networkidle"),
-    );
-    await actor.asks(
-      Screen.does.haveUrl("https://the-internet.herokuapp.com/windows"),
-    );
+      await actor.attemptsTo(
+        Bring.toFront(page),
+        Wait.forLoadState("networkidle"),
+      );
+      await actor.asks(
+        Screen.does.haveUrl("https://the-internet.herokuapp.com/windows"),
+      );
+    });
+
+    test("by url", async ({ actor }) => {
+      // To get access of the page object
+      const page: Page = BrowseTheWeb.as(actor).getPage();
+
+      await actor.attemptsTo(
+        Navigate.to("https://the-internet.herokuapp.com/windows"),
+      );
+      await actor.asks(
+        Screen.does.haveUrl("https://the-internet.herokuapp.com/windows"),
+      );
+
+      await Promise.all<Page>([
+        actor.attemptsTo(Wait.forEvent<Page>("page")),
+        actor.attemptsTo(
+          Click.on(page.getByRole("link", { name: "Click Here" })),
+        ),
+      ]);
+
+      await actor.attemptsTo(
+        Bring.toFrontByUrl("https://the-internet.herokuapp.com/windows"),
+      );
+      await actor.asks(
+        Screen.does.haveUrl("https://the-internet.herokuapp.com/windows"),
+      );
+
+      await actor.attemptsTo(
+        Bring.toFrontByUrl("https://the-internet.herokuapp.com/windows/new"),
+        Wait.forLoadState("networkidle"),
+      );
+      await actor.asks(
+        Screen.does.haveUrl("https://the-internet.herokuapp.com/windows/new"),
+      );
+    });
   });
 
   test("Close", async ({ actor }) => {
