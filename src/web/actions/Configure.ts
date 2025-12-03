@@ -34,11 +34,11 @@ export class Configure extends Action {
    */
   public async performAs(actor: Actor): Promise<void> {
     if (this.mode === "geolocation" && this.geolocation !== undefined) {
-      return await BrowseTheWeb.as(actor).setGeolocation(this.geolocation);
+      return BrowseTheWeb.as(actor).setGeolocation(this.geolocation);
     }
     if (this.mode === "network" && this.network !== undefined) {
       const offline = this.network === "offline";
-      return await BrowseTheWeb.as(actor).setOffline(offline);
+      return BrowseTheWeb.as(actor).setOffline(offline);
     }
     throw new Error("Error: no match for Configure.performAs()");
   }
