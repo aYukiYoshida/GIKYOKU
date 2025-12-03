@@ -12,12 +12,7 @@ import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 export class Bring extends Action {
   private page: Page | undefined;
   private url: string | RegExp | undefined;
-  private constructor(
-    private options: {
-      page?: Page;
-      url?: string | RegExp;
-    },
-  ) {
+  private constructor(options: { page?: Page; url?: string | RegExp }) {
     super();
     this.page = options.page;
     this.url = options.url;
