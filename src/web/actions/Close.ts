@@ -10,27 +10,51 @@ import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
  * @category to interact
  */
 export class Close extends Action {
-  private constructor(private page: Page) {
+  private page: Page | undefined;
+  private url: string | RegExp | undefined;
+  private constructor(options: { page?: Page; url?: string | RegExp }) {
     super();
+    this.page = options.page;
+    this.url = options.url;
   }
 
   /**
    * @category called internally
    */
   public async performAs(actor: Actor): Promise<any> {
-    return BrowseTheWeb.as(actor).close(this.page);
+    if (this.url) {
+      const page = BrowseTheWeb.as(actor).getPage({ url: this.url });
+      return BrowseTheWeb.as(actor).close(page);
+    }
+    if (this.page) {
+      return BrowseTheWeb.as(actor).close(this.page);
+    }
+    throw new Error("Either 'page' must be provided to Close action");
   }
 
   /**
-   * Closes page to front.
+   * Close page.
    *
-   * @param {Page} page Page to bring to front
+   * @param {Page} page Page to close
    * @return {Close} new Close instance
    * @category Factory
    */
   public static page(page: Page): Close {
-    const instance = new Close(page);
+    const instance = new Close({ page });
     instance.setCallStackInitializeCalledWith({ page });
+    return instance;
+  }
+
+  /**
+   * Close page by URL.
+   *
+   * @param {string | RegExp} url URL of the page to close
+   * @return {Close} new Close instance
+   * @category Factory
+   */
+  public static pageByUrl(url: string | RegExp): Close {
+    const instance = new Close({ url });
+    instance.setCallStackInitializeCalledWith({ url });
     return instance;
   }
 }
