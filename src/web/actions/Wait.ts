@@ -14,7 +14,7 @@ import {
   Worker,
 } from "@playwright/test";
 import { Action, Actor } from "@testla/screenplay";
-import { PageFunction, SmartHandle } from "playwright-core/types/structs";
+import { PageFunction } from "playwright-core/types/structs";
 
 import { BrowseTheWeb } from "../abilities/BrowseTheWeb";
 import {

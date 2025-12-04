@@ -1,4 +1,3 @@
-import { PageFunction, SmartHandle } from "playwright-core/types/structs";
 import z from "zod";
 
 /**

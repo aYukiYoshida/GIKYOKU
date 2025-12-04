@@ -687,14 +687,11 @@ test.describe("Web Questions", () => {
 
   test("Element.haveScreenshot", async ({ actor }) => {
     const page: Page = BrowseTheWeb.as(actor).getPage();
-    await actor.attemptsTo(
-      Navigate.to("https://the-internet.herokuapp.com/shifting_content/image"),
-      Wait.forLoadState("networkidle"),
-    );
+    await actor.attemptsTo(Navigate.to("http://127.0.0.1:3000"));
 
     expect(
       await actor.asks(
-        Element.of(page.locator("#content").getByRole("img")).haveScreenshot(
+        Element.of(page.getByRole("img")).haveScreenshot(
           "element-positive.png",
         ),
       ),
@@ -704,7 +701,7 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of(page.locator("#content").getByRole("img")).haveScreenshot(
+          Element.of(page.getByRole("img")).haveScreenshot(
             "element-negative.png",
             {
               timeout: 1000,
@@ -719,9 +716,9 @@ test.describe("Web Questions", () => {
 
     expect(
       await actor.asks(
-        Element.of(
-          page.locator("#content").getByRole("img"),
-        ).not.haveScreenshot("element-negative.png"),
+        Element.of(page.getByRole("img")).not.haveScreenshot(
+          "element-negative.png",
+        ),
       ),
     ).toBe(true);
 
@@ -729,11 +726,12 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of(
-            page.locator("#content").getByRole("img"),
-          ).not.haveScreenshot("element-positive.png", {
-            timeout: 1000,
-          }),
+          Element.of(page.getByRole("img")).not.haveScreenshot(
+            "element-positive.png",
+            {
+              timeout: 1000,
+            },
+          ),
         ),
       ).toBe(true);
     } catch (error) {
@@ -743,9 +741,9 @@ test.describe("Web Questions", () => {
   });
 
   test("Screen.haveUrl", async ({ actor }) => {
-    await actor.attemptsTo(Navigate.to("https://example.com"));
+    await actor.attemptsTo(Navigate.to("http://127.0.0.1:3000"));
 
-    expect(await actor.asks(Screen.does.haveUrl("https://example.com"))).toBe(
+    expect(await actor.asks(Screen.does.haveUrl("http://127.0.0.1:3000"))).toBe(
       true,
     );
 
@@ -754,7 +752,7 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Screen.does.haveUrl("https://example.co.jp", { timeout: 1000 }),
+          Screen.does.haveUrl("https://example.com", { timeout: 1000 }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -763,14 +761,14 @@ test.describe("Web Questions", () => {
     expect(urlRes).toBeTruthy();
 
     expect(
-      await actor.asks(Screen.does.not.haveUrl("https://example.co.jp")),
+      await actor.asks(Screen.does.not.haveUrl("https://example.com")),
     ).toBe(true);
 
     let notTextRes = false;
     try {
       expect(
         await actor.asks(
-          Screen.does.not.haveUrl("https://example.com", { timeout: 1000 }),
+          Screen.does.not.haveUrl("http://127.0.0.1:3000", { timeout: 1000 }),
         ),
       ).toBe(true);
     } catch (error) {
@@ -780,9 +778,9 @@ test.describe("Web Questions", () => {
   });
 
   test("Screen.haveTitle", async ({ actor }) => {
-    await actor.attemptsTo(Navigate.to("https://google.com"));
+    await actor.attemptsTo(Navigate.to("http://127.0.0.1:3000"));
 
-    expect(await actor.asks(Screen.does.haveTitle("Google"))).toBe(true);
+    expect(await actor.asks(Screen.does.haveTitle("Hello World"))).toBe(true);
 
     // toHave.title test: expect the question to fail if the expected title is not correct
     let titleRes = false;
@@ -805,7 +803,7 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Screen.does.not.haveTitle("Google", {
+          Screen.does.not.haveTitle("Hello World", {
             timeout: 1000,
           }),
         ),
@@ -818,7 +816,7 @@ test.describe("Web Questions", () => {
 
   test("Screen.haveScreenshot", async ({ actor }) => {
     const page: Page = BrowseTheWeb.as(actor).getPage();
-    await actor.attemptsTo(Navigate.to("https://example.com/"));
+    await actor.attemptsTo(Navigate.to("http://127.0.0.1:3000"));
 
     expect(
       await actor.asks(Screen.of(page).haveScreenshot("screen-positive.png")),
