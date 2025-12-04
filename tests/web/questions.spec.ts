@@ -778,9 +778,9 @@ test.describe("Web Questions", () => {
   });
 
   test("Screen.haveTitle", async ({ actor }) => {
-    await actor.attemptsTo(Navigate.to("https://google.com"));
+    await actor.attemptsTo(Navigate.to("http://127.0.0.1:3000"));
 
-    expect(await actor.asks(Screen.does.haveTitle("Google"))).toBe(true);
+    expect(await actor.asks(Screen.does.haveTitle("Hello World"))).toBe(true);
 
     // toHave.title test: expect the question to fail if the expected title is not correct
     let titleRes = false;
@@ -803,7 +803,7 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Screen.does.not.haveTitle("Google", {
+          Screen.does.not.haveTitle("Hello World", {
             timeout: 1000,
           }),
         ),
