@@ -15,7 +15,7 @@ const server = http.createServer((request, response) => {
   </head>
   <body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#0f172a;">
     <!-- コンテンツは SVG のみ -->
-    <svg width="360" height="160" viewBox="0 0 360 160"
+    <svg width="160" height="160" viewBox="0 0 160 160"
          xmlns="http://www.w3.org/2000/svg" role="img"
          aria-labelledby="title desc">
       <title id="title">Hello from the server</title>
@@ -32,25 +32,22 @@ const server = http.createServer((request, response) => {
         </linearGradient>
       </defs>
 
-      <!-- カード背景 -->
-      <rect x="16" y="16" rx="20" ry="20" width="328" height="128"
-            fill="url(#bg)" />
-      <rect x="20" y="20" rx="18" ry="18" width="320" height="120"
-            fill="#020617" opacity="0.9" />
+      <!-- カード背景（正方形・横幅に合わせたサイズ） -->
+      <rect x="16" y="16" rx="20" ry="20" width="128" height="128"
+        fill="url(#bg)" />
+      <rect x="20" y="20" rx="18" ry="18" width="120" height="120"
+        fill="#020617" opacity="0.9" />
 
-      <!-- 左側アイコン的な図形 -->
-      <circle cx="70" cy="80" r="30" fill="url(#accent)" opacity="0.9" />
-      <path d="M55 80 L70 65 L85 80 L70 95 Z"
-            fill="#020617" stroke="#e5e7eb" stroke-width="1.2"
-            stroke-linejoin="round" />
-
-      <!-- テキスト -->
-      <text x="130" y="80" fill="#e5e7eb"
-        font-family="'Noto Sans JP', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-        font-size="22" font-weight="600"
-        dominant-baseline="middle">
-        Hello World
-      </text>
+      <!-- アイコン（カード中央に大きめに配置） -->
+      <circle cx="80" cy="80" r="38" fill="url(#accent)" opacity="0.9" />
+      <!-- 右向き矢印 -->
+      <path
+        d="M60 70 H82 L82 60 L102 80 L82 100 L82 90 H60 Z"
+        fill="#020617"
+        stroke="#e5e7eb"
+        stroke-width="2"
+        stroke-linejoin="round"
+      />
     </svg>
   </body>
   </html>
