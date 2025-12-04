@@ -691,7 +691,7 @@ test.describe("Web Questions", () => {
 
     expect(
       await actor.asks(
-        Element.of(page.getByRole("heading")).haveScreenshot(
+        Element.of(page.getByRole("img")).haveScreenshot(
           "element-positive.png",
         ),
       ),
@@ -701,7 +701,7 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of(page.getByRole("heading")).haveScreenshot(
+          Element.of(page.getByRole("img")).haveScreenshot(
             "element-negative.png",
             {
               timeout: 1000,
@@ -716,7 +716,7 @@ test.describe("Web Questions", () => {
 
     expect(
       await actor.asks(
-        Element.of(page.getByRole("heading")).not.haveScreenshot(
+        Element.of(page.getByRole("img")).not.haveScreenshot(
           "element-negative.png",
         ),
       ),
@@ -726,7 +726,7 @@ test.describe("Web Questions", () => {
     try {
       expect(
         await actor.asks(
-          Element.of(page.getByRole("heading")).not.haveScreenshot(
+          Element.of(page.getByRole("img")).not.haveScreenshot(
             "element-positive.png",
             {
               timeout: 1000,
