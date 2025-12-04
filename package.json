@@ -12,7 +12,7 @@
     "prebuild": "failsafe clean lint format test",
     "build": "tsc --project ./tsconfig-build.json",
     "build:docs": "typedoc",
-    "server": "node tests/server/index.js",
+    "server": "node scripts/server.js",
     "test": "npx playwright test",
     "test:debug": "DEBUG=testla:sp npx playwright test",
     "test:api": "npx playwright test tests/api",
